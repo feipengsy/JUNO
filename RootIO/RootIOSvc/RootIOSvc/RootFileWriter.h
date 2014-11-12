@@ -1,0 +1,75 @@
+#ifndef ROOTIOUTIL_ROOTFILEWRITER_H
+#define ROOTIOUTIL_ROOTFILEWRITER_H
+
+#include "TObject.h"
+
+#include <string>
+#include <vector>
+
+class RootOutputFileHandle;
+class DataRegistritionSvc;
+class TTree;
+class TDirectory;
+class TObject;
+
+namespace JM {
+    class TreeMetaData;
+}
+
+class RootFileWriter {
+
+public:
+    RootFileWriter(const std::string& treepath, const std::string& headername, const std::string& eventname, DataRegistritionSvc* regSvc);
+    ~RootFileWriter();
+
+    /// Get current file handle
+    RootOutputFileHandle* getFile();
+
+    /// Write current state of addr to disk.
+    bool write();
+
+    /// Write tree to file and close file.
+    bool close();
+
+    /// Start a new output file
+    bool newFile(RootOutputFileHandle* file);
+
+    /// Return the number of entries in the output stream
+    int entries();
+
+    int fileEntries();
+
+    void setAddress(void* nav, void* header, void* event);
+
+private:
+    /// Write event data to tree
+    bool writeData();
+ 
+    /// Write Evtnavigators to tree
+    bool writeNav();
+
+    /// Build data for auto-loading
+    void fillBID(TObject* obj, int bid);
+
+private:
+    RootOutputFileHandle* m_file;
+    TTree* m_tree;
+    TTree* m_navTree;
+    JM::TreeMetaData* m_treeMetaData;
+    TDirectory* m_dir;
+    std::string m_headerName, m_eventName, m_path;
+    bool m_withNav;
+    int m_entries, m_fileEntries;
+    void* m_headerAddr;
+    void* m_eventAddr;
+    void* m_navAddr;
+    DataRegistritionSvc* m_regSvc;
+   
+    // For building TreeMetaData auto-loading data.
+    std::vector<std::string> m_guid;
+    std::vector<std::vector<Short_t> > m_bid;
+    std::vector<std::vector<Int_t> > m_uid;
+};
+
+
+#endif

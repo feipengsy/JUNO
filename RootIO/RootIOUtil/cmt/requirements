@@ -1,0 +1,19 @@
+package RootIOUtil
+
+use SniperKernel v*
+use BaseEvent v* DataModel
+use ROOT v* Externals
+
+macro_append TreeMetaData_cintflags "-I$(CMTINSTALLAREA)/include"
+macro_append FileMetaData_cintflags "-I$(CMTINSTALLAREA)/include"
+macro_append SmartRef_cintflags "-I$(CMTINSTALLAREA)/include"
+
+apply_pattern install_more_includes more=RootIOUtil
+apply_pattern cint_dictionary files=../RootIOUtil/TreeMetaData.h
+apply_pattern cint_dictionary files=../RootIOUtil/FileMetaData.h
+apply_pattern cint_dictionary files=../RootIOUtil/SmartRef.h
+
+include_dirs $(ROOTIOUTILROOT)/RootIOUtil
+library RootIOUtil *.cc
+apply_pattern linker_library library=RootIOUtil
+

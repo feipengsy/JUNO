@@ -1,0 +1,20 @@
+package RootIOTest
+
+use BaseEvent v* DataModel
+use RootIOSvc v* RootIO
+use RootIOUtil v* RootIO
+use SniperKernel v*
+use ROOT v* Externals
+use Boost v* Externals
+use PhyEvent v* DataModel
+use DataRegistritionSvc v* DataModel
+use EvtNavigator v* DataModel
+use BufferMemMgr v* CommonSvc
+
+use SimEventV2 v* DataModel
+use CalibEvent v* DataModel
+
+library RootIOTest *.cc
+apply_pattern linker_library library=RootIOTest
+apply_pattern install_python_modules
+
