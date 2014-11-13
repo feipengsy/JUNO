@@ -189,7 +189,7 @@ bool RootFileWriter::newFile(RootOutputFileHandle* file)
 
     // Make the TTree holding data
     std::string title = "Tree at " + m_path + " holding " + m_eventName;
-    std::string treename = m_path.substr(last).substr(m_path.substr(last).rfind("::")+2);
+    std::string treename = m_path.substr(last).substr(m_path.substr(last).rfind("::")+1);
 
     std::string branchname_header = m_headerName.substr(m_headerName.rfind("::")+2);
     std::string branchname_event = m_eventName.substr(m_eventName.rfind("::")+2);
