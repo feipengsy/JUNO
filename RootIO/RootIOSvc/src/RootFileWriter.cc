@@ -195,7 +195,7 @@ bool RootFileWriter::newFile(RootOutputFileHandle* file)
     std::string branchname_event = m_eventName.substr(m_eventName.rfind("::")+2);
 
     m_tree = new TTree(treename.c_str(),title.c_str());
-    m_tree->Branch(branchname_header.c_str(),m_headerName.c_str(),&m_headerAddr);
+    m_tree->Branch(branchname_header.c_str(),m_headerName.c_str(),&m_headerAddr,16000,1);
     // TODO if it is nessesary for users to decide the buffsize and split level
     // Set split to 1 by default
     m_tree->Branch(branchname_event.c_str(),m_eventName.c_str(),&m_eventAddr,16000,1);
