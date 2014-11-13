@@ -128,10 +128,9 @@ void JM::SmartRef::SetObject(JM::EventObject* obj)
     uid = obj->GetUniqueID();
   } 
   else {
-    // TODO wrong uid
     uid = TProcessID::AssignID(obj);
   }
-  m_pid = TProcessID::GetProcessWithUID(uid,obj);
+  m_pid = TProcessID::GetProcessWithUID(obj->GetUniqueID(),obj);
   ResetBit(kHasUUID);
   SetUniqueID(uid); 
 
