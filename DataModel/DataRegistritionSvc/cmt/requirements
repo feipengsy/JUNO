@@ -1,0 +1,11 @@
+package DataRegistritionSvc
+
+use SniperKernel v*
+use Boost v* Externals
+
+apply_pattern install_more_includes more=DataRegistritionSvc
+apply_pattern install_python_modules
+
+library DataRegistritionSvc *.cc
+apply_pattern linker_library library=DataRegistritionSvc
+

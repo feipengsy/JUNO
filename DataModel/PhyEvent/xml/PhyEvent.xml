@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE xdd SYSTEM "xdd.dtd">
+ 
+<xdd>
+    <package name="PhyEvent">
+ 
+        <import name="Event/EventObject"/>
+ 
+        <class name="PhyEvent"
+               author="LI Teng"
+               desc="Physics Event Class">
+ 
+            <base name="EventObject"/>
+ 
+            <attribute name="energy"
+                       type="Float_t"
+                       desc=""
+                       init="0.0"/>
+ 
+            <attribute name="rawEvis"
+                       type="Float_t"
+                       desc=""
+                       init="0.0"/>
+ 
+            <attribute name="enrec"
+                       type="Float_t"
+                       desc=""
+                       init="0.0"/>
+ 
+            <attribute name="eprec"
+                       type="Float_t"
+                       desc=""
+                       init="0.0"/>
+ 
+        </class>
+    </package>
+</xdd>

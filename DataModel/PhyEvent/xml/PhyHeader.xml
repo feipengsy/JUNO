@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE xdd SYSTEM "xdd.dtd">
+ 
+<xdd>
+    <package name="PhyEvent">
+ 
+        <import name="Event/HeaderObject"/>
+        <import name="Event/PhyEvent"/>
+ 
+        <class name="PhyHeader"
+               author="LI Teng"
+               desc="Physics Header Class">
+ 
+            <base name="HeaderObject"/>
+ 
+            <SmartRelation  type="JM::PhyEvent"
+                            desc="SmartRef to the phyEvent"
+                            nonconstaccessor="TRUE"/>
+ 
+        </class>
+    </package>
+</xdd>
