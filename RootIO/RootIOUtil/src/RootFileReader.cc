@@ -105,7 +105,7 @@ bool RootFileReader::ReadFiles(NavTreeList* navs, vector<string>& path, vector<s
 
 JM::FileMetaData* RootFileReader::GetFileMetaData(TFile* file)
 {
-  TObject* obj = file->Get("JM::FileMetaData");
+  TObject* obj = file->Get("FileMetaData");
   if (!obj) return 0;
   return dynamic_cast<JM::FileMetaData*>(obj);
 }

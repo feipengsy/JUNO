@@ -2,20 +2,20 @@
 #define ROOTIOUTIL_SMARTREF_H
 
 #include "TObject.h"
-#include "Event/EventObject.h"
-#include "TRef.h"
-#include "TClass.h"
+
+class TProcessID;
 
 namespace JM 
 {
+  class EventObject;
 
   class SmartRef: public TObject
   {
   private:
 
-    Long64_t m_entry;        // entry number of the referenced header
-    TRef     m_ref;          // TRef pointed to the referenced header
-    bool     m_IsReferring;  //! indicate weather SmartRef is currently referring to a object
+    Long64_t      m_entry;       //  Entry number of the referenced object
+    EventObject*  m_refObjTemp;  //! Transient pointer to the referenced object
+    TProcessID*   m_pid;         //! Transient pointer to TProcessID when SmartRef was written 
   
 
   protected:
@@ -23,17 +23,16 @@ namespace JM
 
   public:
   // Default Constructor
-  SmartRef() : m_entry(-1),
-               m_IsReferring(false) { Class()->IgnoreTObjectStreamer(); }
+  SmartRef();
   
   // Copy Constructor
   SmartRef(const SmartRef&);
 
-  // Default Destructor
+  // Destructor
   virtual ~SmartRef();
   
   // Set the referenced object
-  void operator=(TObject* value);
+  void operator=(EventObject* value);
 
   // Assignment operator
   SmartRef& operator=(const SmartRef&);
@@ -48,22 +47,22 @@ namespace JM
   void clear();
   
   // Set the referenced object
-  void SetObject(TObject* value);
+  void SetObject(EventObject* value);
   
   // Get the refernced object
   EventObject* GetObject();
+
+  // Get the TProcessID of the SmartRef
+  TProcessID* GetPID() const { return m_pid; }
   
   // Get the entry number of the referenced object
-  const Long64_t& entry() const;
+  const Long64_t& entry() const { return m_entry; }
   
   // Set the entry number of the referenced object
-  void setEntry(const Long64_t& value);
-  
-  // Get the inner TRef
-  const TRef& ref() const;
+  void setEntry(const Long64_t& value) { m_entry = value; }
 
-  // Get the inner TRef(non const)
-  TRef& ref();
+  friend bool operator==(const SmartRef& r1, const SmartRef& r2);
+  friend bool operator!=(const SmartRef& r1, const SmartRef& r2);
   
   ClassDef(SmartRef,1);
   
@@ -72,25 +71,5 @@ namespace JM
 
 } // namespace JM;
 
-
-inline const Long64_t& JM::SmartRef::entry() const 
-{
-  return m_entry;
-}
-
-inline void JM::SmartRef::setEntry(const Long64_t& value) 
-{
-  m_entry = value;
-}
-
-inline const TRef& JM::SmartRef::ref() const 
-{
-  return m_ref;
-}
-
-inline TRef& JM::SmartRef::ref()
-{
-  return m_ref;
-}
 
 #endif ///ROOTIOUTIL_SMARTREF_H

@@ -50,6 +50,8 @@ public:
 
     void writing(const std::string& path);
 
+    bool hasPath(const std::string& path);
+
 private:
     TFile* m_file;
     TTree* m_navTree;
@@ -70,17 +72,22 @@ public:
     // Singleton
     static RootOutputFileManager* get();
 
-    // Get file of given name, increase file's ref count
-    RootOutputFileHandle* get_file(const std::string& filename, const std::string& path, int priority, const std::map<std::string, int>& otherPath);
+    // Create a new output file
+    void new_file(const std::string& filename, const std::map<std::string, int>& pathMap);
 
     // Get file of given name
-    RootOutputFileHandle* get_file(const std::string& filename);
+    RootOutputFileHandle* get_file_with_name(const std::string& filename);
+
+    // Get file of given path, increase reference count of file
+    // TODO One output stream can only go to one output file
+    RootOutputFileHandle* get_file_with_path(const std::string& path);
 
     // Decrease file's ref count, really close when it hits zero.
     void close_file(const std::string& filename);
 
 private:
     // Singleton
+    // TODO Singleton within a task?
     RootOutputFileManager();
 
 private:

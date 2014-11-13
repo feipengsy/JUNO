@@ -14,7 +14,7 @@ RootOutputFileHandle::RootOutputFileHandle(const std::string& filename,
     : m_file(TFile::Open(filename.c_str(),"recreate","RootOutputStream file"))
     , m_navTree(new TTree("navigator", "Tree for EvtNavigator"))
     , m_fileMetaData(new JM::FileMetaData())
-    , m_refCount(1)
+    , m_refCount(0)
     , m_navAddr(0)
 {
     std::map<std::string, int>::const_iterator it, end = paths.end();
@@ -65,7 +65,7 @@ void RootOutputFileHandle::close()
     m_file->cd();
 
     // Write out file meta data
-    m_fileMetaData->Write();
+    m_fileMetaData->Write("FileMetaData");
 
     // Write out geometry infomation
 
@@ -129,6 +129,12 @@ void RootOutputFileHandle::setNavAddr(void* navAddr)
     m_navAddr = navAddr;
 }
 
+bool RootOutputFileHandle::hasPath(const std::string& path)
+{
+    if (m_paths.find(path) != m_paths.end()) return true;
+    return false; 
+}
+
 /*   RootOutputFileManager   */
 
 RootOutputFileManager* RootOutputFileManager::m_fileMgr = 0;
@@ -147,33 +153,35 @@ RootOutputFileManager* RootOutputFileManager::get()
     return m_fileMgr;
 }
 
-RootOutputFileHandle* RootOutputFileManager::get_file(const std::string& filename, 
-                                                     const std::string& path, 
-                                                     int priority, 
-                                                     const std::map<std::string, int>& otherPath)
+void RootOutputFileManager::new_file(const std::string& filename, 
+                                     const std::map<std::string, int>& pathMap)
 {
     FileMap::iterator it = m_filemap.find(filename);
-    if (it == m_filemap.end()) {  // miss
-
+    if (it == m_filemap.end()) {
         // Generate a new RootOutputFile with the paths and coresponding data priotity
-        std::map<std::string, int> paths = otherPath;
-        paths.insert(std::make_pair(path,priority));
-        RootOutputFileHandle* filehandle = new RootOutputFileHandle(filename, paths);
+        RootOutputFileHandle* filehandle = new RootOutputFileHandle(filename, pathMap);
         m_filemap[filename] = filehandle;
-        filehandle->writing(path);
-        return filehandle;
     }
-    // hit
-    it->second->addRef();
-    it->second->writing(path);
-    return it->second;
+    return;
 }
 
-RootOutputFileHandle* RootOutputFileManager::get_file(const std::string& filename) 
+RootOutputFileHandle* RootOutputFileManager::get_file_with_name(const std::string& filename) 
 {
     FileMap::iterator it = m_filemap.find(filename);
     if (it == m_filemap.end()) return 0;
     return it->second;
+}
+
+RootOutputFileHandle* RootOutputFileManager::get_file_with_path(const std::string& path)
+{
+    FileMap::iterator it, end = m_filemap.end();
+    for (it = m_filemap.begin(); it != end; ++it) {
+        if (it->second->hasPath(path)) {
+            it->second->addRef();
+            return it->second;
+        }
+    }
+    return 0;
 }
 
 void RootOutputFileManager::close_file(const std::string& filename)
