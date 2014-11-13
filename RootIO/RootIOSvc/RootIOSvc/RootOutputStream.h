@@ -24,8 +24,6 @@ public:
     RootOutputStream(const std::string& headername, 
                      const std::string& eventname, 
                      const std::string& treepath,
-                     int priority,
-                     const PathMap& otherPath,
                      DataRegistritionSvc* regSvc);
     virtual ~RootOutputStream();
 
@@ -38,9 +36,6 @@ public:
     /// Write tree to file and close file.
     bool close();
 
-    /// Attach additional TObject to be written to the stream.
-    bool attachObj(TObject* obj);
-
     bool setAddress(JM::EvtNavigator* nav);
 
     /// Start a new output file
@@ -50,8 +45,6 @@ public:
 
 private:
     std::string m_headerName, m_eventName, m_path;
-    int m_eventPriority;
-    PathMap m_otherPaths; // Other paths to be written to the same file(if any)
     RootFileWriter* m_writer;
 };
 

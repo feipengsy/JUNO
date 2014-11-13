@@ -189,10 +189,10 @@ bool RootFileWriter::newFile(RootOutputFileHandle* file)
 
     // Make the TTree holding data
     std::string title = "Tree at " + m_path + " holding " + m_eventName;
-    std::string treename = m_path.substr(last);
+    std::string treename = m_path.substr(last).substr(m_path.substr(last).rfind("::")+2);
 
-    std::string branchname_header = m_headerName + "_branch";
-    std::string branchname_event = m_eventName + "_branch";
+    std::string branchname_header = m_headerName.substr(m_headerName.rfind("::")+2);
+    std::string branchname_event = m_eventName.substr(m_eventName.rfind("::")+2);
 
     m_tree = new TTree(treename.c_str(),title.c_str());
     m_tree->Branch(branchname_header.c_str(),m_headerName.c_str(),&m_headerAddr);
@@ -201,7 +201,7 @@ bool RootFileWriter::newFile(RootOutputFileHandle* file)
     m_tree->Branch(branchname_event.c_str(),m_eventName.c_str(),&m_eventAddr,16000,1);
 
     m_treeMetaData = new JM::TreeMetaData();
-    m_treeMetaData->SetTreeName(m_path);
+    m_treeMetaData->SetTreeName(m_path.substr(0,last)+treename);
 
     // Make the TTree holding EvtNavigator
     // Save EvtNavigator together with the last path in the file

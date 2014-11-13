@@ -4,6 +4,7 @@
 #include "SniperKernel/SniperPtr.h"
 #include "RootIOSvc/RootOutputStream.h"
 #include "DataRegistritionSvc/DataRegistritionSvc.h"
+#include "RootIOUtil/RootOutputFileManager.h"
 
 DECLARE_SERVICE(RootOutputSvc);
 
@@ -74,7 +75,7 @@ bool RootOutputSvc::initializeOutputStream()
 
     // The first string of the inner vector is the path of the stream to be generated.
     // Rest of the strings are the path of other streams share the same output file(if any).
-    std::map<int, std::vector<std::string> > propaths;
+    std::map<int, std::vector<std::string> > priority2paths;
 
     OutputFileMap::iterator it, it2, end  = m_outputFileMap.end();
     for (it = m_outputFileMap.begin(); it != end; ++it) {
@@ -93,26 +94,26 @@ bool RootOutputSvc::initializeOutputStream()
             if (it2->second == it->second) { paths.push_back(it2->first); }
         }
         // Map, should be automatically sorted.
-        propaths.insert(std::make_pair(priority, paths));
+        priority2paths.insert(std::make_pair(priority, paths));
     }
 
     
-    // Now initialize the RootOutputStreams.
-    std::map<int, std::vector<std::string> >::iterator pit, pend = propaths.end();
-    for (pit = propaths.begin(); pit != pend; ++pit) {
+    // Now create output file and initialize RootOutputStreams.
+    std::map<int, std::vector<std::string> >::iterator pit, pend = priority2paths.end();
+    for (pit = priority2paths.begin(); pit != pend; ++pit) {
+        // Create output file
+        std::map<std::string, int> path2priority;
+        std::vector<std::string>::iterator oit, oend = pit->second.end();
+        for (oit = pit->second.begin(); oit != oend; ++oit) {
+            int opriority = m_regSvc->getPriority(*oit);
+            path2priority.insert(std::make_pair(*oit, opriority));
+        }
         std::string primary_path = pit->second[0];
+        RootOutputFileManager::get()->new_file(m_outputFileMap[primary_path], path2priority);
+        // Create output stream
         std::string headerName = m_regSvc->getHeaderName(primary_path);
         std::string eventName = m_regSvc->getEventName(primary_path);
-        std::map<std::string, int> otherPaths;
-        if (pit->second.size() > 1) {
-            // Have other paths
-            std::vector<std::string>::iterator oit, oend = pit->second.end();
-            for (oit = pit->second.begin() + 1; oit != oend; ++oit) {
-                int opriority = m_regSvc->getPriority(*oit);
-                otherPaths.insert(std::make_pair(*oit, opriority));
-            }
-        }
-        RootOutputStream* stream = new RootOutputStream(headerName, eventName, primary_path, pit->first, otherPaths, m_regSvc);
+        RootOutputStream* stream = new RootOutputStream(headerName, eventName, primary_path, m_regSvc);
         // Start the output file
         stream->newFile(m_outputFileMap[primary_path]);
         // Then the vector is sorted according to priotity
@@ -193,17 +194,18 @@ bool RootOutputSvc::attachObj(const std::string& path, TObject* obj)
 
 bool RootOutputSvc::doAttachObj(const std::string& path, TObject* obj)
 {
-    OutputStreamVector::iterator it, end = m_outputStreams.end();
-    for (it = m_outputStreams.begin();it != end;++it) {
-        LogDebug << "* Path: " << (*it)->path() << std::endl;
-        if (path == (*it)->path()) {
+    OutputFileMap::iterator it, end = m_outputFileMap.end();
+    for (it = m_outputFileMap.begin();it != end;++it) {
+        if (path == it->first) {
             // Hit
-            bool ok = (*it)->attachObj(obj);
-            if (!ok) {
-                LogError << "Failed to attach " << obj->ClassName()
-                         << std::endl;
+            // File will always be found
+            RootOutputFileHandle* file = RootOutputFileManager::get()->get_file_with_name(it->second);
+            if (strcmp(obj->ClassName(), "TGeoManager") == 0) {
+                file->addGeoManager(static_cast<TGeoManager*>(obj));
+                return true;
             }
-            return ok;
+            // TODO Other object type... 
+            return true;
         }
     }
     // Miss

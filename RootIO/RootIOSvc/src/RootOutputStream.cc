@@ -10,15 +10,11 @@
 RootOutputStream::RootOutputStream(const std::string& headername,
                                    const std::string& eventname,
                                    const std::string& treepath, 
-                                   int priority,
-                                   const PathMap& otherPath,
                                    DataRegistritionSvc* regSvc)
     : BaseIOStream("RootOutputStream") 
     , m_headerName(headername)
     , m_eventName(eventname)
     , m_path(treepath)
-    , m_eventPriority(priority)
-    , m_otherPaths(otherPath)
     , m_writer(new RootFileWriter(treepath, headername, eventname, regSvc))
 {
 }
@@ -55,17 +51,6 @@ bool RootOutputStream::close()
     return true;
 }
 
-bool RootOutputStream::attachObj(TObject* obj)
-{
-    RootOutputFileHandle* file =  m_writer->getFile();
-    if (strcmp(obj->ClassName(), "TGeoManager") == 0) {
-        file->addGeoManager(static_cast<TGeoManager*>(obj));
-        return true;
-    }
-    // TODO Other object type... 
-    return false;
-}
-
 bool RootOutputStream::setAddress(JM::EvtNavigator* nav)
 {
     void* header = nav->getHeader(m_path);
@@ -85,7 +70,7 @@ bool RootOutputStream::newFile(const std::string& filename)
 
     this->close();
 
-    bool ok = m_writer->newFile(RootOutputFileManager::get()->get_file(filename, m_path, m_eventPriority, m_otherPaths));
+    bool ok = m_writer->newFile(RootOutputFileManager::get()->get_file_with_path(m_path));
 
     if (ok) {
         LogDebug << "Start a new file: " << filename
