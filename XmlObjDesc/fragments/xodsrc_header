@@ -1,0 +1,5 @@
+pythonexe     = python
+parsetool     = $(XMLOBJDESCROOT)/scripts/genSrc.py
+dest          = ../src/
+
+${CONSTITUENT}_cleanuplist =

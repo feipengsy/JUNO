@@ -1,0 +1,7 @@
+${CONSTITUENT} :: $(dest)${NAME}.cc
+
+$(dest)${NAME}.cc : ${FULLNAME}
+	@-mkdir -p $(dest)
+	cd $(dest); $(pythonexe) $(parsetool) $(XODflags) ${FULLNAME}
+
+

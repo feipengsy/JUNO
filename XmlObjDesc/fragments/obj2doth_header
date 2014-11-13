@@ -1,0 +1,23 @@
+
+pythonexe     = python
+parsetool     = $(XMLOBJDESCROOT)/scripts/godII.py
+dest          = ../Event/
+dtdfile       = ../$(xmlsrc)/xdd.dtd 
+
+${CONSTITUENT}_output = $(dest)
+
+
+${CONSTITUENT} :: $(dtdfile)
+	@echo "-----> ${CONSTITUENT} ok"
+
+
+
+$(dtdfile) : $(XMLOBJDESCROOT)/xml_files/xdd.dtd
+	@echo "Copying global DTD to current package"
+	@cp $(XMLOBJDESCROOT)/xml_files/xdd.dtd $(dtdfile)
+
+${CONSTITUENT}_headerlist = 
+${CONSTITUENT}_obj2dothlist = 
+${CONSTITUENT}_cleanuplist =
+
+
