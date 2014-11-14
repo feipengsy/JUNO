@@ -35,6 +35,32 @@ void InputFileHandle::UpdateFile(TFile* file)
   m_status = true;
 }
 
+void InputFileHandle::AddTreeRef()
+{
+  ++m_activeTrees;
+}
+
+void InputFileHandle::DecTreeRef()
+{
+  --m_activeTrees;
+  if (m_activeTrees <= 0 && !m_navTreeRefFlag) {
+    this->close();
+  }
+}
+
+void InputFileHandle::SetNavTreeRef()
+{
+  m_navTreeRefFlag = true;
+}
+
+void InputFileHandle::ResetNavTreeRef()
+{
+  m_navTreeRefFlag = false;
+  if (m_activeTrees <= 0) {
+    this->close();
+  }
+}
+
 void InputFileHandle::SetTreeInfo(std::map<int,std::string>& treeinfo) 
 {
     m_treeInfo = treeinfo;
@@ -77,8 +103,7 @@ void InputFileManager::AddTreeRef(int fileid)
 
 void InputFileManager::DecTreeRef(int fileid)
 {
-  int active = m_files[fileid]->DecTreeRef();
-  if (0 == active) close(fileid);
+  m_files[fileid]->DecTreeRef();
 }
 
 void InputFileManager::SetNavTreeRef(int fileid)

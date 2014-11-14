@@ -37,16 +37,16 @@ public:
     TFile* GetFile() { return m_file; }
 
     // Add number of active trees by one
-    void AddTreeRef() { ++m_activeTrees; }
+    void AddTreeRef();
 
     // Minus number of active trees by one
-    int DecTreeRef() { return --m_activeTrees; }
+    void DecTreeRef();
 
     // Set the nav tree reference flag
-    void SetNavTreeRef() { m_navTreeRefFlag = true; }
+    void SetNavTreeRef();
 
     // Reset the nav tree reference flag
-    void ResetNavTreeRef() { m_navTreeRefFlag = false; }
+    void ResetNavTreeRef();
 
     // Get the status of the file
     bool GetStatus() const { return m_status; }
