@@ -72,6 +72,16 @@ void InputElementKeeper::DecTreeRef(int fileid)
   m_fileMgr->DecTreeRef(fileid);
 }
 
+void InputElementKeeper::SetNavTreeRef(int fileid)
+{
+  m_fileMgr->SetNavTreeRef(fileid);
+}
+
+void InputElementKeeper::ResetNavTreeRef(int fileid)
+{
+  m_fileMgr->ResetNavTreeRef(fileid);
+}
+
 void InputElementKeeper::DelObj(Int_t uid, TProcessID* pid, Long64_t entry)
 {
   int treeid = m_table->GetTreeID(uid, pid);
@@ -94,7 +104,6 @@ bool InputElementKeeper::GetNavTree(int fileid, TTree*& tree)
 {
   if (!CheckFileStatus(fileid)) {
     OpenFile(fileid); // TODO if fail to open file
-    AddTreeRef(fileid);
   }
   TFile* file = m_fileMgr->GetFile(fileid);
   tree = RootFileReader::GetNavTree(file);

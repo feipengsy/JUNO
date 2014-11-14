@@ -17,7 +17,6 @@ NavTreeHandle::NavTreeHandle(int fileid, const std::string& filename)
 
 NavTreeHandle::~NavTreeHandle()
 {
-// TODO maybe we need to close the files
 }
 
 bool NavTreeHandle::open()
@@ -27,6 +26,7 @@ bool NavTreeHandle::open()
     LogDebug << "Getting nav tree from " << m_filename
              << std::endl;
     bool ok = keeper->GetNavTree(m_fileID, m_tree);
+    keeper->SetNavTreeRef(m_fileID);
     if (!ok) {
         LogError << "Fail to open file for nav tree"
                  << std::endl;
@@ -51,7 +51,7 @@ bool NavTreeHandle::leave()
 
     InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
     // dec reference to the file owning this nav tree by one
-    keeper->DecTreeRef(m_fileID);
+    keeper->ResetNavTreeRef(m_fileID);
     m_tree = 0;
     m_addr = 0;
     m_entry = -1;

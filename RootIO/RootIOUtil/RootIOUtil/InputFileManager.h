@@ -42,6 +42,12 @@ public:
     // Minus number of active trees by one
     int DecTreeRef() { return --m_activeTrees; }
 
+    // Set the nav tree reference flag
+    void SetNavTreeRef() { m_navTreeRefFlag = true; }
+
+    // Reset the nav tree reference flag
+    void ResetNavTreeRef() { m_navTreeRefFlag = false; }
+
     // Get the status of the file
     bool GetStatus() const { return m_status; }
 
@@ -57,6 +63,7 @@ public:
   private:
     std::string m_name;  // Name of the file
     bool m_status;  // Status of the file
+    bool m_navTreeRefFlag;
     std::map<int,std::string> m_treeInfo;
     int m_activeTrees;
     TFile* m_file;
@@ -83,6 +90,12 @@ public:
   
     // Minus number of active trees by one
     void DecTreeRef(int fileid);
+
+    // Set the nav tree reference flag
+    void SetNavTreeRef(int fileid);
+
+    // Reset the nav tree reference flag
+    void ResetNavTreeRef(int fileid);
 
     // Get the pointer to TFile
     TFile* GetFile(int fileid);

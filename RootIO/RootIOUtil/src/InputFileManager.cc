@@ -4,7 +4,12 @@
 #include "TTree.h"
 #include "TFile.h"
 
-InputFileHandle::InputFileHandle(std::string filename) : m_name(filename), m_status(false), m_activeTrees(0), m_file(0)
+InputFileHandle::InputFileHandle(std::string filename) 
+        : m_name(filename)
+        , m_status(false)
+        , m_navTreeRefFlag(false)
+        , m_activeTrees(0)
+        , m_file(0)
 {
 }
 
@@ -74,6 +79,16 @@ void InputFileManager::DecTreeRef(int fileid)
 {
   int active = m_files[fileid]->DecTreeRef();
   if (0 == active) close(fileid);
+}
+
+void InputFileManager::SetNavTreeRef(int fileid)
+{
+  m_files[fileid]->SetNavTreeRef();
+}
+
+void InputFileManager::ResetNavTreeRef(int fileid)
+{
+  m_files[fileid]->ResetNavTreeRef();
 }
 
 bool InputFileManager::CheckFileStatus(int fileid) const

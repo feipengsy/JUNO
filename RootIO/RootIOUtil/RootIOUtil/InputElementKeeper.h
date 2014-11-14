@@ -65,7 +65,6 @@ public:
     // Open a certain file
     void OpenFile(int fileid);
 
-
     // Register a new input file into this keeper
     int RegisterFile(std::string& filename, std::vector<JM::TreeMetaData*>& trees);
 
