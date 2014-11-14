@@ -20,9 +20,8 @@ InputFileHandle::~InputFileHandle()
 
 void InputFileHandle::close()
 {
-  //FIXME: Find out how do we lose the file?
-  //m_file->Close();
-  //m_status = false;
+  m_file->Close();
+  m_status = false;
 }
 
 void InputFileHandle::UpdateFile(TFile* file) 
