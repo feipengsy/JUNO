@@ -8,7 +8,7 @@
 
 SmartRefTable* SmartRefTable::fgSmartRefTable = 0;
 
-SmartRefTable::SmartRefTable() : fTreeIDs(0), fBranchIDs(0), fPreIid(-1), fN(0), fNumPIDs(0), fAllocSize(0), fDefaultSize(10)
+SmartRefTable::SmartRefTable() : fTreeIDs(0), fPreIid(-1), fN(0), fNumPIDs(0), fAllocSize(0), fDefaultSize(10)
 {
   // Default constructor of SmartRefTable
   
@@ -21,10 +21,8 @@ SmartRefTable::~SmartRefTable()
   delete [] fAllocSize;
   delete [] fN;
   for (Int_t pid = 0; pid < fNumPIDs; ++pid) {
-    delete [] fBranchIDs[pid];
     delete [] fTreeIDs[pid];
   }
-  delete [] fBranchIDs;
   delete [] fTreeIDs;
   if (fgSmartRefTable == this) fgSmartRefTable = 0;
 }
@@ -39,7 +37,7 @@ void SmartRefTable::Add(const std::string& guid, Int_t uid, Int_t bid, Int_t tid
 
   Int_t newsize = 0;
   uid = uid & 0xffffff;
-  // expand fBranchIDs and fTreeIDs if necessary
+  // expand fTreeIDs if necessary
   if (uid >= fAllocSize[iid]) {
     newsize = uid + uid / 2;
     if (newsize < fDefaultSize)
@@ -47,10 +45,9 @@ void SmartRefTable::Add(const std::string& guid, Int_t uid, Int_t bid, Int_t tid
     newsize = ExpandForIID(iid, newsize);
   }
   if (newsize < 0) {
-    // fail to expand fBranchIDs or fTreeIDs
+    // fail to expand or fTreeIDs
     return;
   }
-  fBranchIDs[iid][uid] = bid + 1;
   fTreeIDs[iid][uid] = tid + 1;
   if (uid >= fN[iid]) fN[iid] = uid + 1;
 }
@@ -79,7 +76,6 @@ void SmartRefTable::Clear()
   // Clear the table
 
   for (Int_t iid = 0; iid < fNumPIDs; ++iid) {
-    memset(fBranchIDs[iid], 0, sizeof(Int_t) * fN[iid]);
     memset(fTreeIDs[iid], 0, sizeof(Int_t) * fN[iid]);
   }
   memset(fN, 0, sizeof(Int_t) * fNumPIDs);
@@ -113,14 +109,9 @@ void SmartRefTable::ExpandPIDs(Int_t numpids)
   memset(&fN[oldNumPIDs], 0, (fNumPIDs - oldNumPIDs) * sizeof(Int_t));
   delete nTemp;
 
-  // update fBranchIDs and fTreeIDs
-  Int_t** branchIDsTemp = fBranchIDs;
+  // update fTreeIDs
   Int_t** treeIDsTemp = fTreeIDs;
-  fBranchIDs = new Int_t *[fNumPIDs];
   fTreeIDs = new Int_t *[fNumPIDs];
-  if (branchIDsTemp)
-    memcpy(fBranchIDs, branchIDsTemp, oldNumPIDs * sizeof(Int_t *));
-  memset(&fBranchIDs[oldNumPIDs], 0, (fNumPIDs - oldNumPIDs) * sizeof(Int_t*));
   if (treeIDsTemp)
     memcpy(fTreeIDs, treeIDsTemp, oldNumPIDs * sizeof(Int_t *));                                           
   memset(&fTreeIDs[oldNumPIDs], 0, (fNumPIDs - oldNumPIDs) * sizeof(Int_t*));
@@ -129,36 +120,29 @@ void SmartRefTable::ExpandPIDs(Int_t numpids)
 
 Int_t SmartRefTable::ExpandForIID(Int_t iid, Int_t newsize)
 {
-  // Expand fBranchIDs and fTreeIDs to newsize for internel ProcessID index iid
+  // Expand fTreeIDs to newsize for internel ProcessID index iid
   
   if (newsize < 0)  
     return newsize;
   if (newsize != fAllocSize[iid]) {
-    Int_t *temp1 = fBranchIDs[iid];
-    Int_t *temp2 = fTreeIDs[iid];
+    Int_t *temp = fTreeIDs[iid];
     if (newsize != 0) {
-      fBranchIDs[iid] = new Int_t[newsize];
       fTreeIDs[iid] = new Int_t[newsize];
       if (newsize < fAllocSize[iid]) {
 	    // contract, just copy old values
-        memcpy(fBranchIDs[iid], temp1, newsize * sizeof(Int_t));
-        memcpy(fTreeIDs[iid], temp2, newsize * sizeof(Int_t));
+        memcpy(fTreeIDs[iid], temp, newsize * sizeof(Int_t));
       }
       else {
 	    // expand, copy old values and set new values to 0
-        memcpy(fBranchIDs[iid], temp1, fAllocSize[iid] * sizeof(Int_t));
-        memset(&fBranchIDs[iid][fAllocSize[iid]], 0, (newsize - fAllocSize[iid]) * sizeof(Int_t));
-        memcpy(fTreeIDs[iid], temp2, fAllocSize[iid] * sizeof(Int_t));
+        memcpy(fTreeIDs[iid], temp, fAllocSize[iid] * sizeof(Int_t));
         memset(&fTreeIDs[iid][fAllocSize[iid]], 0, (newsize - fAllocSize[iid]) * sizeof(Int_t));
       }
     }
     else {
-      fBranchIDs[iid] = 0;
       fTreeIDs[iid] = 0;
     }
     if (fAllocSize[iid]) 
-      delete [] temp1;
-      delete [] temp2;
+      delete [] temp;
     fAllocSize[iid] = newsize;
   }
   return newsize;
@@ -170,15 +154,6 @@ Int_t SmartRefTable::FindPIDGUID(const std::string& guid) const
   std::vector<std::string>::const_iterator posPID = std::find(fProcessGUIDs.begin(), fProcessGUIDs.end(), guid);
   if (posPID == fProcessGUIDs.end()) return -1;
   return posPID - fProcessGUIDs.begin();
-}
-
-Int_t SmartRefTable::GetBranchID(Int_t uid, const TProcessID* pid)
-{
-  Int_t iid = GetInternalIdxForPID(pid->GetTitle());
-
-  uid = uid & 0xFFFFFF;
-  if (uid < 0 || uid >= fN[iid]) return -1;
-  return fBranchIDs[iid][uid] - 1;
 }
 
 Int_t SmartRefTable::GetTreeID(Int_t uid, const TProcessID* pid)
