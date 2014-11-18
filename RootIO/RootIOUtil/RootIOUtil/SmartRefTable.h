@@ -45,6 +45,8 @@ public:
     void Clear();
     // Given a SmartRef, get the id of the tree holding the object if refers to
     Int_t GetTreeID(Int_t uid, const TProcessID* pid);
+    // Given a SmartRef, get the id of the branch holding the referenced object
+    Int_t GetBranchID(Int_t uid, const TProcessID* pid);
     // Static method to get the current SmartRefTable
     static SmartRefTable* GetRefTable();
     // Read TreeMetadata, register all referenced object it holds

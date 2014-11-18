@@ -48,7 +48,7 @@ void SmartRefTable::Add(const std::string& guid, Int_t uid, Int_t bid, Int_t tid
     // fail to expand or fTreeIDs
     return;
   }
-  fTreeIDs[iid][uid] = tid + 1;
+  fTreeIDs[iid][uid] = tid + 1 + ( bid + 1  << 24 );
   if (uid >= fN[iid]) fN[iid] = uid + 1;
 }
 
@@ -156,13 +156,22 @@ Int_t SmartRefTable::FindPIDGUID(const std::string& guid) const
   return posPID - fProcessGUIDs.begin();
 }
 
+Int_t SmartRefTable::GetBranchID(Int_t uid, const TProcessID* pid)
+{
+  Int_t iid = GetInternalIdxForPID(pid->GetTitle());
+
+  uid = uid & 0xFFFFFF;
+  if (uid < 0 || uid >= fN[iid]) return -1;
+  return ( fTreeIDs[iid][uid] >> 24 ) - 1;
+}
+
 Int_t SmartRefTable::GetTreeID(Int_t uid, const TProcessID* pid)
 {
   Int_t iid = GetInternalIdxForPID(pid->GetTitle());
 
   uid = uid & 0xFFFFFF;
   if (uid < 0 || uid >= fN[iid]) return -1;
-  return fTreeIDs[iid][uid] - 1;
+  return ( fTreeIDs[iid][uid] & 0xFFFFFF ) - 1;
 }
 
 SmartRefTable* SmartRefTable::GetRefTable()
@@ -199,5 +208,4 @@ void SmartRefTable::ReadMetaData(JM::TreeMetaData* metadata, Int_t treeid)
     }
   } 
 }
-
 
