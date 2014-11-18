@@ -8,7 +8,7 @@
 
 SmartRefTable* SmartRefTable::fgSmartRefTable = 0;
 
-SmartRefTable::SmartRefTable() : fTreeIDs(0), fPreIid(-1), fN(0), fNumPIDs(0), fAllocSize(0), fDefaultSize(10)
+SmartRefTable::SmartRefTable() : fTreeIDs(0), fPreIid(-1), fN(0), fNumPIDs(0), fAllocSize(0), fMinSize(1000), fMaxSize(100000)
 {
   // Default constructor of SmartRefTable
   
@@ -39,9 +39,9 @@ void SmartRefTable::Add(const std::string& guid, Int_t uid, Int_t bid, Int_t tid
   uid = uid & 0xffffff;
   // expand fTreeIDs if necessary
   if (uid >= fAllocSize[iid]) {
-    newsize = uid + uid / 2;
-    if (newsize < fDefaultSize)
-      newsize = fDefaultSize;
+    newsize = min(uid + uid / 2, fMaxSize);
+    if (newsize < fMinSize)
+      newsize = fMinSize;
     newsize = ExpandForIID(iid, newsize);
   }
   if (newsize < 0) {
