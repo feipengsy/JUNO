@@ -39,7 +39,7 @@ void SmartRefTable::Add(const std::string& guid, Int_t uid, Int_t bid, Int_t tid
   uid = uid & 0xffffff;
   // expand fTreeIDs if necessary
   if (uid >= fAllocSize[iid]) {
-    newsize = min(uid + uid / 2, fMaxSize);
+    newsize = std::min(uid + uid / 2, fMaxSize);
     if (newsize < fMinSize)
       newsize = fMinSize;
     newsize = ExpandForIID(iid, newsize);
