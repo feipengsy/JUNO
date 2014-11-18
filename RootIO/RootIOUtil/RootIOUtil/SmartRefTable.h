@@ -69,7 +69,8 @@ private:
     Int_t*                      fN;         // Max number of fTreeIDs[iid]
     Int_t                       fNumPIDs;   // Number of known TProcessIDs
     Int_t*                      fAllocSize; // Length of fTreeIDs[iid]
-    Int_t                       fDefaultSize;  // Default alloc size of fTreeIDs
+    Int_t                       fMinSize;  // Minimum allocating size of fTreeIDs
+    Int_t                       fMaxSize;  // Maximum allocating size of fTreeIDs
     static SmartRefTable*       fgSmartRefTable; // Current SmartRefTable
 };
 
