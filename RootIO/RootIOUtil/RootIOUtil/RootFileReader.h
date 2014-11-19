@@ -44,7 +44,7 @@ public:
     bool GetNavTreeList(std::map<int,JM::FileMetaData*>& fmetadatas, NavTreeList* navs, std::vector<std::string>& path, std::vector<std::string>& eventName);
 
     // Get the FileMetaData of a TFile
-    JM::FileMetaData* GetFileMetaData(TFile* file);
+    static JM::FileMetaData* GetFileMetaData(TFile* file);
 
     // Get addtional TObject of input file(s)
     TObject* GetUserData(const std::vector<int>& fileList, const std::string& name);

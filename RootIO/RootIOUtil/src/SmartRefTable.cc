@@ -73,7 +73,15 @@ Int_t SmartRefTable::AddInternalIdxForPID(const std::string& guid)
 
 void SmartRefTable::Clear()
 {
-  // Clear the table
+  // Clear the table and reclaim memory
+
+  fPreIid = -1;
+  fPrePID.clear();
+}
+
+void SmartRefTable::Reset()
+{
+  // Clear the table, but won't reclaim memory
 
   for (Int_t iid = 0; iid < fNumPIDs; ++iid) {
     memset(fTreeIDs[iid], 0, sizeof(Int_t) * fN[iid]);

@@ -42,7 +42,8 @@ int InputElementKeeper::RegisterFile(std::string& filename, std::vector<JM::Tree
   std::vector<JM::TreeMetaData*>::iterator it;
   for (it = trees.begin(); it != trees.end(); ++it) {
     int treeid = m_treeMgr->AddTree(fileid);
-    m_table->ReadMetaData(*it, treeid);
+    // Register meta data later when start to read data
+    //m_table->ReadMetaData(*it, treeid);
     treeinfo.insert(std::make_pair(treeid, (*it)->GetTreeName()));
   }
   m_fileMgr->SetTreeInfo(fileid, treeinfo);
@@ -131,11 +132,14 @@ void InputElementKeeper::OpenFile(int fileid)
     return;
   }
   m_fileMgr->UpdateFile(fileid, file);
+  JM::FileMetaData* fmd = RootFileReader::GetFileMetaData(file);
   std::map<int,std::string>::iterator it;
   std::vector<TTree*>::iterator it2;
   for(it = treeInfo.begin(), it2 = trees.begin(); it != treeInfo.end(); ++it, ++it2) {
     m_treeMgr->ResetTree(it->first, *it2);
+    // TODO
   }
+  delete fmd;
 }
 
 TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid)

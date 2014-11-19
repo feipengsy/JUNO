@@ -44,6 +44,7 @@ bool RootFileReader::ReOpen(const string& filename, TFile*& file, const map<int,
       }
       trees.push_back(tree);
     }
+    // Register the meta data of this file into SmartRefTable
     return true;
 }
 
@@ -69,7 +70,6 @@ bool RootFileReader::ReadFiles(NavTreeList* navs, vector<string>& path, vector<s
     // Get tree metadatas in file metadata, and register this file in InputElementKeeper
     vector<JM::TreeMetaData*> tmetadatas = fmetadata->GetTreeMetaData();
     // keeper should already be initialized by RootInputSvc
-    // TODO registering file from here is not so clear
     int fileid = m_keeper->RegisterFile(*it, tmetadatas);
     
     fileMetaDatas.insert(make_pair(fileid, fmetadata));
