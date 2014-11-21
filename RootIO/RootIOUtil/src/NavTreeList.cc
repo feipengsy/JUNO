@@ -208,6 +208,7 @@ bool NavTreeList::last()
                  << std::endl;
         return false;
     }
+    handle->open();
     return true;
 }
 
@@ -227,6 +228,7 @@ bool NavTreeList::prev()
                  << std::endl;
         return false;
     }
+    handle->open();
     return true;
 }
 
@@ -242,6 +244,7 @@ bool NavTreeList::first()
                  << std::endl;
         return false;
     }
+    handle->open();
     return true;
 }
 
@@ -257,6 +260,7 @@ bool NavTreeList::jump(int index)
                  << std::endl;
         return false;
     }
+    handle->open();
     return true;
 }
 
