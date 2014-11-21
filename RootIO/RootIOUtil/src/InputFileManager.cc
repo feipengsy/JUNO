@@ -45,6 +45,8 @@ void InputFileHandle::DecTreeRef()
   --m_activeTrees;
   if (m_activeTrees <= 0 && !m_navTreeRefFlag) {
     this->close();
+    InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
+    keeper->ClearTable();
   }
 }
 

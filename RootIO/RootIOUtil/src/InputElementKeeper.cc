@@ -27,6 +27,11 @@ void InputElementKeeper::AddRef()
   ++m_refCount;
 }
 
+void InputElementKeeper::ClearTable()
+{
+  m_table->Clear();
+}
+
 void InputElementKeeper::DecRef()
 {
   if (0 == --m_refCount) delete this;
