@@ -75,8 +75,20 @@ void SmartRefTable::Clear()
 {
   // Clear the table and reclaim memory
 
+  delete [] fAllocSize;
+  fAllocSize = 0;
+  delete [] fN;
+  fN = 0;
+  for (Int_t pid = 0; pid < fNumPIDs; ++pid) {
+    delete [] fTreeIDs[pid];
+  }
+  delete [] fTreeIDs;
+  fTreeIDs = 0;
+
+  fNumPIDs = 0;
   fPreIid = -1;
   fPrePID.clear();
+  fProcessGUIDs.clear();
 }
 
 void SmartRefTable::Reset()
