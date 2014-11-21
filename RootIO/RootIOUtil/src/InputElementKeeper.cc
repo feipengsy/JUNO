@@ -132,12 +132,22 @@ void InputElementKeeper::OpenFile(int fileid)
     return;
   }
   m_fileMgr->UpdateFile(fileid, file);
+
   JM::FileMetaData* fmd = RootFileReader::GetFileMetaData(file);
+  std::vector<JM::TreeMetaData*> tmds = fmd->GetTreeMetaData();
   std::map<int,std::string>::iterator it;
   std::vector<TTree*>::iterator it2;
   for(it = treeInfo.begin(), it2 = trees.begin(); it != treeInfo.end(); ++it, ++it2) {
+    // Reset the pointer to TTree
     m_treeMgr->ResetTree(it->first, *it2);
-    // TODO
+
+    // Put meta data into SmartRefTable when opening file
+    std::vector<JM::TreeMetaData*>::iterator tit, tend = tmds.end();
+    for (tit = tmds.begin(); tit != tend; ++tit) {
+      if (it->second == (*tit)->GetTreeName()) {
+        m_table->ReadMetaData(*tit,it->first);
+      }
+    }
   }
   delete fmd;
 }
