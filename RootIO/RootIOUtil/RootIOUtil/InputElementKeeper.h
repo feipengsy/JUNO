@@ -41,6 +41,12 @@ public:
     // Minus reference count of this object by 1
     void DecRef();
 
+    // Set nav tree reference of one file
+    void SetNavTreeRef(int fileid);
+
+    // Reset nav tree refernence of one file
+    void ResetNavTreeRef(int fileid);
+
     // Given a SmartRef, add active entries of the parent tree by 1
     void AddObjRef(Int_t uid, const TProcessID* pid);
 

@@ -43,6 +43,8 @@ public:
     void Add(const std::string& guid, Int_t uid, Int_t bid, Int_t tid);
     // Clear the table
     void Clear();
+    // Clear the table and reclaim memory
+    void Reset();
     // Given a SmartRef, get the id of the tree holding the object if refers to
     Int_t GetTreeID(Int_t uid, const TProcessID* pid);
     // Given a SmartRef, get the id of the branch holding the referenced object
