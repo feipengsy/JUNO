@@ -195,6 +195,11 @@ Int_t SmartRefTableImpl::GetTreeID(Int_t uid, const TProcessID* pid)
   return ( m_TreeIDs[iid][uid] & 0xFFFFFF ) - 1;
 }
 
+Int_t SmartRefTableImpl::GetFileID()
+{
+  return m_FileID;
+}
+
 Int_t SmartRefTableImpl::GetInternalIdxForPID(const std::string& guid) const
 {
   // Get the index for m_ProcessIDs
