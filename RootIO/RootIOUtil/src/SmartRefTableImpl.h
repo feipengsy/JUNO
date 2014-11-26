@@ -1,11 +1,24 @@
 #ifndef ROOTIOUTIL_SMARTREFTABLEIMPL_H
 #define ROOTIOUTIL_SMARTREFTABLEIMPL_H
 
+#include "TObject.h"
+
+#include <string>
+#include <vector>
+
+class TProcessID;
+
+namespace JM {
+
+    class TreeMetaData;
+
+}
+
 class SmartRefTableImpl {
 
     public:
 
-        SmartRefTableImpl();
+        SmartRefTableImpl(Int_t fileid);
         ~SmartRefTableImpl();
         // Register a referenced object into this table
         void Add(const std::string& guid, Int_t uid, Int_t bid, Int_t tid);
@@ -41,9 +54,8 @@ class SmartRefTableImpl {
         Int_t*                         m_AllocSize;     // Length of fTreeIDs[iid]
         Int_t                          m_MinSize;       // Minimum allocating size of fTreeIDs
         Int_t                          m_MaxSize;       // Maximum allocating size of fTreeIDs
-        Int_t                          m_fileID;        // File id of this table
+        Int_t                          m_FileID;        // File id of this table
 
 };
-
 
 #endif
