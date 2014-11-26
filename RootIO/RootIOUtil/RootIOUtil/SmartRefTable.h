@@ -19,13 +19,11 @@
 #include "TObject.h"
 
 #include <vector>
-#include <map>
 #include <string>
+#include <list>
 
-class TTree;
-class TBranch;
-class TObjArray;
 class TProcessID;
+class SmartRefTableImpl;
 
 namespace JM {
 
@@ -36,15 +34,11 @@ namespace JM {
 class SmartRefTable {
  //Table of referenced objects during an I/O operation
 
+    typedef std::list<SmartRefTableImpl*>::iterator SRTIterator;
+
 public:
     SmartRefTable();
     ~SmartRefTable();
-    // Register a referenced object into this table
-    void Add(const std::string& guid, Int_t uid, Int_t bid, Int_t tid);
-    // Clear the table
-    void Clear();
-    // Clear the table and reclaim memory
-    void Reset();
     // Given a SmartRef, get the id of the tree holding the object if refers to
     Int_t GetTreeID(Int_t uid, const TProcessID* pid);
     // Given a SmartRef, get the id of the branch holding the referenced object
@@ -53,27 +47,14 @@ public:
     static SmartRefTable* GetRefTable();
     // Read TreeMetadata, register all referenced object it holds
     void ReadMetaData(JM::TreeMetaData* metadata, Int_t treeid);
-
-private:
-    // Add one guid of TProcessID
-    Int_t AddInternalIdxForPID(const std::string& guid);
-    // Expand table for a new TProcessID
-    Int_t ExpandForIID(Int_t iid, Int_t newsize);
-    void  ExpandPIDs(Int_t numpids);
-    Int_t FindPIDGUID(const std::string& guid) const;
-    Int_t GetInternalIdxForPID(const std::string& guid) const;
+    // Start a new table for a new input file
+    void StartNewTable(Int_t fileid);
+    // Delete the table for a given file
+    void DeleteTable(Int_t fileid);
     
 private:
-    Int_t**                     fTreeIDs;   // Array of tree ids 
-    Int_t                       fPreIid;    // Cached iid
-    std::string                 fPrePID;    // Cached TProcessID title
-    std::vector<std::string>    fProcessGUIDs;  // Array of TProcessID titles
-    Int_t*                      fN;         // Max number of fTreeIDs[iid]
-    Int_t                       fNumPIDs;   // Number of known TProcessIDs
-    Int_t*                      fAllocSize; // Length of fTreeIDs[iid]
-    Int_t                       fMinSize;  // Minimum allocating size of fTreeIDs
-    Int_t                       fMaxSize;  // Maximum allocating size of fTreeIDs
-    static SmartRefTable*       fgSmartRefTable; // Current SmartRefTable
+    std::list<SmartRefTableImpl*>  m_tableList;  // List of the SmartRefTableImpl*(one for each file) 
+    static SmartRefTable*          fgSmartRefTable; // Current SmartRefTable
 };
 
 #endif
