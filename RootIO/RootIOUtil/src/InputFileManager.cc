@@ -4,12 +4,13 @@
 #include "TTree.h"
 #include "TFile.h"
 
-InputFileHandle::InputFileHandle(std::string filename) 
+InputFileHandle::InputFileHandle(const std::string filename&, int fileid) 
         : m_name(filename)
         , m_status(false)
         , m_navTreeRefFlag(false)
         , m_activeTrees(0)
         , m_file(0)
+        , m_fileID(fileid)
 {
 }
 
@@ -46,7 +47,7 @@ void InputFileHandle::DecTreeRef()
   if (m_activeTrees <= 0 && !m_navTreeRefFlag) {
     this->close();
     InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
-    keeper->ClearTable();
+    keeper->ClearTable(m_fileID);
   }
 }
 
@@ -60,6 +61,8 @@ void InputFileHandle::ResetNavTreeRef()
   m_navTreeRefFlag = false;
   if (m_activeTrees <= 0) {
     this->close();
+    InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
+    keeper->ClearTable(m_fileID);
   }
 }
 
@@ -80,8 +83,9 @@ InputFileManager::~InputFileManager()
 
 int InputFileManager::AddFile(std::string& filename)
 {
-  m_files.push_back(new InputFileHandle(filename));
-  return m_files.size() - 1;
+  int fileid = m_files.size();
+  m_files.push_back(new InputFileHandle(filename, fileid));
+  return fileid;
 }
 
 int InputFileManager::FindFile(std::string& filename)

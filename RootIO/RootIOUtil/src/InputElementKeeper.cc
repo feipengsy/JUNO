@@ -27,9 +27,9 @@ void InputElementKeeper::AddRef()
   ++m_refCount;
 }
 
-void InputElementKeeper::ClearTable()
+void InputElementKeeper::ClearTable(int fileid)
 {
-  m_table->Clear();
+  m_table->DeleteTable(fileid);
 }
 
 void InputElementKeeper::DecRef()

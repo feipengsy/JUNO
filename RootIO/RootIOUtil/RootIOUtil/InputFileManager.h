@@ -24,7 +24,7 @@ class InputFileHandle {
   
 public:
 
-    InputFileHandle(std::string filename);
+    InputFileHandle(const std::string filename&, int fileid);
     ~InputFileHandle();
     
     // Close the file
@@ -67,6 +67,7 @@ public:
     std::map<int,std::string> m_treeInfo;
     int m_activeTrees;
     TFile* m_file;
+    int m_fileID;
 
 };
 
