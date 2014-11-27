@@ -75,7 +75,7 @@ void JM::SmartRef::clear() {
   if (0 == rc) {
     delete m_refObjTemp;
     InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper(false);
-    if (keeper) {
+    if (keeper && TProcessID::IsValid(m_pid)) {
         UInt_t uid = GetUniqueID();
         keeper->DelObj(uid, m_pid, m_entry);
     }
