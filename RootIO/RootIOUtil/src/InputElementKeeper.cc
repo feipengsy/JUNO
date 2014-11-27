@@ -139,7 +139,7 @@ void InputElementKeeper::OpenFile(int fileid)
   m_fileMgr->UpdateFile(fileid, file);
 
   // Register meta data to SmartRefTable and update pointer to TTree
-  m_table->startNewTable(fileid);
+  m_table->StartNewTable(fileid);
 
   JM::FileMetaData* fmd = RootFileReader::GetFileMetaData(file);
   std::vector<JM::TreeMetaData*> tmds = fmd->GetTreeMetaData();

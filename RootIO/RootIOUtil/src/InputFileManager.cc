@@ -4,7 +4,7 @@
 #include "TTree.h"
 #include "TFile.h"
 
-InputFileHandle::InputFileHandle(const std::string filename&, int fileid) 
+InputFileHandle::InputFileHandle(const std::string& filename, int fileid) 
         : m_name(filename)
         , m_status(false)
         , m_navTreeRefFlag(false)

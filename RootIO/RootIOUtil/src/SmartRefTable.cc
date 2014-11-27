@@ -48,19 +48,19 @@ SmartRefTable* SmartRefTable::GetRefTable()
 
 void SmartRefTable::StartNewTable(Int_t fileid)
 {
-    m_tableList.push_back(new SmartRefTableImpl);
+    m_tableList.push_back(new SmartRefTableImpl(fileid));
 }
 
 void SmartRefTable::ReadMetaData(JM::TreeMetaData* metadata, Int_t treeid)
 {
-    m_tableList.back()->ReadMetaData(JM::TreeMetaData* metadata, Int_t treeid);
+    m_tableList.back()->ReadMetaData(metadata, treeid);
 }
 
 void SmartRefTable::DeleteTable(Int_t fileid)
 {
     SRTIterator it, end = m_tableList.end();
     for (it = m_tableList.begin();it != end; ++it) {
-        int fileID = (*it)->GetFileID(uid, pid);
+        int fileID = (*it)->GetFileID();
         if (fileid == fileID) {
            delete *it;
            m_tableList.erase(it);

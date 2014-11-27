@@ -156,7 +156,7 @@ Int_t SmartRefTableImpl::ExpandForIID(Int_t iid, Int_t newsize)
       else {
         // expand, copy old values and set new values to 0
         memcpy(m_TreeIDs[iid], temp, m_AllocSize[iid] * sizeof(Int_t));
-        memset(&m_TreeIDs[iid][fAllocSize[iid]], 0, (newsize - m_AllocSize[iid]) * sizeof(Int_t));
+        memset(&m_TreeIDs[iid][m_AllocSize[iid]], 0, (newsize - m_AllocSize[iid]) * sizeof(Int_t));
       }
     }
     else {

@@ -24,7 +24,7 @@ class InputFileHandle {
   
 public:
 
-    InputFileHandle(const std::string filename&, int fileid);
+    InputFileHandle(const std::string& filename, int fileid);
     ~InputFileHandle();
     
     // Close the file
