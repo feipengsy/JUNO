@@ -10,6 +10,7 @@ ClassImp(JM::SmartRef);
 
 JM::SmartRef::SmartRef() 
     : m_entry(-1)
+    , m_branchID(-1)
     , m_refObjTemp(0)
     , m_pid(0) 
 {

@@ -14,6 +14,7 @@ namespace JM
   private:
 
     Long64_t      m_entry;       //  Entry number of the referenced object
+    Short_t       m_branchID;    //! Branch ID of the referenced object
     EventObject*  m_refObjTemp;  //! Transient pointer to the referenced object
     TProcessID*   m_pid;         //! Transient pointer to TProcessID when SmartRef was written 
   
