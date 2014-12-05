@@ -90,7 +90,7 @@ void InputElementKeeper::ResetNavTreeRef(int fileid)
 
 void InputElementKeeper::DelObj(Int_t uid, TProcessID* pid, Long64_t entry)
 {
-  int treeid = m_table->GetTreeID(uid, pid);
+  int treeid = m_table->GetTreeID(uid, pid, true);
   if (-1 == treeid) return;
   m_treeMgr->DelObj(treeid, entry);
 }

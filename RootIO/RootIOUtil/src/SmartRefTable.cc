@@ -29,13 +29,15 @@ Int_t SmartRefTable::GetBranchID(Int_t uid, const TProcessID* pid)
     return branchID;
 }
 
-Int_t SmartRefTable::GetTreeID(Int_t uid, const TProcessID* pid)
+Int_t SmartRefTable::GetTreeID(Int_t uid, const TProcessID* pid, bool del)
 {
     int treeID = -1;
     for (SRTIterator it = m_tableList.begin();it != m_tableList.end(); ++it) {
         treeID = (*it)->GetTreeID(uid, pid);
         if (-1 != treeID) return treeID;
     }
+    if (del) return treeID;
+    //TODO search the auxiliary file list here
     return treeID;
 }
 
