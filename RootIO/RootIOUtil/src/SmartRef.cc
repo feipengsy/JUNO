@@ -139,6 +139,11 @@ void JM::SmartRef::SetObject(JM::EventObject* obj)
   m_refObjTemp = obj;
 }
 
+void JM::SmartRef::SetBranchID(Short_t value)
+{
+  m_branchID = value;
+}
+
 JM::EventObject* JM::SmartRef::GetObject()
 {
   // Return a pointer to the referenced object.

@@ -15,6 +15,7 @@ JM::HeaderObject* JM::EvtNavigator::getHeader(const std::string& path)
 {
     std::vector<std::string>::iterator pos = find(m_paths.begin(), m_paths.end(), path);
     if (m_paths.end() == pos) return 0;
+    m_refs[pos - m_paths.begin()]->SetBranchID(0);
     return static_cast<JM::HeaderObject*>(m_refs[pos - m_paths.begin()]->GetObject());
 }
 
