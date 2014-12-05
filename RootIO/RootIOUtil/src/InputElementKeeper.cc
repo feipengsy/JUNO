@@ -160,15 +160,15 @@ void InputElementKeeper::OpenFile(int fileid)
   delete fmd;
 }
 
-TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid)
+TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Int_t branchID)
 {
-  int branchid = m_table->GetBranchID(uid, pid);
-  if (-1 == branchid) return 0;
+  if (-1 == branchID) branchID = m_table->GetBranchID(uid, pid);
+  if (-1 == branchID) return 0;
   int treeid = m_table->GetTreeID(uid, pid);
   if (-1 == treeid) return 0;
   TTree* tree = m_treeMgr->GetTree(treeid);
   if (!tree) return 0;
-  return (TBranch*)tree->GetListOfBranches()->At(branchid);
+  return (TBranch*)tree->GetListOfBranches()->At(branchID);
 }
 
 std::vector<int> InputElementKeeper::GetFileList(const std::string& path)

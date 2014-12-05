@@ -35,6 +35,7 @@ JM::SmartRef& JM::SmartRef::operator=(const JM::SmartRef& ref)
   if (this != &ref) {
     SetUniqueID(ref.GetUniqueID());
     m_entry = ref.m_entry;
+    m_branchID = ref.m_branchID;
     m_refObjTemp = ref.m_refObjTemp;
     m_pid = ref.m_pid;
     SetBit(kHasUUID, ref.TestBit(kHasUUID));
@@ -83,6 +84,7 @@ void JM::SmartRef::clear() {
   }
   m_pid = 0;
   m_entry = -1;
+  m_branchID = -1;
   m_refObjTemp = 0;
 }
 
@@ -168,7 +170,7 @@ JM::EventObject* JM::SmartRef::GetObject()
 
   // Search the referenced object in SmartRefTable
   InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
-  TBranch* branch =  keeper->GetBranch(uid, m_pid);
+  TBranch* branch =  keeper->GetBranch(uid, m_pid, m_branchID);
   if (!branch) return 0;
   // Load the referenced object
   void* addr = 0;
