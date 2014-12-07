@@ -58,10 +58,11 @@ bool RootFileWriter::write()
     // Build auto-loading data for TreeMetaData
     TObject* header = static_cast<TObject*>(m_headerAddr);
     // Header in the 1st branch, event in the 2nd branch
-    fillBID(header, 0);
+    // Now, branch ID will NOT be saved
+    fillBID(header, -1);
 
     TObject* event = static_cast<TObject*>(m_eventAddr);
-    fillBID(event, 1);
+    fillBID(event, -1);
 
     // Set entry for SmartRefs
     JM::EvtNavigator* nav = static_cast<JM::EvtNavigator*>(m_navAddr);
@@ -101,7 +102,10 @@ void RootFileWriter::fillBID(TObject* obj, int bid)
     if (posPID == m_guid.end()) {
         m_guid.push_back(guid);
         m_uid.push_back(std::vector<Int_t>());
-        m_bid.push_back(std::vector<Short_t>());
+        // When bid is -1, branch id won't be saved
+        if (-1 != bid) {
+            m_bid.push_back(std::vector<Short_t>());
+        }
         iid = m_guid.size() - 1;
     }
     else {
@@ -109,7 +113,9 @@ void RootFileWriter::fillBID(TObject* obj, int bid)
     }
     uid = uid & 0xffffff;
     m_uid[iid].push_back(uid);
-    m_bid[iid].push_back(bid);
+    if (-1 != bid) {
+        m_bid[iid].push_back(bid);
+    }
 }
 
 bool RootFileWriter::writeNav()
