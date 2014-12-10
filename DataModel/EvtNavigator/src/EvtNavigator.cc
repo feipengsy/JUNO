@@ -19,10 +19,11 @@ JM::EvtNavigator::EvtNavigator(const JM::EvtNavigator& nav)
 
 JM::EvtNavigator& JM::EvtNavigator::operator=(const JM::EvtNavigator& nav)
 {
-    if (this == &nav) return;
-
-    TObject::operator=(nav);
-    init(nav);
+    if (this != &nav) {
+        TObject::operator=(nav);
+        init(nav);
+    }
+    return *this;
 }
 
 void JM::EvtNavigator::init(const JM::EvtNavigator& nav)
@@ -36,9 +37,9 @@ void JM::EvtNavigator::init(const JM::EvtNavigator& nav)
         delete *it;
     }
     // Copy new SmartRefs
-    end = nav.m_refs.end();
-    for (it = nav.m_refs.begin(); it != end; ++it) {
-        SmartRef* ref = new SmartRef(*it);
+    std::vector<SmartRef*>::const_iterator it2, end2 = nav.m_refs.end();
+    for (it2 = nav.m_refs.begin(); it2 != end2; ++it2) {
+        SmartRef* ref = new SmartRef(**it2);
         m_refs.push_back(ref);
     }
 }

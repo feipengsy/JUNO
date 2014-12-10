@@ -21,7 +21,7 @@ public:
 
     EvtNavigator(const EvtNavigator& nav);
 
-    EvtNaviagtor& operator=(const EvtNavigator& nav);
+    EvtNavigator& operator=(const EvtNavigator& nav);
 
     JM::HeaderObject* getHeader(const std::string& path);
 
