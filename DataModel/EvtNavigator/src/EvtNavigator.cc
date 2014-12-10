@@ -11,6 +11,38 @@ JM::EvtNavigator::~EvtNavigator()
     }
 }
 
+JM::EvtNavigator::EvtNavigator(const JM::EvtNavigator& nav)
+    : TObject(nav)
+{
+    init(nav);
+}
+
+JM::EvtNavigator& JM::EvtNavigator::operator=(const JM::EvtNavigator& nav)
+{
+    if (this == &nav) return;
+
+    TObject::operator=(nav);
+    init(nav);
+}
+
+void JM::EvtNavigator::init(const JM::EvtNavigator& nav)
+{
+    m_paths = nav.m_paths;
+    m_writeFlag = nav.m_writeFlag;
+    m_TimeStamp = nav.m_TimeStamp;
+    // Clear previous SmartRefs
+    std::vector<SmartRef*>::iterator it, end = m_refs.end();
+    for (it = m_refs.begin(); it != end; ++it) {
+        delete *it;
+    }
+    // Copy new SmartRefs
+    end = nav.m_refs.end();
+    for (it = nav.m_refs.begin(); it != end; ++it) {
+        SmartRef* ref = new SmartRef(*it);
+        m_refs.push_back(ref);
+    }
+}
+
 JM::HeaderObject* JM::EvtNavigator::getHeader(const std::string& path)
 {
     std::vector<std::string>::iterator pos = find(m_paths.begin(), m_paths.end(), path);

@@ -19,6 +19,10 @@ public:
 
     ~EvtNavigator();
 
+    EvtNavigator(const EvtNavigator& nav);
+
+    EvtNaviagtor& operator=(const EvtNavigator& nav);
+
     JM::HeaderObject* getHeader(const std::string& path);
 
     void addHeader(const std::string& path, JM::HeaderObject* header);
@@ -47,6 +51,9 @@ private:
     std::vector<bool> m_writeFlag; //!
     std::vector<JM::SmartRef*> m_refs;
     TTimeStamp m_TimeStamp; // Time stamp of event
+
+    // Initialize self, using another EvtNavigator
+    void init(const EvtNavigator& nav);
 
 ClassDef(EvtNavigator,1)
 
