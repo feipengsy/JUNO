@@ -19,6 +19,10 @@ namespace JM {
 class RootFileWriter {
 
 public:
+    typedef std::vector<std::string> GUIDVector;
+    typedef std::vector<std::vector<Short_t> > BIDVector;
+    typedef std::vector<std::vector<Int_t> > UIDVector;
+
     RootFileWriter(const std::string& treepath, const std::string& headername, const std::string& eventname, DataRegistritionSvc* regSvc);
     ~RootFileWriter();
 
@@ -66,9 +70,9 @@ private:
     DataRegistritionSvc* m_regSvc;
    
     // For building TreeMetaData auto-loading data.
-    std::vector<std::string> m_guid;
-    std::vector<std::vector<Short_t> > m_bid;
-    std::vector<std::vector<Int_t> > m_uid;
+    GUIDVector m_guid;
+    BIDVector m_bid;
+    UIDVector m_uid;
 };
 
 

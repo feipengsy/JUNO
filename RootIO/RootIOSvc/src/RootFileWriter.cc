@@ -98,7 +98,7 @@ void RootFileWriter::fillBID(TObject* obj, int bid)
     TProcessID* pid = TProcessID::GetProcessWithUID(uid,obj);
     const char* guid = pid->GetTitle();
     int iid;
-    std::vector<std::string>::const_iterator posPID = find( m_guid.begin(), m_guid.end(), guid);
+    GUIDVector::const_iterator posPID = find( m_guid.begin(), m_guid.end(), guid);
     if (posPID == m_guid.end()) {
         m_guid.push_back(guid);
         m_uid.push_back(std::vector<Int_t>());
@@ -148,9 +148,8 @@ bool RootFileWriter::close()
     m_tree->Write(NULL,TObject::kOverwrite);
     if (m_withNav) m_navTree->Write(NULL,TObject::kOverwrite);
     // Set TreeMetaData
-    m_treeMetaData->SetIDs(m_uid, m_bid);
-    m_treeMetaData->SetGUIDs(m_guid);
     m_file->addTreeMetaData(m_treeMetaData);
+    m_file->addUniqueIDTable(m_path, m_guid, m_uid, m_bid);
     // Dec file reference, close when it hits 0
     RootOutputFileManager::get()->close_file(m_file->getName());
     // Reset pointers
@@ -162,9 +161,9 @@ bool RootFileWriter::close()
     // Reset file entry
     m_fileEntries = 0;
     // Clear and reclaim memory
-    m_guid = std::vector<std::string>();
-    m_uid = std::vector<std::vector<Int_t> >();
-    m_bid = std::vector<std::vector<Short_t> >();
+    m_guid = GUIDVector();
+    m_uid = UIDVector();
+    m_bid = BIDVector();
     return true;
 }
 

@@ -13,6 +13,7 @@ class TTree;
 namespace JM {
     class FileMetaData;
     class TreeMetaData;
+    class UniqueIDTable;
 }
 
 class RootOutputFileHandle {
@@ -39,6 +40,11 @@ public:
     void addGeoManager(TGeoManager* geo);
 
     void addRef();
+
+    void addUniqueIDTable(const std::string& treename,
+                          const std::vector<std::string>& guid,
+                          const std::vector<std::vector<Int_t> >& uid,
+                          const std::vector<std::vector<Short_t> >& bid);
 
     int decRef();
 
