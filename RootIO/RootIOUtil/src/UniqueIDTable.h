@@ -9,7 +9,7 @@
 
 namespace JM {
 
-class TablePerTree {
+class TablePerTree : public TObject {
 
     public:
         // Attribute type typedefs
@@ -35,6 +35,8 @@ class TablePerTree {
         UIDVector m_UniqueIDs;
         BIDVector m_BranchIDs;
         GUIDVector m_GUIDs;
+
+    ClassDef(TablePerTree,1);
 };
 
 inline void TablePerTree::SetIDs(const UIDVector& uids, const BIDVector& bids)
@@ -43,7 +45,7 @@ inline void TablePerTree::SetIDs(const UIDVector& uids, const BIDVector& bids)
     m_BranchIDs = bids;
 }
 
-class UniqueIDTable {
+class UniqueIDTable : public TObject {
 
     public:
         typedef std::map<std::string, TablePerTree*> TableMap;
@@ -61,6 +63,8 @@ class UniqueIDTable {
 
     private:
         TableMap m_tables;
+
+    ClassDef(UniqueIDTable,1);
 
 };
 

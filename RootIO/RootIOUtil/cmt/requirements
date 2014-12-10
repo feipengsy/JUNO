@@ -12,6 +12,7 @@ apply_pattern install_more_includes more=RootIOUtil
 apply_pattern cint_dictionary files=../RootIOUtil/TreeMetaData.h
 apply_pattern cint_dictionary files=../RootIOUtil/FileMetaData.h
 apply_pattern cint_dictionary files=../RootIOUtil/SmartRef.h
+apply_pattern cint_dictionary files=../src/UniqueIDTable.h
 
 include_dirs $(ROOTIOUTILROOT)/RootIOUtil
 library RootIOUtil *.cc
