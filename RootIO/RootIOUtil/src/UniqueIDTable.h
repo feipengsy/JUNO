@@ -24,9 +24,12 @@ class TablePerTree {
         BIDVector& GetBranchIDs() { return m_BranchIDs; }
         UIDVector& GetUniqueIDs() { return m_UniqueIDs; }
         GUIDVector& GetGUIDs() { return m_GUIDs; }
+        const BIDVector& GetBranchIDs() const { return m_BranchIDs; }
+        const UIDVector& GetUniqueIDs() const { return m_UniqueIDs; }
+        const GUIDVector& GetGUIDs() const { return m_GUIDs; }
 
+        void SetGUIDs(const GUIDVector& guids) { m_GUIDs = guids; }
         void SetIDs(const UIDVector& uids, const BIDVector& bids);
-        void SetGUIDs(const GUIDVector& guids);
 
     private:
         UIDVector m_UniqueIDs;
@@ -34,12 +37,18 @@ class TablePerTree {
         GUIDVector m_GUIDs;
 };
 
+inline void TablePerTree::SetIDs(const UIDVector& uids, const BIDVector& bids)
+{
+    m_UniqueIDs = uids;
+    m_BranchIDs = bids;
+}
+
 class UniqueIDTable {
 
     public:
         typedef std::map<std::string, TablePerTree*> TableMap;
 
-        UniqueIDTable();
+        UniqueIDTable() { }
         ~UniqueIDTable();
 
         void AddTable(const std::string& treename, 

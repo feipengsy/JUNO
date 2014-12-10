@@ -62,6 +62,7 @@ private:
     TFile* m_file;
     TTree* m_navTree;
     JM::FileMetaData* m_fileMetaData;
+    JM::UniqueIDTable* m_IDTable;
     PathMap m_paths;
     GeoVector m_geos;
     int m_refCount;

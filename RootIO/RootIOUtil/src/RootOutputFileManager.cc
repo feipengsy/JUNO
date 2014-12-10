@@ -4,6 +4,7 @@
 #include "TFile.h"
 #include "TGeoManager.h"
 #include "RootIOUtil/FileMetaData.h"
+#include "UniqueIDTable.h"
 
 #include <iostream>
 #include <fstream>
@@ -14,6 +15,7 @@ RootOutputFileHandle::RootOutputFileHandle(const std::string& filename,
     : m_file(TFile::Open(filename.c_str(),"recreate","RootOutputStream file"))
     , m_navTree(new TTree("navigator", "Tree for EvtNavigator"))
     , m_fileMetaData(new JM::FileMetaData())
+    , m_IDTable(new JM::UniqueIDTable())
     , m_refCount(0)
     , m_navAddr(0)
 {
@@ -31,6 +33,7 @@ RootOutputFileHandle::~RootOutputFileHandle()
 {
     delete m_file;
     delete m_fileMetaData;
+    delete m_IDTable;
 }
 
 std::string RootOutputFileHandle::getName()
@@ -53,6 +56,14 @@ void RootOutputFileHandle::addGeoManager(TGeoManager* geo)
     if (std::find(m_geos.begin(), m_geos.end(), geo) == m_geos.end()) {
         m_geos.push_back(geo);
     }
+}
+
+void addUniqueIDTable(const std::string& treename,
+                      const std::vector<std::string>& guid,
+                      const std::vector<std::vector<Int_t> >& uid,
+                      const std::vector<std::vector<Short_t> >& bid)
+{
+    m_IDTable->AddTable(treename, guid, uid, bid);
 }
 
 int RootOutputFileHandle::decRef()
