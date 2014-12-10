@@ -73,13 +73,17 @@ int RootOutputFileHandle::decRef()
 
 void RootOutputFileHandle::close()
 {
-    m_file->cd();
+    m_file->mkdir("NonUserData");
+    m_file->cd("NonUserData");
 
+    // Write out TTree holding EvtNavigator
+    m_navTree->Write(NULL,TObject::kOverwrite);
     // Write out file meta data
     m_fileMetaData->Write("FileMetaData");
+    // Write out the UniqueIDTable
+    m_IDTable->Write("UniqueIDTable");
 
     // Write out geometry infomation
-
     if (m_geos.size()) {
         // Shield noizy log info for the moment
         std::streambuf *backup;

@@ -9,14 +9,20 @@
 
 #include "TFile.h"
 #include "TTree.h"
-#include "RootIOUtil/FileMetaData.h"
-#include "RootIOUtil/TreeMetaData.h"
+
 #include <string>
 #include <map>
 #include <vector>
 
 class NavTreeList;
 class InputElementKeeper;
+
+namespace JM {
+
+    class FileMetaData;
+    class UniqueIDTable;
+
+}
 
 class RootFileReader { 
 
@@ -45,6 +51,9 @@ public:
 
     // Get the FileMetaData of a TFile
     static JM::FileMetaData* GetFileMetaData(TFile* file);
+
+    // Get the UniqueIDTable of a TFile
+    static JM::UniqueIDTable* GetUniqueIDTable(TFile* file);
 
     // Get addtional TObject of input file(s)
     TObject* GetUserData(const std::vector<int>& fileList, const std::string& name);

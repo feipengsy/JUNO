@@ -146,7 +146,8 @@ bool RootFileWriter::close()
     m_dir->cd();
     // Write trees
     m_tree->Write(NULL,TObject::kOverwrite);
-    if (m_withNav) m_navTree->Write(NULL,TObject::kOverwrite);
+    // Tree for EvtNavigator will be written by file handle
+    //if (m_withNav) m_navTree->Write(NULL,TObject::kOverwrite);
     // Set TreeMetaData
     m_file->addTreeMetaData(m_treeMetaData);
     m_file->addUniqueIDTable(m_path, m_guid, m_uid, m_bid);

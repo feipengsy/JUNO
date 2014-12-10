@@ -1,6 +1,9 @@
 #include "RootIOUtil/RootFileReader.h"
 #include "RootIOUtil/InputElementKeeper.h"
 #include "RootIOUtil/NavTreeList.h"
+#include "RootIOUtil/TreeMetaData.h"
+#include "RootIOUtil/FileMetaData.h"
+#include "UniqueIDTable.h"
 #include "SniperKernel/SniperLog.h"
 
 #include <algorithm>
@@ -105,9 +108,16 @@ bool RootFileReader::ReadFiles(NavTreeList* navs, vector<string>& path, vector<s
 
 JM::FileMetaData* RootFileReader::GetFileMetaData(TFile* file)
 {
-  TObject* obj = file->Get("FileMetaData");
+  TObject* obj = file->Get("NonUserData/FileMetaData");
   if (!obj) return 0;
   return dynamic_cast<JM::FileMetaData*>(obj);
+}
+
+JM::UniqueIDTable* RootFileReader::GetUniqueIDTable(TFile* file)
+{
+  TObject* obj = file->Get("NonUserData/UniqueIDTable");
+  if (!obj) return 0;
+  return dynamic_cast<JM::UniqueIDTable*>(obj);
 }
 
 TFile* RootFileReader::OpenFile(const string& filename)
