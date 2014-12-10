@@ -3,6 +3,7 @@
 #include "RootIOUtil/InputFileManager.h"
 #include "RootIOUtil/SmartRefTable.h"
 #include "RootIOUtil/RootFileReader.h"
+#include "UniqueIDTable.h"
 
 #include "TTree.h"
 #include "TFile.h"
@@ -129,7 +130,7 @@ TFile* InputElementKeeper::GetFile(int fileid)
 void InputElementKeeper::OpenFile(int fileid)
 {
   std::string filename = m_fileMgr->GetFileName(fileid);
-  TFile* file;
+  TFile* file = 0;
   std::map<int,std::string> treeInfo = m_fileMgr->GetTreeInfo(fileid);
   std::vector<TTree*> trees;
   if (!RootFileReader::ReOpen(filename, file, treeInfo, trees)) {
@@ -141,23 +142,24 @@ void InputElementKeeper::OpenFile(int fileid)
   // Register meta data to SmartRefTable and update pointer to TTree
   m_table->StartNewTable(fileid);
 
-  JM::FileMetaData* fmd = RootFileReader::GetFileMetaData(file);
-  std::vector<JM::TreeMetaData*> tmds = fmd->GetTreeMetaData();
-  std::map<int,std::string>::iterator it;
-  std::vector<TTree*>::iterator it2;
-  for(it = treeInfo.begin(), it2 = trees.begin(); it != treeInfo.end(); ++it, ++it2) {
+  JM::UniqueIDTable* uidTable = RootFileReader::GetUniqueIDTable(file);
+  // TableMap : std::map<std::string, TablePerTree*>
+  JM::UniqueIDTable::TableMap tables = uidTable->GetTable();
+  std::map<int,std::string>::iterator it1 = treeInfo.begin();
+  std::vector<TTree*>::iterator it2 = trees.begin();
+  // The vector of poniters to TTree is of the same order with the treeInfo map
+  for (; it != treeInfo.end(); ++it1, ++it2) {
     // Reset the pointer to TTree
-    m_treeMgr->ResetTree(it->first, *it2);
+    m_treeMgr->ResetTree(it1->first, *it2);
 
     // Put meta data into SmartRefTable when opening file
-    std::vector<JM::TreeMetaData*>::iterator tit, tend = tmds.end();
-    for (tit = tmds.begin(); tit != tend; ++tit) {
-      if (it->second == (*tit)->GetTreeName()) {
-        m_table->ReadMetaData(*tit,it->first);
-      }
+    JM::UniqueIDTable::TableMap::iterator tpos = tables.find(it1->second);
+    if (tpos != tables.end()) {
+      m_table->ReadMetaData(tpos->second, it1->first);
     }
   }
-  delete fmd;
+  
+  delete uidTable;
 }
 
 TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Int_t branchID)

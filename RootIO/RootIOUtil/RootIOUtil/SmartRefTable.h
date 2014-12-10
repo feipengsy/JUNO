@@ -27,7 +27,7 @@ class SmartRefTableImpl;
 
 namespace JM {
 
-    class TreeMetaData;
+    class TablePerTree;
 
 }
 
@@ -45,8 +45,8 @@ public:
     Int_t GetBranchID(Int_t uid, const TProcessID* pid);
     // Static method to get the current SmartRefTable
     static SmartRefTable* GetRefTable();
-    // Read TreeMetadata, register all referenced object it holds
-    void ReadMetaData(JM::TreeMetaData* metadata, Int_t treeid);
+    // Read UniqueIDTable, register all referenced object it holds
+    void ReadMetaData(JM::TablePerTree* table, Int_t treeid);
     // Start a new table for a new input file
     void StartNewTable(Int_t fileid);
     // Delete the table for a given file

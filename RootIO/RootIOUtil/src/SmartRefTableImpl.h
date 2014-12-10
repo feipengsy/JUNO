@@ -10,7 +10,7 @@ class TProcessID;
 
 namespace JM {
 
-    class TreeMetaData;
+    class TablePerTree;
 
 }
 
@@ -32,8 +32,8 @@ class SmartRefTableImpl {
         Int_t GetBranchID(Int_t uid, const TProcessID* pid);
         // Get the file ID of this table
         Int_t GetFileID();
-        // Read TreeMetadata, register all referenced object it holds
-        void ReadMetaData(JM::TreeMetaData* metadata, Int_t treeid);
+        // Read UniqueIDTable, register all referenced object it holds
+        void ReadMetaData(JM::TablePerTree* table, Int_t treeid);
 
     private:
 

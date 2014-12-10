@@ -53,9 +53,9 @@ void SmartRefTable::StartNewTable(Int_t fileid)
     m_tableList.push_back(new SmartRefTableImpl(fileid));
 }
 
-void SmartRefTable::ReadMetaData(JM::TreeMetaData* metadata, Int_t treeid)
+void SmartRefTable::ReadMetaData(JM::TablePerTree* table, Int_t treeid)
 {
-    m_tableList.back()->ReadMetaData(metadata, treeid);
+    m_tableList.back()->ReadMetaData(table, treeid);
 }
 
 void SmartRefTable::DeleteTable(Int_t fileid)
