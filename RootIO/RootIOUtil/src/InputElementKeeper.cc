@@ -148,7 +148,7 @@ void InputElementKeeper::OpenFile(int fileid)
   std::map<int,std::string>::iterator it1 = treeInfo.begin();
   std::vector<TTree*>::iterator it2 = trees.begin();
   // The vector of poniters to TTree is of the same order with the treeInfo map
-  for (; it != treeInfo.end(); ++it1, ++it2) {
+  for (; it1 != treeInfo.end(); ++it1, ++it2) {
     // Reset the pointer to TTree
     m_treeMgr->ResetTree(it1->first, *it2);
 

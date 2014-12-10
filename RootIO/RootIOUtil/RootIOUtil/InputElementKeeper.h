@@ -14,6 +14,10 @@
 #include "RootIOUtil/TreeMetaData.h"
 #include "TObject.h"
 
+#include <map>
+#include <string>
+#include <vector>
+
 class SmartRefTable;
 class InputTreeManager;
 class InputFileManager;

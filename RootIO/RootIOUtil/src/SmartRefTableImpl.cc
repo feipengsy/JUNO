@@ -1,7 +1,7 @@
 #include "SmartRefTableImpl.h"
+#include "UniqueIDTable.h"
 #include "TProcessID.h"
 
-#include "UniqueIDTable"
 #include <algorithm>
 
 SmartRefTableImpl::SmartRefTableImpl(Int_t fileid) 
@@ -212,17 +212,17 @@ void SmartRefTableImpl::ReadMetaData(JM::TablePerTree* table, Int_t treeid)
   // Read UniqueIDTable
 
   //BIDVector: std::vector<std::vector<Short_t> >
-  TablePerTree::BIDVector bids = table->GetBranchIDs();
+  JM::TablePerTree::BIDVector bids = table->GetBranchIDs();
   //UIDVector: std::vector<std::vector<Int_t> > 
-  TablePerTree::UIDVector uids = table->GetUniqueIDs();
+  JM::TablePerTree::UIDVector uids = table->GetUniqueIDs();
   //GUIDVector: std::vector<std::string> 
-  TablePerTree::GUIDVector guids = table->GetGUIDs();
+  JM::TablePerTree::GUIDVector guids = table->GetGUIDs();
 
-  TablePerTree::UIDVector::const_iterator it_uids;
+  JM::TablePerTree::UIDVector::const_iterator it_uids;
   std::vector<Int_t>::const_iterator it_uid;
-  TablePerTree::GUIDVector::const_iterator it_guids;
+  JM::TablePerTree::GUIDVector::const_iterator it_guids;
   if (0 != bids.size()) {
-    TablePerTree::BIDVector::const_iterator it_bids;
+    JM::TablePerTree::BIDVector::const_iterator it_bids;
     std::vector<Short_t>::const_iterator it_bid;
     for (it_uids = uids.begin(), it_bids = bids.begin(), it_guids = guids.begin(); it_guids != guids.end(); ++it_uids, ++it_bids, ++it_guids) {
       for (it_uid = it_uids->begin(), it_bid = it_bids->begin(); it_uid != it_uids->end(); ++it_uid, ++it_bid) {

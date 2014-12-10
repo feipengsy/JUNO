@@ -58,10 +58,10 @@ void RootOutputFileHandle::addGeoManager(TGeoManager* geo)
     }
 }
 
-void addUniqueIDTable(const std::string& treename,
-                      const std::vector<std::string>& guid,
-                      const std::vector<std::vector<Int_t> >& uid,
-                      const std::vector<std::vector<Short_t> >& bid)
+void RootOutputFileHandle::addUniqueIDTable(const std::string& treename,
+                                            const std::vector<std::string>& guid,
+                                            const std::vector<std::vector<Int_t> >& uid,
+                                            const std::vector<std::vector<Short_t> >& bid)
 {
     m_IDTable->AddTable(treename, guid, uid, bid);
 }
