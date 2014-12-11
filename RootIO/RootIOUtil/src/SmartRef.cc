@@ -198,7 +198,7 @@ void JM::SmartRef::Streamer(TBuffer &R__b)
     m_pid = R__b.ReadProcessID(pidf);
     InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper(false);
     Int_t uid = GetUniqueID();
-    keeper->AddObjRef(uid, m_pid);
+    if (keeper) keeper->AddObjRef(uid, m_pid);
   } 
   else {
     // Writing
