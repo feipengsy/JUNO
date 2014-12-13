@@ -11,8 +11,9 @@
 DECLARE_SERVICE(RootInputSvc);
 
 RootInputSvc::RootInputSvc(const std::string& name) 
-  : BaseIOSvc(name), m_fileReader(0),
-    m_inputStream(0), m_keeper(0),
+  : BaseIOSvc(name),
+    m_inputStream(0), 
+    m_keeper(0),
     m_regSvc(0)
 {
     declProp("InputFile", m_inputFile);
@@ -40,27 +41,62 @@ bool RootInputSvc::initialize()
     }
 
     m_regSvc = static_cast<DataRegistritionSvc*>(drs.data());
+
+    // Construct input stream
+    m_inputStream = new RootInputStream(m_regSvc);
+
+    // Print out input file list and erase reduplicated input files
+    if (!m_inputFile.size()) {
+        LogError << "No input file set"
+                 << std::endl;
+        return false;
+    }
+    std::vector<std::string>::iterator it, ret, beg = m_inputFile.begin();
+
+    LogDebug << "InputFile list: total " << m_inputFile.size()
+             << std::endl;
+
+    LogDebug << "Input File: " << *beg << std::endl;
+    for (it = beg + 1; it != m_inputFile.end(); ) {
+        ret = std::find(beg, it, *it);
+        if (ret != it) {
+            LogWarn << "Found reduplicated input file: " << *it
+                    << ". Skipped" << std::endl;
+            it = m_inputFile.erase(it);
+        }
+        else {
+            LogDebug << "Input File: " << *it << std::endl;
+            ++it;
+        }
+    }
   
     // Construct file reader and input stream
     m_fileReader = new RootFileReader(m_keeper);
     m_inputStream = new RootInputStream(m_regSvc);
 
-
-    // Add input files to the file reader
+    // Print out input file list
     if (!m_inputFile.size()) {
-        LogError << "No input file set" 
+        LogError << "No input file set"
                  << std::endl;
         return false;
     }
-    std::vector<std::string>::iterator it, end = m_inputFile.end();
+    std::vector<std::string>::iterator it, ret, beg = m_inputFile.begin();
 
     LogDebug << "InputFile list: total " << m_inputFile.size()
              << std::endl;
-    for (it = m_inputFile.begin(); it != end; ++it) {
-        LogDebug <<  "Adding " << *it << std::endl;
-        if(!m_fileReader->AddFile(*it)) {
-          LogWarn << "Found reduplicated input file: " << *it
-                  << ". Skipped" << std::endl;
+
+    // Erase reduplicated files
+    LogDebug << "Input File: " << *beg << std::endl;
+    for (it = beg + 1; it != m_inputFile.end(); ) {
+        ret = std::find(beg, it, *it);
+        if (ret != it) {
+            LogWarn << "Found reduplicated input file: " << *it
+                    << ". Skipped" << std::endl;
+            it = m_inputFile.erase(it);
+        }
+        else {
+            LogDebug << "Input File: " << *it << std::endl;
+            ++it;
         }
     }
 

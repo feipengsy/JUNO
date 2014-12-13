@@ -12,7 +12,6 @@
 #include "RootIOSvc/BaseIOSvc.h"
 
 class RootInputStream;
-class RootFileReader;
 class InputElementKeeper;
 class DataRegistritionSvc;
 class TObject;
@@ -36,7 +35,6 @@ public:
 
 private:
 
-    RootFileReader* m_fileReader;
     std::vector<std::string> m_inputFile;
     RootInputStream* m_inputStream;
     InputElementKeeper* m_keeper;

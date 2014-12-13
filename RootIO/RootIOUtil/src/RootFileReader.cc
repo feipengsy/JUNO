@@ -6,18 +6,12 @@
 #include "UniqueIDTable.h"
 #include "SniperKernel/SniperLog.h"
 
+#include "TTree.h"
+#include "TFile.h"
+
 #include <algorithm>
 
 using namespace std;
-
-bool RootFileReader::AddFile(const string& filename)
-{
-    vector<string>::iterator it = find(m_filenames.begin(), m_filenames.end(), filename);
-    // Reduplicated file found, which should be a mistake made by user
-    if (!(it == m_filenames.end())) return false;
-    m_filenames.push_back(filename);
-    return true;
-}
 
 bool RootFileReader::ReOpen(const string& filename, TFile*& file, const map<int,string>& treeinfo, vector<TTree*>& trees)
 {
@@ -51,30 +45,35 @@ bool RootFileReader::ReOpen(const string& filename, TFile*& file, const map<int,
     return true;
 }
 
-bool RootFileReader::ReadFiles(NavTreeList* navs, vector<string>& path, vector<string>& eventName)
+bool RootFileReader::ReadFiles(const vector<string>& fileList, NavTreeList* navs, vector<string>& path, vector<string>& eventName)
 {
+
+  // Get instance of InputElementKeeper
+  InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
+  if (!keeper) {
+    return false;
+  }
+
   vector<string>::iterator it;
   map<int,JM::FileMetaData*> fileMetaDatas;
   map<string, vector<int> > path2FileList;
-  for (it = m_filenames.begin(); it != m_filenames.end(); ++it) {
+  for (it = fileList.begin(); it != fileList.end(); ++it) {
     TFile* f = OpenFile(*it);
     if (!f) { 
-        LogError << "Fail to open file: " << *it
-                 << endl;
+        //LogError << "Fail to open file: " << *it
+        //         << endl;
         return false;
     }
     JM::FileMetaData* fmetadata = GetFileMetaData(f);
     if (!fmetadata) {
-        LogError << "Fail to read file metadata for file: " << *it
-                 << endl;
+        //LogError << "Fail to read file metadata for file: " << *it
+        //         << endl;
         return false;
     }
 
     // Get tree metadatas in file metadata, and register this file in InputElementKeeper
     vector<JM::TreeMetaData*> tmetadatas = fmetadata->GetTreeMetaData();
-    // keeper should already be initialized by RootInputSvc
-    int fileid = m_keeper->RegisterFile(*it, tmetadatas);
-    
+    int fileid = keeper->RegisterFile(*it, tmetadatas);    
     fileMetaDatas.insert(make_pair(fileid, fmetadata));
 
     // Construct the path2files map
@@ -90,9 +89,10 @@ bool RootFileReader::ReadFiles(NavTreeList* navs, vector<string>& path, vector<s
             pathpos->second.push_back(fileid);
         }
     }
+    //TODO Construct the uuid2files map
     f->Close();
   }
-  m_keeper->RegisterPathMap(path2FileList);
+  keeper->RegisterPathMap(path2FileList);
 
   // coffee time over, now get down to business
 
@@ -164,18 +164,25 @@ TTree* RootFileReader::GetNavTree(TFile* file)
 
 TObject* RootFileReader::GetUserData(const std::vector<int>& fileList, const std::string& name)
 {
+
+  // Get instance of InputElementKeeper
+  InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
+  if (!keeper) {
+    return false;
+  }
+
   TObject* obj = 0;
   std::vector<int>::const_iterator it, end = fileList.end();
   for (it = fileList.begin();it != end; ++it) {
-    bool preStatus = m_keeper->CheckFileStatus(*it);
+    bool preStatus = keeper->CheckFileStatus(*it);
     TFile* file;
     if (preStatus) {
       // File not closed
-      file = m_keeper->GetFile(*it);
+      file = keeper->GetFile(*it);
       obj = ReadObject(file,name);
     }
     else {
-      file = OpenFile(m_keeper->GetFileName(*it));
+      file = OpenFile(keeper->GetFileName(*it));
       obj = ReadObject(file,name);
       file->Close();
     }
