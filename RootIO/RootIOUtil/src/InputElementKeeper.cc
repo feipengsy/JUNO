@@ -3,6 +3,7 @@
 #include "RootIOUtil/InputFileManager.h"
 #include "RootIOUtil/SmartRefTable.h"
 #include "RootIOUtil/RootFileReader.h"
+#include "RootIOUtil/FileMetaData.h"
 #include "UniqueIDTable.h"
 
 #include "TTree.h"
@@ -56,9 +57,41 @@ int InputElementKeeper::RegisterFile(std::string& filename, std::vector<JM::Tree
   return fileid;
 }
 
-void InputElementKeeper::RegisterPathMap(const Path2Files& pathmap)
+void InputElementKeeper::RegisterPathMap(const String2FileIDs& pathmap)
 {
-  m_path2FileList = pathmap;
+  RegisterFileMap(pathmap, "path");
+}
+
+void InputElementKeeper::RegisterUUIDMap(const String2FileIDs& uuidmap)
+{
+  RegisterFileMap(uuidmap, "uuid");
+}
+
+void InputElementKeeper::RegisterFileMap(const String2FileIDs& value, const std::string& type)
+{
+  String2FileIDs* tar = 0;
+  if ("uuid" == type) {
+    tar = &m_uuid2FileList;
+  }
+  else if ("path" == type) {
+    tar = &m_path2FileList;
+  }
+  else {
+    return;
+  }
+
+  String2FileIDs::iterator pos, it, end = value.end();
+  for (it = value.begin(); it != end; ++it) {
+    pos = tar->find(it->first);
+    if (pos != tar->end()) {
+      // Hit, connect the 2 file id vector
+      pos->second.insert(pos->second.end(), it->second.begin(), it->second.end());
+    }
+    else {
+      // Miss, insert one new element
+      tar->insert(std::make_pair(it->first, it->second));
+    }
+  }
 }
 
 void InputElementKeeper::AddObjRef(Int_t uid, const TProcessID* pid)
@@ -176,14 +209,15 @@ TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Int_t b
 std::vector<int> InputElementKeeper::GetFileList(const std::string& path)
 {
   if (path == "none") {
+    // Return all the files
     std::vector<int> allList;
-    Path2Files::iterator it, end = m_path2FileList.end();
+    String2FileIDs::iterator it, end = m_path2FileList.end();
     for (it = m_path2FileList.begin(); it != end; ++it) {
       allList.insert(allList.begin(), it->second.begin(), it->second.end());
     }
     return allList;
   }
-  Path2Files::iterator pos = m_path2FileList.find(path);
+  String2FileIDs::iterator pos = m_path2FileList.find(path);
   if (pos == m_path2FileList.end()) {
     return std::vector<int>();
   }

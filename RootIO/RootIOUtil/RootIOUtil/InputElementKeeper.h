@@ -36,7 +36,7 @@ class InputElementKeeper {
 
 public:
 
-    typedef std::map<std::string, std::vector<int> > Path2Files;
+    typedef std::map<std::string, std::vector<int> > String2FileIDs;
 
     // Destructor
     ~InputElementKeeper();
@@ -86,8 +86,11 @@ public:
     // Register a new input file into this keeper
     int RegisterFile(std::string& filename, std::vector<JM::TreeMetaData*>& trees);
 
-    // Set the map of data path and input file list
-    void RegisterPathMap(const Path2Files& pathmap);
+    // Reigster the map of data path and input file list
+    void RegisterPathMap(const String2FileIDs& pathmap);
+
+    // Register the map of TProcessID UUID and input file list
+    void RegisterUUIDMap(const String2FileIDs& uuidmap);
 
     // Check file status of a certain input file
     bool CheckFileStatus(int fileid) const;
@@ -99,17 +102,21 @@ public:
     std::vector<int> GetFileList(const std::string& path);
 
   private:
+
     SmartRefTable* m_table;
     InputTreeManager* m_treeMgr;
     InputFileManager* m_fileMgr;
-    Path2Files m_path2FileList;
+    String2FileIDs m_path2FileList, m_uuid2FileList;
+
+    // Singleton class
     static InputElementKeeper* m_keeper;  // Current InputElementKeeper
     int m_refCount;   // Reference count
 
   private:
     
-    /// Singleton class, constructor not supported
+    // Singleton class, private constructor
     InputElementKeeper();
+    RegisterFileMap(const String2FileIDs& value, const std::string& type);
 };
 
 #endif
