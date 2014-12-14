@@ -11,7 +11,6 @@
 #ifndef ROOTIOUTIL_INPUTELEMENTKEEPER_H
 #define ROOTIOUTIL_INPUTELEMENTKEEPER_H
 
-#include "RootIOUtil/TreeMetaData.h"
 #include "TObject.h"
 
 #include <map>
@@ -25,6 +24,12 @@ class TBranch;
 class TTree;
 class TFile;
 class TProcessID;
+
+namespace JM {
+  
+  class FileMetaData;
+  
+}
 
 
 class InputElementKeeper {

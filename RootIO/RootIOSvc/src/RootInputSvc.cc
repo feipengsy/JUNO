@@ -76,7 +76,7 @@ bool RootInputSvc::initialize()
              << std::endl;
     NavTreeList* ntl = new NavTreeList();
     std::vector<std::string> paths, eventNames;
-    if (!m_fileReader->ReadFiles(ntl, paths, eventNames)) {
+    if (!m_fileReader->ReadFiles(m_inputFile, ntl, paths, eventNames)) {
         LogError << "Failed to register input file"
                  << std::endl;
         return false;

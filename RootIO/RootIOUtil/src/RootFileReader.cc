@@ -47,6 +47,7 @@ bool RootFileReader::ReOpen(const string& filename, TFile*& file, const map<int,
 
 bool RootFileReader::ReadFiles(const vector<string>& fileList, NavTreeList* navs, vector<string>& path, vector<string>& eventName)
 {
+  // Read meta data of input files and register to InputElementKeeper, called by RootInputSvc
 
   // Get instance of InputElementKeeper
   InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
@@ -56,7 +57,7 @@ bool RootFileReader::ReadFiles(const vector<string>& fileList, NavTreeList* navs
 
   vector<string>::iterator it;
   map<int,JM::FileMetaData*> fileMetaDatas;
-  map<string, vector<int> > path2FileList;
+  map<string, vector<int> > path2FileList, uuid2FileList;
   for (it = fileList.begin(); it != fileList.end(); ++it) {
     TFile* f = OpenFile(*it);
     if (!f) { 
@@ -76,7 +77,7 @@ bool RootFileReader::ReadFiles(const vector<string>& fileList, NavTreeList* navs
     int fileid = keeper->RegisterFile(*it, tmetadatas);    
     fileMetaDatas.insert(make_pair(fileid, fmetadata));
 
-    // Construct the path2files map
+    // Construct the path2filesList map
     vector<JM::TreeMetaData*>::iterator tit, tend = tmetadatas.end();
     for (tit = tmetadatas.begin();tit != tend;++tit) {
         map<string, vector<int> >::iterator pathpos = path2FileList.find((*tit)->GetTreeName());
@@ -89,10 +90,24 @@ bool RootFileReader::ReadFiles(const vector<string>& fileList, NavTreeList* navs
             pathpos->second.push_back(fileid);
         }
     }
-    //TODO Construct the uuid2files map
+    // Construct the uuid2fileList map
+    vector<string> uuidList = fmetadata->GetUUIDList();
+    vector<string>::iterator uid, uend = uuidList.end();
+    for (uit = uuidList.begin(); uit != uend; ++uit) {
+        map<string, vector<int> >::iterator uuidpos = uuid2FileList.find(*uit);
+        if (uuidpos == uuid2FileList.end()) {
+            // miss
+            uuid2FileList.insert(make_pair(*uit, vector<int>(1,fileid)));
+        }
+        else {
+            // hit
+            uuidpos->second.push_back(fileid);
+        }
+    }
     f->Close();
   }
   keeper->RegisterPathMap(path2FileList);
+  keeper->RegisterUUIDMap(uuid2FileList);
 
   // coffee time over, now get down to business
 
