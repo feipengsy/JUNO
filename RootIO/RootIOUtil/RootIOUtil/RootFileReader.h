@@ -24,7 +24,6 @@ class RootFileReader {
 
 public:
 
-    RootFileReader() {}
     ~RootFileReader() {}
 
     // Open a registered input file again, called by InputElementKeeper
@@ -52,6 +51,7 @@ public:
     static TObject* GetUserData(const std::vector<int>& fileList, const std::string& name);
 
 private:
+    RootFileReader() {}
     static TObject* ReadObject(TDirectory* dir, const std::string& name);
 
 };
