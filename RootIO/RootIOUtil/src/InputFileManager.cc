@@ -24,9 +24,11 @@ InputFileHandle::~InputFileHandle()
     delete m_file;
 }
 
-void InputFileHandle::close()
+void InputFileHandle::Close()
 {
   m_file->Close();
+  InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
+  keeper->ClearTable(m_fileID);
   m_status = false;
 }
 
@@ -45,9 +47,7 @@ void InputFileHandle::DecTreeRef()
 {
   --m_activeTrees;
   if (m_activeTrees <= 0 && !m_navTreeRefFlag) {
-    this->close();
-    InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
-    keeper->ClearTable(m_fileID);
+    this->Close();
   }
 }
 
@@ -60,9 +60,7 @@ void InputFileHandle::ResetNavTreeRef()
 {
   m_navTreeRefFlag = false;
   if (m_activeTrees <= 0) {
-    this->close();
-    InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
-    keeper->ClearTable(m_fileID);
+    this->Close();
   }
 }
 
@@ -107,6 +105,11 @@ void InputFileManager::AddTreeRef(int fileid)
   m_files[fileid]->AddTreeRef();
 }
 
+void InputFileManager::CloseFile(int fileid)
+{
+  m_files[fileid]->Close();
+}
+
 void InputFileManager::DecTreeRef(int fileid)
 {
   m_files[fileid]->DecTreeRef();
@@ -125,11 +128,6 @@ void InputFileManager::ResetNavTreeRef(int fileid)
 bool InputFileManager::CheckFileStatus(int fileid) const
 {
   return m_files[fileid]->GetStatus();
-}
-
-void InputFileManager::close(int fileid)
-{
-  m_files[fileid]->close();
 }
 
 void InputFileManager::UpdateFile(int fileid, TFile* file)

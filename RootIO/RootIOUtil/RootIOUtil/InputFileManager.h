@@ -28,7 +28,7 @@ public:
     ~InputFileHandle();
     
     // Close the file
-    void close();
+    void Close();
     
     // Update the pointer to TFile when file is re-opened
     void UpdateFile(TFile* file);
@@ -88,6 +88,9 @@ public:
     
     // Add number of active trees by one
     void AddTreeRef(int fileid);
+
+    // Close the file
+    void CloseFile(int fileid);
   
     // Minus number of active trees by one
     void DecTreeRef(int fileid);
@@ -115,9 +118,6 @@ public:
 
   private:
     std::vector<InputFileHandle*> m_files;
-
-    // Close one file
-    void close(int fileid);
 };
 
 #endif

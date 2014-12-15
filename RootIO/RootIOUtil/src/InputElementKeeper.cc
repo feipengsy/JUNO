@@ -197,11 +197,34 @@ void InputElementKeeper::OpenFile(int fileid)
 
 TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Int_t branchID)
 {
+  int treeid = m_table->GetTreeID(uid, pid);
+  if (-1 == treeid) {
+    // Try to open a new input file and search again
+    String2FileIDs::iterator pos = m_uuid2FileList.find(pid->GetTitle());
+    if (pos != m_uuid2FileList.end()) {
+      std::vector<int>::iterator it, end = pos->second.end();
+      for (it = pos->second.begin(); it != end; ++it) {
+        // If this file is closed, open it
+        if (!CheckFileStatus(*it)) {
+          OpenFile(*it);
+          // Search branch id again
+          treeid = m_table->GetTreeID(uid, pid);
+          if (-1 == treeid) {
+            // oops! Opened the wrong file
+            m_fileMgr->CloseFile(*it)
+          }
+          else {
+            break;
+          }
+        }
+      }
+    }
+    // Sorry, the object is not in the input file list
+    if (-1 == treeid) return 0;
+  }
+  TTree* tree = m_treeMgr->GetTree(treeid);
   if (-1 == branchID) branchID = m_table->GetBranchID(uid, pid);
   if (-1 == branchID) return 0;
-  int treeid = m_table->GetTreeID(uid, pid);
-  if (-1 == treeid) return 0;
-  TTree* tree = m_treeMgr->GetTree(treeid);
   if (!tree) return 0;
   return (TBranch*)tree->GetListOfBranches()->At(branchID);
 }
