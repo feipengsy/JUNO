@@ -28,6 +28,7 @@ class TProcessID;
 namespace JM {
   
   class FileMetaData;
+  class TreeMetaData;
   
 }
 
@@ -84,7 +85,7 @@ public:
     void OpenFile(int fileid);
 
     // Register a new input file into this keeper
-    int RegisterFile(std::string& filename, std::vector<JM::TreeMetaData*>& trees);
+    int RegisterFile(const std::string& filename, const std::vector<JM::TreeMetaData*>& trees);
 
     // Reigster the map of data path and input file list
     void RegisterPathMap(const String2FileIDs& pathmap);
@@ -116,7 +117,7 @@ public:
     
     // Singleton class, private constructor
     InputElementKeeper();
-    RegisterFileMap(const String2FileIDs& value, const std::string& type);
+    void RegisterFileMap(const String2FileIDs& value, const std::string& type);
 };
 
 #endif

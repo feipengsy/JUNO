@@ -8,6 +8,7 @@
 
 #include "TTree.h"
 #include "TFile.h"
+#include "TProcessID.h"
 
 InputElementKeeper* InputElementKeeper::m_keeper = 0;
 
@@ -39,14 +40,14 @@ void InputElementKeeper::DecRef()
   if (0 == --m_refCount) delete this;
 }
 
-int InputElementKeeper::RegisterFile(std::string& filename, std::vector<JM::TreeMetaData*>& trees)
+int InputElementKeeper::RegisterFile(const std::string& filename, const std::vector<JM::TreeMetaData*>& trees)
 {
   int fileid = m_fileMgr->FindFile(filename);
   // File already registered.
   if (fileid != -1) return fileid;
   fileid = m_fileMgr->AddFile(filename);
   std::map<int,std::string> treeinfo;
-  std::vector<JM::TreeMetaData*>::iterator it;
+  std::vector<JM::TreeMetaData*>::const_iterator it;
   for (it = trees.begin(); it != trees.end(); ++it) {
     int treeid = m_treeMgr->AddTree(fileid);
     // Register meta data later when start to read data
@@ -80,7 +81,8 @@ void InputElementKeeper::RegisterFileMap(const String2FileIDs& value, const std:
     return;
   }
 
-  String2FileIDs::iterator pos, it, end = value.end();
+  String2FileIDs::iterator pos;
+  String2FileIDs::const_iterator it, end = value.end();
   for (it = value.begin(); it != end; ++it) {
     pos = tar->find(it->first);
     if (pos != tar->end()) {
@@ -211,7 +213,7 @@ TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Int_t b
           treeid = m_table->GetTreeID(uid, pid);
           if (-1 == treeid) {
             // oops! Opened the wrong file
-            m_fileMgr->CloseFile(*it)
+            m_fileMgr->CloseFile(*it);
           }
           else {
             break;

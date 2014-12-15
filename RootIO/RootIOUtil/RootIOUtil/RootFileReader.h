@@ -11,6 +11,10 @@
 #include <map>
 #include <vector>
 
+class TObject;
+class TTree;
+class TFile;
+class TDirectory;
 class NavTreeList;
 
 namespace JM {

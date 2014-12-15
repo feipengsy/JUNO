@@ -55,7 +55,7 @@ bool RootFileReader::ReadFiles(const vector<string>& fileList, NavTreeList* navs
     return false;
   }
 
-  vector<string>::iterator it;
+  vector<string>::const_iterator it;
   map<int,JM::FileMetaData*> fileMetaDatas;
   map<string, vector<int> > path2FileList, uuid2FileList;
   for (it = fileList.begin(); it != fileList.end(); ++it) {
@@ -92,7 +92,7 @@ bool RootFileReader::ReadFiles(const vector<string>& fileList, NavTreeList* navs
     }
     // Construct the uuid2fileList map
     vector<string> uuidList = fmetadata->GetUUIDList();
-    vector<string>::iterator uid, uend = uuidList.end();
+    vector<string>::iterator uit, uend = uuidList.end();
     for (uit = uuidList.begin(); uit != uend; ++uit) {
         map<string, vector<int> >::iterator uuidpos = uuid2FileList.find(*uit);
         if (uuidpos == uuid2FileList.end()) {
@@ -151,6 +151,11 @@ bool RootFileReader::GetNavTreeList(map<int,JM::FileMetaData*>& fmetadatas, NavT
 {
   // Construct NavTreeList for InputStream, using prority of navigators
   // TODO Add sanity check
+
+  InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
+  if (!keeper) {
+    return false;
+  }
   
   map<int,int> fid2priority;
   int highest = 0;
@@ -162,7 +167,7 @@ bool RootFileReader::GetNavTreeList(map<int,JM::FileMetaData*>& fmetadatas, NavT
   for (map<int,int>::iterator it = fid2priority.begin(); it != fid2priority.end(); ++it) {
     if (it->second == highest) {
       int fileid = it->first;
-      NavTreeHandle* tree = new NavTreeHandle(fileid,  m_keeper->GetFileName(fileid));
+      NavTreeHandle* tree = new NavTreeHandle(fileid,  keeper->GetFileName(fileid));
       navs->push_back(tree);
     }
   }

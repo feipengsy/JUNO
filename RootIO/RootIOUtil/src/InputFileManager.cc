@@ -64,7 +64,7 @@ void InputFileHandle::ResetNavTreeRef()
   }
 }
 
-void InputFileHandle::SetTreeInfo(std::map<int,std::string>& treeinfo) 
+void InputFileHandle::SetTreeInfo(const std::map<int,std::string>& treeinfo) 
 {
     m_treeInfo = treeinfo;
 }
@@ -79,14 +79,14 @@ InputFileManager::~InputFileManager()
     }
 }
 
-int InputFileManager::AddFile(std::string& filename)
+int InputFileManager::AddFile(const std::string& filename)
 {
   int fileid = m_files.size();
   m_files.push_back(new InputFileHandle(filename, fileid));
   return fileid;
 }
 
-int InputFileManager::FindFile(std::string& filename)
+int InputFileManager::FindFile(const std::string& filename)
 {
   std::vector<InputFileHandle*>::iterator it, itend = m_files.end();
   for (it = m_files.begin(); it != itend; ++it) {
@@ -95,7 +95,7 @@ int InputFileManager::FindFile(std::string& filename)
   return -1;
 }
 
-void InputFileManager::SetTreeInfo(int fileid, std::map<int,std::string>& treeinfo)
+void InputFileManager::SetTreeInfo(int fileid, const std::map<int,std::string>& treeinfo)
 {
   m_files[fileid]->SetTreeInfo(treeinfo);
 }

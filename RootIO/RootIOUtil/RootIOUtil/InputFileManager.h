@@ -52,7 +52,7 @@ public:
     bool GetStatus() const { return m_status; }
 
     // Reset the tree info when the file is re-opened
-    void SetTreeInfo(std::map<int,std::string>& treeinfo);
+    void SetTreeInfo(const std::map<int,std::string>& treeinfo);
 
     // Get the name of the file
     std::string& GetFileName() { return m_name; }
@@ -78,13 +78,13 @@ public:
     ~InputFileManager();
     
     // Add a input file
-    int AddFile(std::string& filename);
+    int AddFile(const std::string& filename);
 
     // Get the file id of the given file, -1 if not found
-    int FindFile(std::string& filename);
+    int FindFile(const std::string& filename);
     
     // Reset the tree info when one file is re-opened
-    void SetTreeInfo(int fileid, std::map<int,std::string>& treeinfo);
+    void SetTreeInfo(int fileid, const std::map<int,std::string>& treeinfo);
     
     // Add number of active trees by one
     void AddTreeRef(int fileid);

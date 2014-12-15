@@ -18,7 +18,7 @@ class FileMetaData : public TObject {
         ~FileMetaData();
 
         // Add a TreeMetaData to this FileMetaData
-        void AddTreeMetaData(JM::TreeMetaData* tmd);
+        void AddTreeMetaData(JM::TreeMetaData* tmd) { m_TreeMetaDatas.push_back(tmd); }
 
         // Setter and Getter functions
         void SetNavPriority(int value) { m_NavPriority = value; }

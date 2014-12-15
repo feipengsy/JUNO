@@ -71,7 +71,7 @@ void RootOutputFileHandle::addUUID(const std::vector<std::string>& uuids)
     // Insert new uuids
     m_UUIDList.insert(m_UUIDList.end(), uuids.begin(), uuids.end());
     // Erase reduplicated uuids
-    std::sort(m_UUIDList);
+    std::sort(m_UUIDList.begin(), m_UUIDList.end());
     m_UUIDList.erase(std::unique(m_UUIDList.begin(), m_UUIDList.end()), m_UUIDList.end());
 }
 
