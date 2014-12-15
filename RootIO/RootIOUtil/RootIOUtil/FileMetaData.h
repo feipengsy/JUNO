@@ -12,7 +12,7 @@ class FileMetaData : public TObject {
 
     public:
         typedef std::vector<JM::TreeMetaData*> TMDVector;
-        typedef std::vector<std::string> NameVector;
+        typedef std::vector<std::string> StringVector;
 
         FileMetaData() : m_NavPriority(-1) {}
         ~FileMetaData();
@@ -21,21 +21,21 @@ class FileMetaData : public TObject {
         void AddTreeMetaData(JM::TreeMetaData* tmd);
 
         // Setter and Getter functions
-        void SetNavPriority(int value);
-        void SetNavPath(const std::vector<std::string>& path);
-        void SetNavEventName(const std::vector<std::string>& path);
+        void SetNavPriority(int value) { m_NavPriority = value; }
+        void SetNavPath(const StringVector& path) { m_NavPath = path; }
+        void SetNavEventName(const StringVector& path) { m_NavEventName = path; }
 
-        int GetNavPriority() const;
-        TMDVector& GetTreeMetaData();
-        NameVector& GetNavPath();
-        NameVector& GetNavEventName();
-        const TMDVector& GetTreeMetaData() const;
-        const NameVector& GetNavPath() const;
-        const NameVector& GetNavEventName() const;
+        int GetNavPriority() const { return m_NavPriority; }
+        TMDVector& GetTreeMetaData() { return m_TreeMetaDatas; }
+        StringVector& GetNavPath() { return m_NavPath; }
+        StringVector& GetNavEventName() { return m_NavEventName; }
+        const TMDVector& GetTreeMetaData() const { return m_TreeMetaDatas; }
+        const StringVector& GetNavPath() const { return m_NavPath; }
+        const StringVector& GetNavEventName() const { return m_NavEventName; }
 
     private:
-        NameVector m_NavPath;       // The data path holded by EvtNavigator in this file
-        NameVector m_NavEventName;  // The name of event holded by EvtNavigator in this file
+        StringVector m_NavPath;       // The data path holded by EvtNavigator in this file
+        StringVector m_NavEventName;  // The name of event holded by EvtNavigator in this file
         TMDVector m_TreeMetaDatas;  // Container of TreeMetaData
         int m_NavPriority;          // Priority of this file
 
@@ -44,60 +44,5 @@ class FileMetaData : public TObject {
 };
 
 } // namespace JM
-
-inline void JM::FileMetaData::SetNavPriority(int value)
-{
-    m_NavPriority = value;
-}
-
-inline int JM::FileMetaData::GetNavPriority() const
-{
-    return m_NavPriority;
-}
-
-inline void JM::FileMetaData::AddTreeMetaData(JM::TreeMetaData* tmd)
-{
-    m_TreeMetaDatas.push_back(tmd);
-}
-
-inline void JM::FileMetaData::SetNavPath(const std::vector<std::string>& paths)
-{
-    m_NavPath = paths;
-}
-
-inline void JM::FileMetaData::SetNavEventName(const std::vector<std::string>& eventNames)
-{
-    m_NavEventName = eventNames;
-}
-
-inline JM::FileMetaData::TMDVector& JM::FileMetaData::GetTreeMetaData()
-{
-    return m_TreeMetaDatas;
-}
-
-inline const JM::FileMetaData::TMDVector& JM::FileMetaData::GetTreeMetaData() const
-{
-    return m_TreeMetaDatas;
-}
-
-inline JM::FileMetaData::NameVector& JM::FileMetaData::GetNavPath()
-{
-    return m_NavPath;
-}
-
-inline const JM::FileMetaData::NameVector& JM::FileMetaData::GetNavPath() const
-{
-    return m_NavPath;
-}
-
-inline JM::FileMetaData::NameVector& JM::FileMetaData::GetNavEventName()
-{
-    return m_NavEventName;
-}
-
-inline const JM::FileMetaData::NameVector& JM::FileMetaData::GetNavEventName() const
-{
-    return m_NavEventName;
-}
 
 #endif
