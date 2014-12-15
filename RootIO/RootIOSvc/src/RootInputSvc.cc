@@ -76,7 +76,7 @@ bool RootInputSvc::initialize()
              << std::endl;
     NavTreeList* ntl = new NavTreeList();
     std::vector<std::string> paths, eventNames;
-    if (!m_fileReader->ReadFiles(m_inputFile, ntl, paths, eventNames)) {
+    if (!RootFileReader::ReadFiles(m_inputFile, ntl, paths, eventNames)) {
         LogError << "Failed to register input file"
                  << std::endl;
         return false;
@@ -96,7 +96,6 @@ bool RootInputSvc::finalize()
            << std::endl;
 
   delete m_inputStream;
-  delete m_fileReader;
   m_keeper->DecRef();
 
   LogDebug << "RootInputSvc sucessfully finalized"
@@ -129,7 +128,7 @@ bool RootInputSvc::getObj(TObject*& obj, const std::string& name, const std::str
                << ". Can't read object" << std::endl;
       return false;
   }
-  readObj = m_fileReader->GetUserData(fileList, name);
+  readObj = RootFileReader::GetUserData(fileList, name);
   if (0 == readObj) {
       LogError << "Failed to read object: " << name 
                << std::endl;
