@@ -151,6 +151,7 @@ bool RootFileWriter::close()
     // Set TreeMetaData
     m_file->addTreeMetaData(m_treeMetaData);
     m_file->addUniqueIDTable(m_path, m_guid, m_uid, m_bid);
+    m_file->addUUID(m_guid);
     // Dec file reference, close when it hits 0
     RootOutputFileManager::get()->close_file(m_file->getName());
     // Reset pointers

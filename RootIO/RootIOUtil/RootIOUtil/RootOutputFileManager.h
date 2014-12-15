@@ -20,6 +20,7 @@ class RootOutputFileHandle {
 
 public:
     typedef std::map<std::string, bool> PathMap;
+    typedef std::vector<std::string> StringVector;
     typedef std::vector<TGeoManager*> GeoVector;
  
     RootOutputFileHandle(const std::string& filename, const std::map<std::string, int>& paths);
@@ -31,9 +32,9 @@ public:
 
     std::string getName();
 
-    void setNavPath(const std::vector<std::string>& paths);
+    void setNavPath(const StringVector& paths);
 
-    void setNavEventName(const std::vector<std::string>& eventNames);
+    void setNavEventName(const StringVector& eventNames);
 
     void addTreeMetaData(JM::TreeMetaData* treemetadata);
 
@@ -42,9 +43,11 @@ public:
     void addRef();
 
     void addUniqueIDTable(const std::string& treename,
-                          const std::vector<std::string>& guid,
+                          const StringVector& guid,
                           const std::vector<std::vector<Int_t> >& uid,
                           const std::vector<std::vector<Short_t> >& bid);
+
+    void addUUID(const StringVector& uuids);
 
     int decRef();
 
@@ -59,14 +62,15 @@ public:
     bool hasPath(const std::string& path);
 
 private:
-    TFile* m_file;
-    TTree* m_navTree;
-    JM::FileMetaData* m_fileMetaData;
-    JM::UniqueIDTable* m_IDTable;
-    PathMap m_paths;
-    GeoVector m_geos;
-    int m_refCount;
-    void* m_navAddr;
+    TFile*              m_file;
+    TTree*              m_navTree;
+    JM::FileMetaData*   m_fileMetaData;
+    JM::UniqueIDTable*  m_IDTable;
+    StringVector        m_UUIDList;
+    PathMap             m_paths;
+    GeoVector           m_geos;
+    int                 m_refCount;
+    void*               m_navAddr;
 };
 
 class RootOutputFileManager {

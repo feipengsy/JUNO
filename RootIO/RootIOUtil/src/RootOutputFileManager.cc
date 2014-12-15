@@ -66,6 +66,15 @@ void RootOutputFileHandle::addUniqueIDTable(const std::string& treename,
     m_IDTable->AddTable(treename, guid, uid, bid);
 }
 
+void RootOutputFileHandle::addUUID(const std::vector<std::string>& uuids)
+{
+    // Insert new uuids
+    m_UUIDList.insert(m_UUIDList.end(), uuids.begin(), uuids.end());
+    // Erase reduplicated uuids
+    std::sort(m_UUIDList);
+    m_UUIDList.erase(std::unique(m_UUIDList.begin(), m_UUIDList.end()), m_UUIDList.end());
+}
+
 int RootOutputFileHandle::decRef()
 {
     return --m_refCount;
@@ -73,6 +82,8 @@ int RootOutputFileHandle::decRef()
 
 void RootOutputFileHandle::close()
 {
+    m_fileMetaData->SetUUIDList(m_UUIDList);
+
     m_file->mkdir("NonUserData");
     m_file->cd("NonUserData");
 
