@@ -41,6 +41,7 @@ private:
     DataRegistritionSvc* m_regSvc;
     bool m_streamInitialized;
 
+    bool initializeOutputStream(const JM::EvtNavigator* nav);
     bool doAttachObj(const std::string& path, TObject* obj);
 };
 

@@ -57,6 +57,13 @@ bool RootOutputSvc::finalize()
 
 bool RootOutputSvc::initializeOutputStream()
 {
+    // Do nothing, just for old version compatibility
+    // Output streams will be initialized by the initalizeOutputStream(JM::EvtNavigator*) version
+    return true;
+}
+
+bool RootOutputSvc::initializeOutputStream(const JM::EvtNavigator* nav)
+{
     LogDebug << "Initializing RootOutputStreams..."
              << std::endl;
 
