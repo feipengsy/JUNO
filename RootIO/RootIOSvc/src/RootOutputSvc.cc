@@ -23,7 +23,7 @@ bool RootOutputSvc::initialize()
     LogDebug << "Initializing RootOutputSvc..."
              << std::endl;
 
-    OutputFileMap::iterator it, end = m_outputFileMap.end();
+    String2String::iterator it, end = m_outputFileMap.end();
     LogDebug << "Output streams list:"
              << std::endl;
     for (it = m_outputFileMap.begin(); it != end; ++it) {
@@ -78,19 +78,32 @@ bool RootOutputSvc::initializeOutputStream(const JM::EvtNavigator* nav)
 
     m_regSvc = dynamic_cast<DataRegistritionSvc*>(drs.data());
 
+    // Now, try to confirm the event type of output paths
+    for (String2String::iterator it = m_outputFileMap.begin(); it != m_outputFileMap.end(); ++it) {
+        JM::HeaderObject* header = nav->getHeader(*it);
+        if (header) {
+            m_path2typeMap.insert(std::make_pair(*it, header->ClassName()));
+        }
+        else {
+            // The EvtNavigator does not hold this output path
+            m_path2typeMap.insert(std::make_pair<std::string, std::string>(*it, "unknown"));
+            // TODO LogWarn
+            // TODO m_notYet...
+        }
+    }
+    
     // Sort the paths according to the priority
 
     // The first string of the inner vector is the path of the stream to be generated.
     // Rest of the strings are the path of other streams share the same output file(if any).
     std::map<int, std::vector<std::string> > priority2paths;
 
-    OutputFileMap::iterator it, it2, end  = m_outputFileMap.end();
+    String2String::iterator it, it2, end  = m_outputFileMap.end();
     for (it = m_outputFileMap.begin(); it != end; ++it) {
-        int priority = m_regSvc->getPriority(it->first);
+        int priority = EDMManager::get()->getPriorityWithHeader(m_path2typeMap[it->first]);
         if (0 == priority) {
-            LogError << "Found un-registered output path: " << it->first
-                     << std::endl;
-            return false;
+            // No yet known path. We won't create output stream for it
+            continue;
         }
         std::vector<std::string> paths;
         paths.push_back(it->first);
@@ -106,13 +119,15 @@ bool RootOutputSvc::initializeOutputStream(const JM::EvtNavigator* nav)
 
     
     // Now create output file and initialize RootOutputStreams.
+    // Notice: We won't create output stream and file for currently "unknown" paths.
+    // They will be created later.
     std::map<int, std::vector<std::string> >::iterator pit, pend = priority2paths.end();
     for (pit = priority2paths.begin(); pit != pend; ++pit) {
         // Create output file
         std::map<std::string, int> path2priority;
         std::vector<std::string>::iterator oit, oend = pit->second.end();
         for (oit = pit->second.begin(); oit != oend; ++oit) {
-            int opriority = m_regSvc->getPriority(*oit);
+            int opriority = EDMManager::get()->getPriorityWithHeader(m_path2typeMap[*oit]);
             path2priority.insert(std::make_pair(*oit, opriority));
         }
         std::string primary_path = pit->second[0];
@@ -145,6 +160,10 @@ bool RootOutputSvc::write(JM::EvtNavigator* nav)
         LogError << "No EvtNavigator, can not write"
                  << std::endl;
         return false;
+    }
+
+    if (!m_streamInitialized) {
+        initializeOutputStream(nav);
     }
 
     LogDebug << "Writing data to output files..."
@@ -201,7 +220,7 @@ bool RootOutputSvc::attachObj(const std::string& path, TObject* obj)
 
 bool RootOutputSvc::doAttachObj(const std::string& path, TObject* obj)
 {
-    OutputFileMap::iterator it, end = m_outputFileMap.end();
+    String2String::iterator it, end = m_outputFileMap.end();
     for (it = m_outputFileMap.begin();it != end;++it) {
         if (path == it->first) {
             // Hit
