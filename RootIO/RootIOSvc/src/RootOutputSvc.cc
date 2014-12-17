@@ -220,19 +220,15 @@ bool RootOutputSvc::attachObj(const std::string& path, TObject* obj)
 
 bool RootOutputSvc::doAttachObj(const std::string& path, TObject* obj)
 {
-    String2String::iterator it, end = m_outputFileMap.end();
-    for (it = m_outputFileMap.begin();it != end;++it) {
-        if (path == it->first) {
-            // Hit
-            // File will always be found
-            RootOutputFileHandle* file = RootOutputFileManager::get()->get_file_with_name(it->second);
-            if (strcmp(obj->ClassName(), "TGeoManager") == 0) {
-                file->addGeoManager(static_cast<TGeoManager*>(obj));
-                return true;
-            }
-            // TODO Other object type... 
+    String2String::iterator pos = m_outputFileMap.find(path);
+    if (pos != m_outputFileMap.end()) {
+        RootOutputFileHandle* file = RootOutputFileManager::get()->get_file_with_name(it->second);
+        if (strcmp(obj->ClassName(), "TGeoManager") == 0) {
+            file->addGeoManager(static_cast<TGeoManager*>(obj));
             return true;
         }
+        // TODO Other object type... 
+        return true;
     }
     // Miss
     LogError << "Can not find output stream: " << path 
