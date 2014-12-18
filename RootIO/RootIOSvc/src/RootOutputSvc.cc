@@ -62,7 +62,7 @@ bool RootOutputSvc::initializeOutputStream()
     return true;
 }
 
-bool RootOutputSvc::initializeOutputStream(const JM::EvtNavigator* nav)
+bool RootOutputSvc::initializeOutputStream(JM::EvtNavigator* nav)
 {
     LogDebug << "Initializing RootOutputStreams..."
              << std::endl;
@@ -87,8 +87,9 @@ bool RootOutputSvc::initializeOutputStream(const JM::EvtNavigator* nav)
         else {
             // The EvtNavigator does not hold this output path
             m_path2typeMap.insert(std::make_pair<std::string, std::string>(*it, "unknown"));
-            // TODO LogWarn
-            // TODO m_notYet...
+            LogWarn << "Can not find path: " << *it 
+                    << "Skipped for now" << std::endl;
+            m_notYetInitPaths.push_back(*it);
         }
     }
     
@@ -96,15 +97,12 @@ bool RootOutputSvc::initializeOutputStream(const JM::EvtNavigator* nav)
 
     // The first string of the inner vector is the path of the stream to be generated.
     // Rest of the strings are the path of other streams share the same output file(if any).
-    std::map<int, std::vector<std::string> > priority2paths;
+    std::multimap<int, std::vector<std::string> > priority2paths;
 
     String2String::iterator it, it2, end  = m_outputFileMap.end();
     for (it = m_outputFileMap.begin(); it != end; ++it) {
+        // Get priority of this path, get 0 out of a "unknown" path
         int priority = EDMManager::get()->getPriorityWithHeader(m_path2typeMap[it->first]);
-        if (0 == priority) {
-            // No yet known path. We won't create output stream for it
-            continue;
-        }
         std::vector<std::string> paths;
         paths.push_back(it->first);
         for (it2 = m_outputFileMap.begin(); it2 != end; ++it2) {
@@ -117,11 +115,8 @@ bool RootOutputSvc::initializeOutputStream(const JM::EvtNavigator* nav)
         priority2paths.insert(std::make_pair(priority, paths));
     }
 
-    
     // Now create output file and initialize RootOutputStreams.
-    // Notice: We won't create output stream and file for currently "unknown" paths.
-    // They will be created later.
-    std::map<int, std::vector<std::string> >::iterator pit, pend = priority2paths.end();
+    std::multimap<int, std::vector<std::string> >::iterator pit, pend = priority2paths.end();
     for (pit = priority2paths.begin(); pit != pend; ++pit) {
         // Create output file
         std::map<std::string, int> path2priority;
@@ -131,13 +126,17 @@ bool RootOutputSvc::initializeOutputStream(const JM::EvtNavigator* nav)
             path2priority.insert(std::make_pair(*oit, opriority));
         }
         std::string primary_path = pit->second[0];
+        // RootOutputFileManager won't create dupilicated output files
         RootOutputFileManager::get()->new_file(m_outputFileMap[primary_path], path2priority);
         // Create output stream
-        std::string headerName = m_regSvc->getHeaderName(primary_path);
-        std::string eventName = m_regSvc->getEventName(primary_path);
+        std::string headerName = m_path2typeMap[*oit];
+        std::string eventName = EDMManager::get()->getEventNameWithHeader(m_path2typeMap[*oit]);
+        // Maybe regSvc is no longer needed
         RootOutputStream* stream = new RootOutputStream(headerName, eventName, primary_path, m_regSvc);
         // Start the output file
-        stream->newFile(m_outputFileMap[primary_path]);
+        if (headerName != "unknown") {
+            stream->newFile(m_outputFileMap[primary_path]);
+        }
         // Then the vector is sorted according to priotity
         m_outputStreams.push_back(stream);
     }
@@ -163,16 +162,40 @@ bool RootOutputSvc::write(JM::EvtNavigator* nav)
     }
 
     if (!m_streamInitialized) {
-        initializeOutputStream(nav);
+        // Output streams are not initialized yet
+        bool ok = initializeOutputStream(nav);
+        if (!ok) {
+            LogError << "Fail to initialize output streams" 
+                     << std::endl;
+            return false;
+        }
+    }
+
+    // Do we need to initialize the not yet initialized streams?
+    StringVector::iterator nit, nend = m_notYetInitPaths.end();
+    for (nit = m_notYetInitPaths.begin(); nit != nend; ++nit) {
+        JM::HeaderObject header = nav->getHeader(nit);
+        if (header) {
+            // Now we have got the "unknown" path, revise the corresponing output stream
+            bool ok = reviseOutputStream(*it, header->EventName());
+            if (!ok) {
+                LogError << "Fail to re-initialize output streams"
+                         << std::endl;
+                return false;
+            }
+        }
     }
 
     LogDebug << "Writing data to output files..."
              << std::endl;
 
+    // TODO before writing data, check if any output streams are revised, there will be a little difference
+
     OutputStreamVector::iterator it, end = m_outputStreams.end();
     for (it = m_outputStreams.begin(); it != end; ++it) {
         bool write = nav->writePath((*it)->path());
         if (!write) {
+            // TODO can not just skip it
             LogDebug << "Skipping path: " << (*it)->path()
                      << std::endl;
             continue;
@@ -196,6 +219,28 @@ bool RootOutputSvc::write(JM::EvtNavigator* nav)
     }
     LogDebug << "Finish write(JM::EvtNavigator*)" << std::endl;
     return true;
+}
+
+bool RootOutputSvc::reviseOutputStream(const std::string& path, const std::string& headerName)
+{
+    OutputStreamVector::iterator it, end = m_outputStreams.end();
+    for (it = m_outputStreams.begin(); it != end; ++it) {
+        if (path == (*it)->path()) {
+            // Reset the header and event name of this stream
+            (*it)->setHeaderName(headerName);
+            (*it)->setEventName(EDMManager::get()->getEventNameWithHeader(headerName));
+            // Notify the output file
+            int priority = EDMManager::get()->getPriorityWithHeader(headerName);
+            RootOutputFileManager::get()->reviseOutputFile(m_outputFileMap[path], path, priority);
+        }
+    }
+    // Notify other output streams
+    for (it = m_outputStreams.begin(); it != end; ++it) {
+        if (path == (*it)->path()) {
+            continue;
+        }
+        (*it)->revise();
+    }
 }
 
 bool RootOutputSvc::attachObj(const std::string& path, TObject* obj) 
