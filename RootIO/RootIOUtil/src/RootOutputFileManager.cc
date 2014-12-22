@@ -161,6 +161,18 @@ bool RootOutputFileHandle::hasPath(const std::string& path)
     return false; 
 }
 
+void RootOuputFileHandle::revise(const std::string& path, int priority)
+{
+    // Reset the priority if it's larger
+    if (priority > m_fileMetaData->GetNavPriority()) {
+        m_fileMetaData->SetNavPriority(priority);
+    }
+    // Add the path
+    if (m_paths.find(path) == m_paths.end()) {
+        m_paths.insert(std::make_pair(path, false));
+    }
+}
+
 /*   RootOutputFileManager   */
 
 RootOutputFileManager* RootOutputFileManager::m_fileMgr = 0;
@@ -225,4 +237,14 @@ void RootOutputFileManager::close_file(const std::string& filename)
     // Delete the file when it's closed
     delete it->second;
     m_filemap.erase(it); 
+}
+
+void RootOutputFileManager::reviseOutputFile(const std::string& filename, const std::string& path, int priority)
+{
+    FileMap::iterator it = m_filemap.find(filename);
+    if (it == m_filemap.end()) {
+        return;
+    }
+
+    it->second->revise(path, priority);
 }
