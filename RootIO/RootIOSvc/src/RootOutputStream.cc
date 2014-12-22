@@ -51,6 +51,12 @@ bool RootOutputStream::close()
     return true;
 }
 
+void RootOutputStream::revise()
+{
+    // Now that some new paths have entered the field view of vision, this stream must be notified
+    m_writer->revise();
+}
+
 bool RootOutputStream::setAddress(JM::EvtNavigator* nav)
 {
     void* header = nav->getHeader(m_path);

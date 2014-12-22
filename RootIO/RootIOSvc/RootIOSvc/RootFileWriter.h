@@ -35,6 +35,8 @@ public:
     /// Write tree to file and close file.
     bool close();
 
+    void revise();
+
     /// Start a new output file
     bool newFile(RootOutputFileHandle* file);
 
@@ -54,6 +56,9 @@ private:
 
     /// Build data for auto-loading
     void fillBID(TObject* obj, int bid);
+
+    // Check if this path is the last path of its output file
+    void checkFilePath();
 
 private:
     RootOutputFileHandle* m_file;

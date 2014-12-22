@@ -169,6 +169,12 @@ bool RootFileWriter::close()
     return true;
 }
 
+void RootFileWriter::revise()
+{
+    // Does EvtNavigator still need to be written with this stream?
+    this->checkFilePath();
+}
+
 bool RootFileWriter::newFile(RootOutputFileHandle* file)
 {
     m_file = file;
@@ -235,4 +241,14 @@ int RootFileWriter::entries()
 int RootFileWriter::fileEntries()
 {
     return m_fileEntries;
+}
+
+void RootFileWriter::checkFilePath()
+{
+    // Make the TTree holding EvtNavigator
+    // Save EvtNavigator together with the last path in the file
+    if (m_file->isLastPath(m_path)) {
+        m_withNav = true;
+        m_navTree = m_file->getNavTree();
+    }
 }

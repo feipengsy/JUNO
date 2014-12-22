@@ -36,6 +36,8 @@ public:
     /// Write tree to file and close file.
     bool close();
 
+    void revise();
+
     bool setAddress(JM::EvtNavigator* nav);
 
     /// Start a new output file
