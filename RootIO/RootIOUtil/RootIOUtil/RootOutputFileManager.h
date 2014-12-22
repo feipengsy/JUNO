@@ -57,7 +57,7 @@ public:
 
     void close();
 
-    void writing(const std::string& path);
+    void occupyPath(const std::string& path);
 
     bool hasPath(const std::string& path);
 

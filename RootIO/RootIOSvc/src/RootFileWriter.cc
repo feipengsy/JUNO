@@ -216,12 +216,8 @@ bool RootFileWriter::newFile(RootOutputFileHandle* file)
     m_treeMetaData = new JM::TreeMetaData();
     m_treeMetaData->SetTreeName(m_path.substr(0,last)+treename);
 
-    // Make the TTree holding EvtNavigator
-    // Save EvtNavigator together with the last path in the file
-    if (m_file->isLastPath(m_path)) {
-        m_withNav = true;
-        m_navTree = m_file->getNavTree();
-    }
+    m_file->occupyPath(m_path);
+    this->checkFilePath();
 
     return true;
 }

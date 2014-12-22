@@ -232,6 +232,8 @@ bool RootOutputSvc::reviseOutputStream(const std::string& path, const std::strin
             // Notify the output file
             int priority = EDMManager::get()->getPriorityWithHeader(headerName);
             RootOutputFileManager::get()->reviseOutputFile(m_outputFileMap[path], path, priority);
+            // Start the output file
+            (*it)->newFile(m_outputFileMap[path])
         }
     }
     // Notify other output streams

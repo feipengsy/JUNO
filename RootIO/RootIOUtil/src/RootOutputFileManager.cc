@@ -114,7 +114,7 @@ void RootOutputFileHandle::close()
     m_file->Close(); 
 }
 
-void RootOutputFileHandle::writing(const std::string& path)
+void RootOutputFileHandle::occupyPath(const std::string& path)
 {
     PathMap::iterator it = m_paths.find(path);
     // Path should always be found
