@@ -60,11 +60,13 @@ void RootOutputStream::revise()
 void RootOutputStream::setHeaderName(const std::string& name)
 {
     m_headerName = name;
+    m_writer->setHeaderName(name);
 }
 
 void RootOutputStream::setEventName(const std::string& name)
 {
     m_eventName = name;
+    m_writer->setEventName(name);
 }
 
 bool RootOutputStream::setAddress(JM::EvtNavigator* nav)

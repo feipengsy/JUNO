@@ -229,6 +229,16 @@ void RootFileWriter::setAddress(void* nav, void* header, void* event)
     m_eventAddr = event;
 }
 
+void RootFileWriter::setHeaderName(const std::string& name)
+{
+    m_headerName = name;
+}
+
+void RootFileWriter::setEventName(const std::string& name)
+{
+    m_eventName = name;
+}
+
 int RootFileWriter::entries()
 {
     return m_entries;

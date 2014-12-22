@@ -189,8 +189,6 @@ bool RootOutputSvc::write(JM::EvtNavigator* nav)
     LogDebug << "Writing data to output files..."
              << std::endl;
 
-    // TODO before writing data, check if any output streams are revised, there will be a little difference
-
     OutputStreamVector::iterator it, end = m_outputStreams.end();
     for (it = m_outputStreams.begin(); it != end; ++it) {
         bool write = nav->writePath((*it)->path());

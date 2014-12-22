@@ -25,38 +25,34 @@ public:
 
     RootFileWriter(const std::string& treepath, const std::string& headername, const std::string& eventname, DataRegistritionSvc* regSvc);
     ~RootFileWriter();
-
     /// Get current file handle
     RootOutputFileHandle* getFile();
-
     /// Write current state of addr to disk.
     bool write();
-
     /// Write tree to file and close file.
     bool close();
 
     void revise();
-
     /// Start a new output file
     bool newFile(RootOutputFileHandle* file);
-
     /// Return the number of entries in the output stream
     int entries();
 
     int fileEntries();
 
     void setAddress(void* nav, void* header, void* event);
+    /// Set the name of event header
+    void setHeaderName(const std::string& name);
+    /// Set the name of event
+    void setEventName(const std::string& name);
 
 private:
     /// Write event data to tree
     bool writeData();
- 
     /// Write Evtnavigators to tree
     bool writeNav();
-
     /// Build data for auto-loading
     void fillBID(TObject* obj, int bid);
-
     // Check if this path is the last path of its output file
     void checkFilePath();
 
