@@ -43,10 +43,25 @@ RootOutputFileHandle* RootFileWriter::getFile()
 
 bool RootFileWriter::write()
 {
-    if (!m_tree) {
-        LogError << "No tree, can not write"
+    if (!m_file) {
+        LogError << "No output file started, can not write"
                  << std::endl;
         return false;
+    }
+
+    if ("unknown" == m_headerName || "unknwon" == m_eventName) {
+        // Currently unknown stream, just idling
+        ++m_fileEntries;
+        return true;  
+    }
+
+    if (!m_tree) {
+        bool ok = this->initialize();
+        if (!ok) {
+            LogError << "Fail to initialize RootFileWriter"
+                     << std::endl;
+            return false;
+        }
     }
 
     if (m_withNav && !m_navTree) {
@@ -66,10 +81,10 @@ bool RootFileWriter::write()
 
     // Set entry for SmartRefs
     JM::EvtNavigator* nav = static_cast<JM::EvtNavigator*>(m_navAddr);
-    nav->setHeaderEntry(m_path, m_fileEntries);
+    nav->setHeaderEntry(m_path, m_entries);
 
     JM::HeaderObject* rheader = static_cast<JM::HeaderObject*>(m_headerAddr);
-    rheader->setEventEntry(m_fileEntries);
+    rheader->setEventEntry(m_entries);
 
     bool ok = this->writeData();
     if (!ok) return false;
@@ -175,10 +190,13 @@ void RootFileWriter::revise()
     this->checkFilePath();
 }
 
-bool RootFileWriter::newFile(RootOutputFileHandle* file)
+void RootFileWriter::newFile(RootOutputFileHandle* file)
 {
     m_file = file;
+}
 
+bool RootFileWriter::initialize()
+{
     // Make the directories up to but not including last one which is
     // the tree name.
     TFile* rootFile =  m_file->getFile();
@@ -218,8 +236,6 @@ bool RootFileWriter::newFile(RootOutputFileHandle* file)
 
     m_file->occupyPath(m_path);
     this->checkFilePath();
-
-    return true;
 }
 
 void RootFileWriter::setAddress(void* nav, void* header, void* event)

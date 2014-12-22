@@ -134,9 +134,7 @@ bool RootOutputSvc::initializeOutputStream(JM::EvtNavigator* nav)
         // Maybe regSvc is no longer needed
         RootOutputStream* stream = new RootOutputStream(headerName, eventName, primary_path, m_regSvc);
         // Start the output file
-        if (headerName != "unknown") {
-            stream->newFile(m_outputFileMap[primary_path]);
-        }
+        stream->newFile(m_outputFileMap[primary_path]);
         // Then the vector is sorted according to priotity
         m_outputStreams.push_back(stream);
     }
@@ -200,14 +198,8 @@ bool RootOutputSvc::write(JM::EvtNavigator* nav)
         }
         LogDebug << "Writing path: " << (*it)->path()
                  << std::endl;
-        LogDebug << "(*it)->setAddress(nav)" << std::endl;
-        bool ok = (*it)->setAddress(nav);
-        if (!ok) {
-            LogError << "Fail to set address for path: " << (*it)->path()
-                     << std::endl;
-            return false;
-        }
-        LogDebug << "(*it)->write()" << std::endl;
+        // Set address
+        (*it)->setAddress(nav);
         ok = (*it)->write();
         if (!ok) {
             LogError << "Fail to write stream for path: " << (*it)->path()
@@ -230,8 +222,6 @@ bool RootOutputSvc::reviseOutputStream(const std::string& path, const std::strin
             // Notify the output file
             int priority = EDMManager::get()->getPriorityWithHeader(headerName);
             RootOutputFileManager::get()->reviseOutputFile(m_outputFileMap[path], path, priority);
-            // Start the output file
-            (*it)->newFile(m_outputFileMap[path])
         }
     }
     // Notify other output streams

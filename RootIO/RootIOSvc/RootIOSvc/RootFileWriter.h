@@ -47,6 +47,8 @@ public:
     void setEventName(const std::string& name);
 
 private:
+    /// Initialize the writer
+    bool initialize();
     /// Write event data to tree
     bool writeData();
     /// Write Evtnavigators to tree
