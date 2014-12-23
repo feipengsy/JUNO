@@ -43,15 +43,29 @@ RootOutputFileHandle* RootFileWriter::getFile()
 
 bool RootFileWriter::write()
 {
+    // Check rationality
     if (!m_file) {
         LogError << "No output file started, can not write"
                  << std::endl;
         return false;
     }
+    if (m_withNav && !m_navTree) {
+        LogError << "No tree for EvtNavigator, can not write"
+                 << std::endl;
+        return false;
+    }
+    if (!m_headerAddr || !m_eventAddr || !m_navAddr) {
+        LogError << "Address not set, can not write"
+                 << std::endl;
+        return false;
+    }
 
-    if ("unknown" == m_headerName || "unknwon" == m_eventName) {
-        // Currently unknown stream, just idling
+    if ("unknown" == m_headerName || !nav->writePath(m_path)) {
+        // Currently unknown stream or skipped entry, just idling
         ++m_fileEntries;
+        if (m_withNav) {
+            this->writeNav();
+        }
         return true;  
     }
 
@@ -64,11 +78,6 @@ bool RootFileWriter::write()
         }
     }
 
-    if (m_withNav && !m_navTree) {
-        LogError << "No tree for EvtNavigator, can not write"
-                 << std::endl;
-        return false;
-    }
 
     // Build auto-loading data for TreeMetaData
     TObject* header = static_cast<TObject*>(m_headerAddr);
@@ -93,6 +102,8 @@ bool RootFileWriter::write()
 
     ++m_entries;
     ++m_fileEntries;
+    this->resetAddress();    
+
     return true;
 }
 
@@ -273,4 +284,11 @@ void RootFileWriter::checkFilePath()
         m_withNav = true;
         m_navTree = m_file->getNavTree();
     }
+}
+
+void RootFileWriter::resetAddress()
+{
+    m_headerAddr = 0;
+    m_eventAddr = 0;
+    m_navAddr = 0; 
 }

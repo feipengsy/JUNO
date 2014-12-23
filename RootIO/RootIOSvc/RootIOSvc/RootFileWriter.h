@@ -57,6 +57,8 @@ private:
     void fillBID(TObject* obj, int bid);
     // Check if this path is the last path of its output file
     void checkFilePath();
+    /// Reset the addresses to 0
+    void resetAddress();
 
 private:
     RootOutputFileHandle* m_file;
