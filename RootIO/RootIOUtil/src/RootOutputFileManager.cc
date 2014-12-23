@@ -161,7 +161,7 @@ bool RootOutputFileHandle::hasPath(const std::string& path)
     return false; 
 }
 
-void RootOuputFileHandle::revise(const std::string& path, int priority)
+void RootOutputFileHandle::revise(const std::string& path, int priority)
 {
     // Reset the priority if it's larger
     if (priority > m_fileMetaData->GetNavPriority()) {

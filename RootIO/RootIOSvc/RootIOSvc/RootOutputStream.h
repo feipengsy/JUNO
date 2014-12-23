@@ -38,10 +38,10 @@ public:
     void setHeaderName(const std::string& value);
     /// Set the event name
     void setEventName(const std::string& value);
-
-    bool setAddress(JM::EvtNavigator* nav);
+    /// Set address for the event to be written
+    void setAddress(JM::EvtNavigator* nav);
     /// Start a new output file
-    bool newFile(const std::string& filename);
+    void newFile(const std::string& filename);
     /// Return the number of entries in the output stream
     int entries();
 

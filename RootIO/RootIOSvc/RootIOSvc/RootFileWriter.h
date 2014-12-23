@@ -34,7 +34,7 @@ public:
 
     void revise();
     /// Start a new output file
-    bool newFile(RootOutputFileHandle* file);
+    void newFile(RootOutputFileHandle* file);
     /// Return the number of entries in the output stream
     int entries();
 

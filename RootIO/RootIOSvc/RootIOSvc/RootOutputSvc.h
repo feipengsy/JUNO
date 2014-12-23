@@ -21,9 +21,7 @@ public:
     typedef std::vector<std::string>              StringVector;
 
     RootOutputSvc(const std::string& name);
-
     ~RootOutputSvc();
-
     // Service interface
     bool initialize();
     bool finalize();
@@ -31,13 +29,12 @@ public:
     bool initializeOutputStream();
 
     bool write(JM::EvtNavigator* nav);
-
     // Attach additional TObject to be written to the stream.
     bool attachObj(const std::string& path, TObject* obj);
 
 private:
     bool initializeOutputStream(JM::EvtNavigator* nav);
-    bool reviseOutputStream(JM::EvtNavigator* nav, path);
+    bool reviseOutputStream(const std::string& path, const std::string& headerName);
     bool doAttachObj(const std::string& path, TObject* obj);
 
 private:

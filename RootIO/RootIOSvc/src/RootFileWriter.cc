@@ -60,7 +60,8 @@ bool RootFileWriter::write()
         return false;
     }
 
-    if ("unknown" == m_headerName || !nav->writePath(m_path)) {
+    bool write = static_cast<JM::EvtNavigator*>(m_navAddr)->writePath(m_path);
+    if ("unknown" == m_headerName || !write) {
         // Currently unknown stream or skipped entry, just idling
         ++m_fileEntries;
         if (m_withNav) {

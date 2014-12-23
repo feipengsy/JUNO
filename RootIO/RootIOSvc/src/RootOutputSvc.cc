@@ -80,16 +80,16 @@ bool RootOutputSvc::initializeOutputStream(JM::EvtNavigator* nav)
 
     // Now, try to confirm the event type of output paths
     for (String2String::iterator it = m_outputFileMap.begin(); it != m_outputFileMap.end(); ++it) {
-        JM::HeaderObject* header = nav->getHeader(*it);
+        JM::HeaderObject* header = nav->getHeader(it->first);
         if (header) {
-            m_path2typeMap.insert(std::make_pair(*it, header->ClassName()));
+            m_path2typeMap.insert(std::make_pair(it->first, header->ClassName()));
         }
         else {
             // The EvtNavigator does not hold this output path
-            m_path2typeMap.insert(std::make_pair<std::string, std::string>(*it, "unknown"));
-            LogWarn << "Can not find path: " << *it 
+            m_path2typeMap.insert(std::make_pair<std::string, std::string>(it->first, "unknown"));
+            LogWarn << "Can not find path: " << it->first 
                     << "Skipped for now" << std::endl;
-            m_notYetInitPaths.push_back(*it);
+            m_notYetInitPaths.push_back(it->first);
         }
     }
     
@@ -172,10 +172,10 @@ bool RootOutputSvc::write(JM::EvtNavigator* nav)
     // Do we need to initialize the not yet initialized streams?
     StringVector::iterator nit, nend = m_notYetInitPaths.end();
     for (nit = m_notYetInitPaths.begin(); nit != nend; ++nit) {
-        JM::HeaderObject header = nav->getHeader(nit);
+        JM::HeaderObject* header = nav->getHeader(*nit);
         if (header) {
             // Now we have got the "unknown" path, revise the corresponing output stream
-            bool ok = reviseOutputStream(*it, header->EventName());
+            bool ok = reviseOutputStream(*nit, header->ClassName());
             if (!ok) {
                 LogError << "Fail to re-initialize output streams"
                          << std::endl;
@@ -200,7 +200,7 @@ bool RootOutputSvc::write(JM::EvtNavigator* nav)
                  << std::endl;
         // Set address
         (*it)->setAddress(nav);
-        ok = (*it)->write();
+        bool ok = (*it)->write();
         if (!ok) {
             LogError << "Fail to write stream for path: " << (*it)->path()
                      << std::endl;
@@ -231,6 +231,7 @@ bool RootOutputSvc::reviseOutputStream(const std::string& path, const std::strin
         }
         (*it)->revise();
     }
+    return true;
 }
 
 bool RootOutputSvc::attachObj(const std::string& path, TObject* obj) 
@@ -257,7 +258,7 @@ bool RootOutputSvc::doAttachObj(const std::string& path, TObject* obj)
 {
     String2String::iterator pos = m_outputFileMap.find(path);
     if (pos != m_outputFileMap.end()) {
-        RootOutputFileHandle* file = RootOutputFileManager::get()->get_file_with_name(it->second);
+        RootOutputFileHandle* file = RootOutputFileManager::get()->get_file_with_name(pos->second);
         if (strcmp(obj->ClassName(), "TGeoManager") == 0) {
             file->addGeoManager(static_cast<TGeoManager*>(obj));
             return true;

@@ -74,22 +74,16 @@ void RootOutputStream::setAddress(JM::EvtNavigator* nav)
     m_writer->setAddress(nav, header, event);
 }
 
-bool RootOutputStream::newFile(const std::string& filename)
+void RootOutputStream::newFile(const std::string& filename)
 {
     // Only start a new file if filename differes
     if (m_writer->getFile() && filename == m_writer->getFile()->getName()) {
-        return true;
+        return;
     }
-
     this->close();
+    m_writer->newFile(RootOutputFileManager::get()->get_file_with_path(m_path));
 
-    bool ok = m_writer->newFile(RootOutputFileManager::get()->get_file_with_path(m_path));
-
-    if (ok) {
-        LogDebug << "Start a new file: " << filename
-                 << "for " << m_path
-                 << std::endl;
-    }
-
-    return ok;
+    LogDebug << "Start a new file: " << filename
+             << "for " << m_path
+             << std::endl;
 }
