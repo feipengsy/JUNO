@@ -1,7 +1,7 @@
 #include "DataRegistritionSvc/BookEDM.h"
-#include "DataRegistritionSvc/EDMRegistritionTable.h"
+#include "DataRegistritionSvc/EDMManager.h"
 
-BookEDM::BookEDM(const std::string& headerName, const std::string& eventName, int priority, const std::string& path)
+BookEDM::BookEDM(const std::string& headerName, const std::string& eventName, int priority, const std::string& defaultPath)
 {
-    EDMRegistritionTable::get()->book(headerName, eventName, priority, path);
+    EDMManager::get()->book(headerName, eventName, priority, defaultPath);
 }
