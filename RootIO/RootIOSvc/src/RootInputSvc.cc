@@ -3,7 +3,6 @@
 #include "RootIOUtil/InputElementKeeper.h"
 #include "RootIOUtil/RootFileReader.h"
 #include "RootIOUtil/NavTreeList.h"
-#include "DataRegistritionSvc/DataRegistritionSvc.h"
 #include "SniperKernel/SvcFactory.h"
 #include "SniperKernel/SniperLog.h"
 #include "SniperKernel/SniperPtr.h"
@@ -63,14 +62,14 @@ bool RootInputSvc::initialize()
     LogDebug << "Start registering input files to InputElementKeeper and initializing InputStream"
              << std::endl;
     NavTreeList* ntl = new NavTreeList();
-    std::vector<std::string> paths, eventNames;
-    if (!RootFileReader::ReadFiles(m_inputFile, ntl, paths, eventNames)) {
+    std::vector<std::string> paths;
+    if (!RootFileReader::ReadFiles(m_inputFile, ntl, paths)) {
         LogError << "Failed to register input file"
                  << std::endl;
         return false;
     }
     m_inputStream->registerTreeList(ntl);
-    m_inputStream->registerNavPaths(paths, eventNames);
+    m_inputStream->registerNavPaths(paths);
 
     LogDebug << "Sucessfully registered all input files, input stream initialized. " 
              << "RootInputSvc sucessfully initialized"

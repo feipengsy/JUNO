@@ -126,10 +126,6 @@ void RootOutputFileHandle::setNavPath(const std::vector<std::string>& paths)
     m_fileMetaData->SetNavPath(paths);
 }
 
-void RootOutputFileHandle::setNavEventName(const std::vector<std::string>& eventNames)
-{
-    m_fileMetaData->SetNavEventName(eventNames);
-}
 void RootOutputFileHandle::addTreeMetaData(JM::TreeMetaData* treemetadata)
 {
     m_fileMetaData->AddTreeMetaData(treemetadata);

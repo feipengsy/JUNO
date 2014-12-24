@@ -2,9 +2,8 @@
 #include "RootIOUtil/NavTreeList.h"
 #include "SniperKernel/SniperLog.h"
 #include "EvtNavigator/EvtNavigator.h"
-#include "DataRegistritionSvc/DataRegistritionSvc.h"
     
-RootInputStream::RootInputStream(DataRegistritionSvc* regSvc)
+RootInputStream::RootInputStream()
     : BaseIOStream("RootInputStream")
     , m_trees(0)
     , m_entry(-1)
@@ -35,10 +34,9 @@ void RootInputStream::registerTreeList(NavTreeList* ntl)
   m_trees = ntl;
 }
 
-void RootInputStream::registerNavPaths(const std::vector<std::string>& paths, const std::vector<std::string>& eventNames)
+void RootInputStream::registerNavPaths(const std::vector<std::string>& paths)
 {
   m_paths = paths;
-  m_eventNames = eventNames;
 }
 
 JM::EvtNavigator* RootInputStream::get() 

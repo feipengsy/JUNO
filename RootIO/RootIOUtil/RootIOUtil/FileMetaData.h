@@ -23,22 +23,18 @@ class FileMetaData : public TObject {
         // Setter and Getter functions
         void SetNavPriority(int value) { m_NavPriority = value; }
         void SetNavPath(const StringVector& path) { m_NavPath = path; }
-        void SetNavEventName(const StringVector& path) { m_NavEventName = path; }
         void SetUUIDList(const StringVector& uuids) { m_UUIDList = uuids; }
 
         int GetNavPriority() const { return m_NavPriority; }
         TMDVector& GetTreeMetaData() { return m_TreeMetaDatas; }
         StringVector& GetNavPath() { return m_NavPath; }
-        StringVector& GetNavEventName() { return m_NavEventName; }
         StringVector& GetUUIDList() { return m_UUIDList; }
         const TMDVector& GetTreeMetaData() const { return m_TreeMetaDatas; }
         const StringVector& GetNavPath() const { return m_NavPath; }
-        const StringVector& GetNavEventName() const { return m_NavEventName; }
         const StringVector& GetUUIDList() const { return m_UUIDList; }
 
     private:
         StringVector m_NavPath;       // The data path holded by EvtNavigator in this file
-        StringVector m_NavEventName;  // The name of event holded by EvtNavigator in this file
         StringVector m_UUIDList;      // The list of TProcessID uuids holded by objects in this file
         TMDVector m_TreeMetaDatas;    // Container of TreeMetaData
         int m_NavPriority;            // Priority of this file

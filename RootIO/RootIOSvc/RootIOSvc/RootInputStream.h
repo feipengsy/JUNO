@@ -31,7 +31,7 @@ public:
 
     void registerTreeList(NavTreeList* ntl);
 
-    void registerNavPaths(const std::vector<std::string>& paths, const std::vector<std::string>& eventNames);
+    void registerNavPaths(const std::vector<std::string>& paths);
 
     /// Read in current entry
     bool read();
@@ -62,7 +62,7 @@ public:
 
 private:
     NavTreeList* m_trees; // tree list of navigator
-    std::vector<std::string> m_paths, m_eventNames;
+    std::vector<std::string> m_paths;
     int m_entry;         // global entry count
     int m_entries;       // total entries;
     void* m_addr;

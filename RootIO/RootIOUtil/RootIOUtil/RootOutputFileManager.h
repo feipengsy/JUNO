@@ -34,8 +34,6 @@ public:
 
     void setNavPath(const StringVector& paths);
 
-    void setNavEventName(const StringVector& eventNames);
-
     void addTreeMetaData(JM::TreeMetaData* treemetadata);
 
     void addGeoManager(TGeoManager* geo);

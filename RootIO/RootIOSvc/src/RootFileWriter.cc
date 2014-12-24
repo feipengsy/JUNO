@@ -3,7 +3,6 @@
 #include "EvtNavigator/EvtNavigator.h"
 #include "RootIOUtil/TreeMetaData.h"
 #include "RootIOUtil/RootOutputFileManager.h"
-#include "DataRegistritionSvc/DataRegistritionSvc.h"
 
 #include "TObject.h"
 #include "TTree.h"

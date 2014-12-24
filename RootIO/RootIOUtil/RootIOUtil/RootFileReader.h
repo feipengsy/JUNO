@@ -34,7 +34,7 @@ public:
     static bool ReOpen(const std::string& filename, TFile*& file, const std::map<int,std::string>& treeinfo, std::vector<TTree*>& trees);
 
     // Open a input file and register it to InputElementKeeper
-    static bool ReadFiles(const std::vector<std::string>& fileList, NavTreeList* navs, std::vector<std::string>& path, std::vector<std::string>& eventName);
+    static bool ReadFiles(const std::vector<std::string>& fileList, NavTreeList* navs, std::vector<std::string>& path);
 
     // Static function to open a file
     static TFile* OpenFile(const std::string& filename);
@@ -43,7 +43,7 @@ public:
     static TTree* GetNavTree(TFile* file);
 
     // Given FileMetaDatas and file ids, initialize NavTreeList
-    static bool GetNavTreeList(std::map<int,JM::FileMetaData*>& fmetadatas, NavTreeList* navs, std::vector<std::string>& path, std::vector<std::string>& eventName);
+    static bool GetNavTreeList(std::map<int,JM::FileMetaData*>& fmetadatas, NavTreeList* navs, std::vector<std::string>& path);
 
     // Get the FileMetaData of a TFile
     static JM::FileMetaData* GetFileMetaData(TFile* file);

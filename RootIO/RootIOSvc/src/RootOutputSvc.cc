@@ -3,7 +3,6 @@
 #include "SniperKernel/SvcFactory.h"
 #include "SniperKernel/SniperPtr.h"
 #include "RootIOSvc/RootOutputStream.h"
-#include "DataRegistritionSvc/DataRegistritionSvc.h"
 #include "RootIOUtil/RootOutputFileManager.h"
 
 DECLARE_SERVICE(RootOutputSvc);

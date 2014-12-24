@@ -45,7 +45,7 @@ bool RootFileReader::ReOpen(const string& filename, TFile*& file, const map<int,
     return true;
 }
 
-bool RootFileReader::ReadFiles(const vector<string>& fileList, NavTreeList* navs, vector<string>& path, vector<string>& eventName)
+bool RootFileReader::ReadFiles(const vector<string>& fileList, NavTreeList* navs, vector<string>& path)
 {
   // Read meta data of input files and register to InputElementKeeper, called by RootInputSvc
 
@@ -111,7 +111,7 @@ bool RootFileReader::ReadFiles(const vector<string>& fileList, NavTreeList* navs
 
   // coffee time over, now get down to business
 
-  if (!GetNavTreeList(fileMetaDatas, navs, path, eventName)) return false; //TODO fail to get NavTreeList
+  if (!GetNavTreeList(fileMetaDatas, navs, path)) return false; //TODO fail to get NavTreeList
   
   // Cleaning gabage
   map<int,JM::FileMetaData*>::iterator fit,fitend = fileMetaDatas.end();
@@ -147,7 +147,7 @@ TFile* RootFileReader::OpenFile(const string& filename)
   return f;
 }
 
-bool RootFileReader::GetNavTreeList(map<int,JM::FileMetaData*>& fmetadatas, NavTreeList* navs, vector<string>& path, vector<string>& eventName)
+bool RootFileReader::GetNavTreeList(map<int,JM::FileMetaData*>& fmetadatas, NavTreeList* navs, vector<string>& path)
 {
   // Construct NavTreeList for InputStream, using prority of navigators
   // TODO Add sanity check
@@ -172,7 +172,6 @@ bool RootFileReader::GetNavTreeList(map<int,JM::FileMetaData*>& fmetadatas, NavT
     }
   }
   path = fmetadatas[fid2priority.begin()->first]->GetNavPath();
-  eventName = fmetadatas[fid2priority.begin()->first]->GetNavEventName();
   return true;
 }
 
