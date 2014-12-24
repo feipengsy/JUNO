@@ -7,7 +7,6 @@
 #include <vector>
 
 class RootOutputFileHandle;
-class DataRegistritionSvc;
 class TTree;
 class TDirectory;
 class TObject;
@@ -23,7 +22,7 @@ public:
     typedef std::vector<std::vector<Short_t> > BIDVector;
     typedef std::vector<std::vector<Int_t> > UIDVector;
 
-    RootFileWriter(const std::string& treepath, const std::string& headername, const std::string& eventname, DataRegistritionSvc* regSvc);
+    RootFileWriter(const std::string& treepath, const std::string& headername, const std::string& eventname);
     ~RootFileWriter();
     /// Get current file handle
     RootOutputFileHandle* getFile();
@@ -72,7 +71,6 @@ private:
     void* m_headerAddr;
     void* m_eventAddr;
     void* m_navAddr;
-    DataRegistritionSvc* m_regSvc;
    
     // For building TreeMetaData auto-loading data.
     GUIDVector m_guid;

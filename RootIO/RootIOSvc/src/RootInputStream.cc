@@ -11,7 +11,6 @@ RootInputStream::RootInputStream(DataRegistritionSvc* regSvc)
     , m_entries(-1)
     , m_addr(0)
     , m_initialized(false)
-    , m_regSvc(regSvc)
 {
 }
 
@@ -23,17 +22,6 @@ RootInputStream::~RootInputStream()
 
 bool RootInputStream::init()
 {
-    if (m_initialized) return true;
-    std::vector<std::string>::size_type index;
-    for (index = 0; index < m_paths.size(); ++index) {
-        bool ok = m_regSvc->registerData(m_eventNames[index], m_paths[index]);
-        if (!ok) {
-            LogError << "Failed to register path: " << m_paths[index]
-                     << " from input files" << std::endl;
-            return false;
-        }
-    }
-    m_initialized = true;
     return true;
 }
 

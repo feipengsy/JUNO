@@ -11,7 +11,7 @@
 #include "TProcessID.h"
 #include "TDirectory.h"
 
-RootFileWriter::RootFileWriter(const std::string& treepath, const std::string& headername, const std::string& eventname, DataRegistritionSvc* regSvc)
+RootFileWriter::RootFileWriter(const std::string& treepath, const std::string& headername, const std::string& eventname)
     : m_file(0)
     , m_tree(0)
     , m_navTree(0)
@@ -26,7 +26,6 @@ RootFileWriter::RootFileWriter(const std::string& treepath, const std::string& h
     , m_headerAddr(0)
     , m_eventAddr(0)
     , m_navAddr(0)
-    , m_regSvc(regSvc)
 {
     
 }
@@ -151,11 +150,7 @@ bool RootFileWriter::writeNav()
         // Tell FileMetaData what paths EvtNavigator privides.
         std::vector<std::string> eventNames, paths = static_cast<JM::EvtNavigator*>(m_navAddr)->getPath();
         std::vector<std::string>::iterator it, end = paths.end();
-        for (it = paths.begin(); it != end; ++it) {
-            eventNames.push_back(m_regSvc->getEventName(*it));
-        }
         m_file->setNavPath(paths);
-        m_file->setNavEventName(eventNames);
     }
     m_file->setNavAddr(m_navAddr);
     int nbytes = m_navTree->Fill();

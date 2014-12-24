@@ -9,7 +9,6 @@
 #include <vector>
 
 class RootOutputStream;
-class DataRegistritionSvc;
 
 class RootOutputSvc: public BaseIOSvc {
 
@@ -42,7 +41,6 @@ private:
     OutputObjMap           m_exOutputObjs;
     OutputStreamVector     m_outputStreams;
     StringVector           m_notYetInitPaths;
-    DataRegistritionSvc*   m_regSvc;
     bool                   m_streamInitialized;
 };
 

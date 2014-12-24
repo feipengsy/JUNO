@@ -7,13 +7,12 @@
 
 RootOutputStream::RootOutputStream(const std::string& headername,
                                    const std::string& eventname,
-                                   const std::string& treepath, 
-                                   DataRegistritionSvc* regSvc)
+                                   const std::string& treepath)
     : BaseIOStream("RootOutputStream") 
     , m_headerName(headername)
     , m_eventName(eventname)
     , m_path(treepath)
-    , m_writer(new RootFileWriter(treepath, headername, eventname, regSvc))
+    , m_writer(new RootFileWriter(treepath, headername, eventname))
 {
 }
 

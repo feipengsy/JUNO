@@ -14,7 +14,6 @@ RootInputSvc::RootInputSvc(const std::string& name)
   : BaseIOSvc(name),
     m_inputStream(0), 
     m_keeper(0),
-    m_regSvc(0)
 {
     declProp("InputFile", m_inputFile);
 }
@@ -30,17 +29,6 @@ bool RootInputSvc::initialize()
     // Get element keeper and add its ref count by one
     m_keeper = InputElementKeeper::GetInputElementKeeper();
     m_keeper->AddRef();
-
-    // Get the DataRegistritionSvc in current scope
-    SniperPtr<DataRegistritionSvc> drs(this->getScope(), "DataRegistritionSvc");
-
-    if (!drs.valid()) {
-        LogError << "Fail to get DataRegistritionSvc instance"
-                  << std::endl;
-        return false;
-    }
-
-    m_regSvc = static_cast<DataRegistritionSvc*>(drs.data());
 
     // Print out input file list and erase reduplicated input files
     if (!m_inputFile.size()) {
@@ -68,7 +56,7 @@ bool RootInputSvc::initialize()
     }
   
     // Construct input stream
-    m_inputStream = new RootInputStream(m_regSvc);
+    m_inputStream = new RootInputStream();
 
     // Register input files to InputElementKeeper
     // and initialize input stream
@@ -105,18 +93,7 @@ bool RootInputSvc::finalize()
 
 RootInputStream* RootInputSvc::getInputStream()
 {
-  if (m_inputStream) {
-      bool ok = m_inputStream->init();
-      if (!ok) {
-          LogError << "Fail to register path from input stream"
-                   << std::endl;
-          return 0;
-      }
-      return m_inputStream;
-  }
-  LogError << "InputStream not inialized"
-           << std::endl;
-  return 0;
+    return m_inputStream;
 }
 
 bool RootInputSvc::getObj(TObject*& obj, const std::string& name, const std::string& path)

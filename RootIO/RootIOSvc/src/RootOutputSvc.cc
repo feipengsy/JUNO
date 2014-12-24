@@ -9,7 +9,7 @@
 DECLARE_SERVICE(RootOutputSvc);
 
 RootOutputSvc::RootOutputSvc(const std::string& name)
-    : BaseIOSvc(name), m_regSvc(0), m_streamInitialized(false)
+    : BaseIOSvc(name), m_streamInitialized(false)
 {
     declProp("OutputStreams", m_outputFileMap);
 }
@@ -67,17 +67,6 @@ bool RootOutputSvc::initializeOutputStream(JM::EvtNavigator* nav)
     LogDebug << "Initializing RootOutputStreams..."
              << std::endl;
 
-    // Get DataRegistritionSvc in current scope
-    SniperPtr<DataRegistritionSvc> drs(this->getScope(), "DataRegistritionSvc");
-
-    if (!drs.valid()) {
-        LogError << "Fail to get DataRegistritionSvc instance"
-                  << std::endl;
-        return false;
-    }
-
-    m_regSvc = dynamic_cast<DataRegistritionSvc*>(drs.data());
-
     // Now, try to confirm the event type of output paths
     for (String2String::iterator it = m_outputFileMap.begin(); it != m_outputFileMap.end(); ++it) {
         JM::HeaderObject* header = nav->getHeader(it->first);
@@ -132,7 +121,7 @@ bool RootOutputSvc::initializeOutputStream(JM::EvtNavigator* nav)
         std::string headerName = m_path2typeMap[*oit];
         std::string eventName = EDMManager::get()->getEventNameWithHeader(m_path2typeMap[*oit]);
         // Maybe regSvc is no longer needed
-        RootOutputStream* stream = new RootOutputStream(headerName, eventName, primary_path, m_regSvc);
+        RootOutputStream* stream = new RootOutputStream(headerName, eventName, primary_path);
         // Start the output file
         stream->newFile(m_outputFileMap[primary_path]);
         // Then the vector is sorted according to priotity

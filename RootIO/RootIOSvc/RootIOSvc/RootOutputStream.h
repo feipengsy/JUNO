@@ -11,7 +11,6 @@ namespace JM {
 }
 
 class RootFileWriter;
-class DataRegistritionSvc;
 class TObject;
 
 class RootOutputStream : public BaseIOStream {
@@ -23,8 +22,7 @@ public:
     
     RootOutputStream(const std::string& headername, 
                      const std::string& eventname, 
-                     const std::string& treepath,
-                     DataRegistritionSvc* regSvc);
+                     const std::string& treepath);
     virtual ~RootOutputStream();
     /// RootIOStream interface
     std::string path();

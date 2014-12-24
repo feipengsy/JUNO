@@ -6,7 +6,6 @@
 #include <string>
 
 class NavTreeList;
-class DataRegistritionSvc;
 
 namespace JM {
     class EvtNavigator;
@@ -16,7 +15,7 @@ class RootInputStream : public BaseIOStream {
 
 public:
 
-    RootInputStream(DataRegistritionSvc* regSvc);
+    RootInputStream();
     ~RootInputStream();
 
     bool init();
@@ -68,7 +67,6 @@ private:
     int m_entries;       // total entries;
     void* m_addr;
     bool m_initialized;
-    DataRegistritionSvc* m_regSvc;
 };
 
 #endif

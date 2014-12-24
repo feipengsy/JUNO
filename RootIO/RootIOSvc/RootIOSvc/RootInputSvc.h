@@ -13,7 +13,6 @@
 
 class RootInputStream;
 class InputElementKeeper;
-class DataRegistritionSvc;
 class TObject;
 
 class RootInputSvc: public BaseIOSvc {
@@ -38,7 +37,6 @@ private:
     std::vector<std::string> m_inputFile;
     RootInputStream* m_inputStream;
     InputElementKeeper* m_keeper;
-    DataRegistritionSvc* m_regSvc;
 };
 
 #endif
