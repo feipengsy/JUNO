@@ -1,5 +1,5 @@
 #include "DataRegistritionSvc/DataRegistritionSvc.h"
-#include "DataRegistritionSvc/EDMRegistritionTable.h"
+#include "DataRegistritionSvc/EDMManager.h"
 #include "SniperKernel/SvcFactory.h"
 #include "SniperKernel/SniperLog.h"
 
@@ -19,7 +19,7 @@ bool DataRegistritionSvc::initialize()
     LogDebug << "Initializing DataRegistritionSvc..."
             << std::endl;
 
-    m_regTable = EDMRegistritionTable::get();
+    m_EDMMgr = EDMManager::get();
 
     for (std::map<std::string, std::string>::iterator it = m_evt2path.begin();
             it != m_evt2path.end(); ++it) {
@@ -44,28 +44,28 @@ bool DataRegistritionSvc::finalize()
 
 bool DataRegistritionSvc::registerData(const std::string& eventName, std::string path)
 {
-    int defaultPriotiry = m_regTable->getPriotiry(eventName);
+    int defaultPriotiry = m_EDMMgr->getPriotiryWithEvent(eventName);
     if (-1 == defaultPriotiry) {
         LogError << "Failed to get default priority for " << eventName
                  << std::endl;
         return false;
     }
-    std::string headerName = m_regTable->getHeaderName(eventName);
-    if (path == "Default") path = m_regTable->getPath(eventName);
-    if (m_registritions.find(path) != m_registritions.end()) {
+    std::string headerName = m_EDMMgr->getHeaderNameWithEvent(eventName);
+    if (path == "Default") path = m_EDMMgr->getPathWithEvent(eventName);
+    if (m_registrations.find(path) != m_registrations.end()) {
         LogError << "Duplicated data path: " << path
                  << std::endl;
         return false;
     }
     int repetition = 0;
-    Path2RegMap::iterator it, end = m_registritions.end();
-    for (it = m_registritions.begin(); it != end; ++it) {
+    Path2RegMap::iterator it, end = m_registrations.end();
+    for (it = m_registrations.begin(); it != end; ++it) {
         if (eventName == it->second->getEventName()) ++repetition;
     }
     defaultPriotiry += repetition;
 
-    DataRegistrition* registrition = new DataRegistrition(path, defaultPriotiry, headerName, eventName);
-    m_registritions.insert(std::make_pair(path, registrition));
+    DataRegistration* registration = new DataRegistration(path, defaultPriotiry, headerName, eventName);
+    m_registrations.insert(std::make_pair(path, registration));
     LogDebug << "Registered data path :" << path
              << std::endl;
     return true;
@@ -73,26 +73,26 @@ bool DataRegistritionSvc::registerData(const std::string& eventName, std::string
 
 int DataRegistritionSvc::getPriority(const std::string& path)
 {
-    DataRegistrition* reg = getDataRegistrition(path);
+    DataRegistration* reg = getDataRegistration(path);
     if (!reg) return 0;
     return reg->getPriority();
 }
 
 std::string& DataRegistritionSvc::getHeaderName(const std::string& path)
 {
-    DataRegistrition* reg = getDataRegistrition(path);
+    DataRegistration* reg = getDataRegistration(path);
     return reg->getHeaderName();
 }
 
 std::string& DataRegistritionSvc::getEventName(const std::string& path)
 {
-    DataRegistrition* reg = getDataRegistrition(path);
+    DataRegistration* reg = getDataRegistration(path);
     return reg->getEventName();
 }
 
-DataRegistrition* DataRegistritionSvc::getDataRegistrition(const std::string& path)
+DataRegistrition* DataRegistritionSvc::getDataRegistration(const std::string& path)
 {
-    std::map<std::string, DataRegistrition*>::iterator it = m_registritions.find(path);
-    if (it == m_registritions.end()) return 0;
+    std::map<std::string, DataRegistrition*>::iterator it = m_registrations.find(path);
+    if (it == m_registrations.end()) return 0;
     return it->second;
 }

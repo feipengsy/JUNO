@@ -3,17 +3,17 @@
 
 #include <string>
 
-class DataRegistrition {
+class DataRegistration {
 
 public:
-    DataRegistrition(const std::string& path, int priority, const std::string& headerName, const std::string& eventName)
+    DataRegistration(const std::string& path, int priority, const std::string& headerName, const std::string& eventName)
         : m_path(path)
         , m_priority(priority)
         , m_headerName(headerName)
         , m_eventName(eventName)
     { }
 
-    ~DataRegistrition() {}
+    ~DataRegistration() {}
 
     int getPriority() { return m_priority; }
 
