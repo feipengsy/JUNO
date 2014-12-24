@@ -1,2 +1,6 @@
 package RootIOTools
 
+use SniperKernel v*
+use DataModelRelease v*
+use RootIOSvc v*
+
