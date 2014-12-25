@@ -6,6 +6,10 @@
 #include <vector>
 #include <string>
 
+class TObject;
+class TFile;
+class TreeMerger;
+
 class MergeRootFilesAlg : public AlgBase {
 
     public:
@@ -17,9 +21,16 @@ class MergeRootFilesAlg : public AlgBase {
         bool finalize();
 
     private:
-        std::vector<std::string>  m_inputFiles;
-        std::string               m_outputFile;
+        bool rationalityCheck(std::vector<std::string>& dataPathList);
+        void writeObj(TObject* obj, const std::string& path, const std::string& name);
+
+    private:
+        int                       m_index;
+        std::vector<std::string>  m_inputFileNames
+        std::string               m_outputFileName;
         std::vector<IMerger*>     m_merger;
+        TFile*                    m_outputFile;
+        TreeMerger*               m_treeMerger;
 
 };
 
