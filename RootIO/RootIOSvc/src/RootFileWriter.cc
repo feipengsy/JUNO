@@ -10,14 +10,13 @@
 #include "TProcessID.h"
 #include "TDirectory.h"
 
-RootFileWriter::RootFileWriter(const std::string& treepath, const std::string& headername, const std::string& eventname)
+RootFileWriter::RootFileWriter(const std::string& treepath, const std::string& headerName)
     : m_file(0)
     , m_tree(0)
     , m_navTree(0)
     , m_treeMetaData(0)
     , m_dir(0)
-    , m_headerName(headername)
-    , m_eventName(eventname)
+    , m_headerName(headerName)
     , m_path(treepath)
     , m_withNav(false)
     , m_entries(0)
@@ -77,7 +76,6 @@ bool RootFileWriter::write()
         }
     }
 
-
     // Build auto-loading data for TreeMetaData
     TObject* header = static_cast<TObject*>(m_headerAddr);
     // Header in the 1st branch, event in the 2nd branch
@@ -94,7 +92,7 @@ bool RootFileWriter::write()
     JM::HeaderObject* rheader = static_cast<JM::HeaderObject*>(m_headerAddr);
     rheader->setEventEntry(m_entries);
 
-    bool ok = this->writeData();
+    bool ok = this->writeHeader() && this->writeEvent()
     if (!ok) return false;
     if (m_withNav) ok = this->writeNav();
     if (!ok) return false;
@@ -106,12 +104,35 @@ bool RootFileWriter::write()
     return true;
 }
 
-bool RootFileWriter::writeData()
+bool RootFileWriter::writeHeader()
 {
-    int nbytes = m_tree->Fill();
+    int nbytes = m_headerTree->Fill();
     LogDebug <<  "Wrote " << nbytes
              << " bytes to entry " << m_entries
-             << " of tree " << m_path
+             << " of  header of " << m_path
+             << std::endl;
+
+    return nbytes > 0;
+}
+
+bool RootFileWriter::writeEvent()
+{
+    return true;
+}
+
+bool RootFileWriter::writeNav()
+{
+    if (0 == m_fileEntries) {
+        // Tell FileMetaData what paths EvtNavigator privides.
+        std::vector<std::string> eventNames, paths = static_cast<JM::EvtNavigator*>(m_navAddr)->getPath();
+        std::vector<std::string>::iterator it, end = paths.end();
+        m_file->setNavPath(paths);
+    }
+    m_file->setNavAddr(m_navAddr);
+    int nbytes = m_navTree->Fill();
+    LogDebug <<  "Wrote " << nbytes
+             << " bytes to entry " << m_entries
+             << " of tree for EvtNavigator "
              << std::endl;
 
     return nbytes > 0;
@@ -141,24 +162,6 @@ void RootFileWriter::fillBID(TObject* obj, int bid)
     if (-1 != bid) {
         m_bid[iid].push_back(bid);
     }
-}
-
-bool RootFileWriter::writeNav()
-{
-    if (0 == m_fileEntries) {
-        // Tell FileMetaData what paths EvtNavigator privides.
-        std::vector<std::string> eventNames, paths = static_cast<JM::EvtNavigator*>(m_navAddr)->getPath();
-        std::vector<std::string>::iterator it, end = paths.end();
-        m_file->setNavPath(paths);
-    }
-    m_file->setNavAddr(m_navAddr);
-    int nbytes = m_navTree->Fill();
-    LogDebug <<  "Wrote " << nbytes
-             << " bytes to entry " << m_entries
-             << " of tree for EvtNavigator "
-             << std::endl;
-
-    return nbytes > 0;
 }
 
 bool RootFileWriter::close()
@@ -254,11 +257,6 @@ void RootFileWriter::setAddress(void* nav, void* header, void* event)
 void RootFileWriter::setHeaderName(const std::string& name)
 {
     m_headerName = name;
-}
-
-void RootFileWriter::setEventName(const std::string& name)
-{
-    m_eventName = name;
 }
 
 int RootFileWriter::entries()

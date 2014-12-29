@@ -6,13 +6,11 @@
 #include "SniperKernel/SniperLog.h"
 
 RootOutputStream::RootOutputStream(const std::string& headername,
-                                   const std::string& eventname,
                                    const std::string& treepath)
     : BaseIOStream("RootOutputStream") 
     , m_headerName(headername)
-    , m_eventName(eventname)
     , m_path(treepath)
-    , m_writer(new RootFileWriter(treepath, headername, eventname))
+    , m_writer(new RootFileWriter(treepath, headername))
 {
 }
 
@@ -60,17 +58,9 @@ void RootOutputStream::setHeaderName(const std::string& name)
     m_writer->setHeaderName(name);
 }
 
-void RootOutputStream::setEventName(const std::string& name)
-{
-    m_eventName = name;
-    m_writer->setEventName(name);
-}
-
 void RootOutputStream::setAddress(JM::EvtNavigator* nav)
 {
-    void* header = nav->getHeader(m_path);
-    void* event = static_cast<JM::HeaderObject*>(header)->event();
-    m_writer->setAddress(nav, header, event);
+    m_writer->setAddress(nav);
 }
 
 void RootOutputStream::newFile(const std::string& filename)

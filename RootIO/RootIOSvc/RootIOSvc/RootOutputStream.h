@@ -21,7 +21,6 @@ public:
     typedef std::map<std::string, int> PathMap;
     
     RootOutputStream(const std::string& headername, 
-                     const std::string& eventname, 
                      const std::string& treepath);
     virtual ~RootOutputStream();
     /// RootIOStream interface
@@ -34,8 +33,6 @@ public:
     void revise();
     /// Set the header name
     void setHeaderName(const std::string& value);
-    /// Set the event name
-    void setEventName(const std::string& value);
     /// Set address for the event to be written
     void setAddress(JM::EvtNavigator* nav);
     /// Start a new output file
@@ -44,7 +41,7 @@ public:
     int entries();
 
 private:
-    std::string m_headerName, m_eventName, m_path;
+    std::string m_headerName, m_path;
     RootFileWriter* m_writer;
 };
 
