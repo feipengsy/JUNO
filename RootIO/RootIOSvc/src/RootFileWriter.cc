@@ -1,6 +1,7 @@
 #include "RootIOSvc/RootFileWriter.h"
 #include "SniperKernel/SniperLog.h"
 #include "EvtNavigator/EvtNavigator.h"
+#include "Event/HeaderObject.h"
 #include "RootIOUtil/TreeMetaData.h"
 #include "RootIOUtil/RootOutputFileManager.h"
 
@@ -10,19 +11,17 @@
 #include "TProcessID.h"
 #include "TDirectory.h"
 
-RootFileWriter::RootFileWriter(const std::string& treepath, const std::string& headerName)
+RootFileWriter::RootFileWriter(const std::string& path, const std::string& headerName)
     : m_file(0)
-    , m_tree(0)
+    , m_headerTree(0)
     , m_navTree(0)
     , m_treeMetaData(0)
     , m_dir(0)
+    , m_path(path)
     , m_headerName(headerName)
-    , m_path(treepath)
     , m_withNav(false)
-    , m_entries(0)
+    , m_initialized(false)
     , m_fileEntries(0)
-    , m_headerAddr(0)
-    , m_eventAddr(0)
     , m_navAddr(0)
 {
     
@@ -40,6 +39,10 @@ RootOutputFileHandle* RootFileWriter::getFile()
 
 bool RootFileWriter::write()
 {
+    // Try to initialize if nessassry
+    if (!m_initialized) {
+        this->initialize();
+    }
     // Check rationality
     if (!m_file) {
         LogError << "No output file started, can not write"
@@ -51,14 +54,14 @@ bool RootFileWriter::write()
                  << std::endl;
         return false;
     }
-    if (!m_headerAddr || !m_eventAddr || !m_navAddr) {
+    if (!m_navAddr) {
         LogError << "Address not set, can not write"
                  << std::endl;
         return false;
     }
 
     bool write = static_cast<JM::EvtNavigator*>(m_navAddr)->writePath(m_path);
-    if ("unknown" == m_headerName || !write) {
+    if (!m_initialized || !write) {
         // Currently unknown stream or skipped entry, just idling
         ++m_fileEntries;
         if (m_withNav) {
@@ -67,37 +70,30 @@ bool RootFileWriter::write()
         return true;  
     }
 
-    if (!m_tree) {
-        bool ok = this->initialize();
-        if (!ok) {
-            LogError << "Fail to initialize RootFileWriter"
-                     << std::endl;
-            return false;
-        }
+    // TODO Build lazy-loading data for UniqueIDTable
+
+    bool ok = this->writeEvent();
+    if (!ok) {
+        LogError << "Fail to write event data for " << m_path
+                 << std::endl;
+        return false;
     }
 
-    // Build auto-loading data for TreeMetaData
-    TObject* header = static_cast<TObject*>(m_headerAddr);
-    // Header in the 1st branch, event in the 2nd branch
-    // Now, branch ID will NOT be saved
-    fillBID(header, -1);
+    ok = this->writeHeader();
+    if (!ok) {
+        LogError << "Fail to write header data for " << m_path
+                 << std::endl;
+        return false;
+    }
 
-    TObject* event = static_cast<TObject*>(m_eventAddr);
-    fillBID(event, -1);
 
-    // Set entry for SmartRefs
-    JM::EvtNavigator* nav = static_cast<JM::EvtNavigator*>(m_navAddr);
-    nav->setHeaderEntry(m_path, m_entries);
-
-    JM::HeaderObject* rheader = static_cast<JM::HeaderObject*>(m_headerAddr);
-    rheader->setEventEntry(m_entries);
-
-    bool ok = this->writeHeader() && this->writeEvent()
-    if (!ok) return false;
     if (m_withNav) ok = this->writeNav();
-    if (!ok) return false;
+    if (!ok) {
+        LogError << "Fail to write EvtNavigator with " << m_path
+                 << std::endl;
+        return false;
+    }
 
-    ++m_entries;
     ++m_fileEntries;
     this->resetAddress();    
 
@@ -204,8 +200,12 @@ void RootFileWriter::newFile(RootOutputFileHandle* file)
     m_file = file;
 }
 
-bool RootFileWriter::initialize()
+void RootFileWriter::initialize()
 {
+    if ("unknown" == m_headerName) {
+        // Still unknown stream, can not initialize
+        return;
+    }
     // Make the directories up to but not including last one which is
     // the tree name.
     TFile* rootFile =  m_file->getFile();
@@ -245,13 +245,18 @@ bool RootFileWriter::initialize()
 
     m_file->occupyPath(m_path);
     this->checkFilePath();
+    m_initialized = true;
 }
 
-void RootFileWriter::setAddress(void* nav, void* header, void* event)
+void RootFileWriter::setAddress(JM::EvtNavigator* nav)
 {
     m_navAddr = nav;
-    m_headerAddr = header;
-    m_eventAddr = event;
+    JM::HeaderObject* header = nav->getHeader(m_path);
+    m_headerTree->setAddress(header);
+    String2TreeHandle::iterator it, end = m_eventTrees.end();
+    for (it = m_eventTrees.begin(); it != end; ++it) {
+        it->second->setAddress(header->event(it->first));
+    }
 }
 
 void RootFileWriter::setHeaderName(const std::string& name)

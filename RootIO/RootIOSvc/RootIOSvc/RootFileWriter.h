@@ -22,7 +22,8 @@ class OutputTreeHandle {
         ~OutputTreeHandle();
 
         void setAddress(void* addr);
-        unsigned int fill();
+        int fill();
+        int entries();
 
     private:
         TTree* m_tree;
@@ -52,17 +53,15 @@ class RootFileWriter {
         // Start a new output file
         void newFile(RootOutputFileHandle* file);
         // Return the number of entries in the output stream
-        int entries();
-
         int fileEntries();
-
+        // Set Address of branches to be filled
         void setAddress(JM::EvtNavigator* nav);
         // Set the name of event header
         void setHeaderName(const std::string& name);
 
     private:
         // Initialize the writer
-        bool initialize();
+        void initialize();
         // Write header data to tree
         bool writeHeader();
         // Write event data to tree
@@ -79,14 +78,17 @@ class RootFileWriter {
     private:
         RootOutputFileHandle*   m_file;
         OutputTreeHandle*       m_headerTree;
-        OutputTreeHandle*       m_navTree;
         String2TreeHandle       m_eventTrees;
+        TTree*                  m_navTree;
         JM::TreeMetaData*       m_treeMetaData;
         TDirectory*             m_dir;
         std::string             m_path;
+        std::string             m_headerName;
         bool                    m_withNav;
+        bool                    m_initialized;
         int                     m_fileEntries;
-   
+        void*                   m_navAddr;  
+
         // For building TreeMetaData auto-loading data.
         GUIDVector              m_guid;
         BIDVector               m_bid;
