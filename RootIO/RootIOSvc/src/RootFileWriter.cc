@@ -39,10 +39,6 @@ RootOutputFileHandle* RootFileWriter::getFile()
 
 bool RootFileWriter::write()
 {
-    // Try to initialize if nessassry
-    if (!m_initialized) {
-        this->initialize();
-    }
     // Check rationality
     if (!m_file) {
         LogError << "No output file started, can not write"
@@ -58,6 +54,11 @@ bool RootFileWriter::write()
         LogError << "Address not set, can not write"
                  << std::endl;
         return false;
+    }
+
+    // Try to initialize if nessassry
+    if (!m_initialized) {
+        this->initialize();
     }
 
     bool write = static_cast<JM::EvtNavigator*>(m_navAddr)->writePath(m_path);
@@ -86,7 +87,6 @@ bool RootFileWriter::write()
         return false;
     }
 
-
     if (m_withNav) ok = this->writeNav();
     if (!ok) {
         LogError << "Fail to write EvtNavigator with " << m_path
@@ -104,8 +104,8 @@ bool RootFileWriter::writeHeader()
 {
     int nbytes = m_headerTree->Fill();
     LogDebug <<  "Wrote " << nbytes
-             << " bytes to entry " << m_entries
-             << " of  header of " << m_path
+             << " byte(s) to entry " << m_entries
+             << " of header of " << m_path
              << std::endl;
 
     return nbytes > 0;
@@ -113,6 +113,18 @@ bool RootFileWriter::writeHeader()
 
 bool RootFileWriter::writeEvent()
 {
+    String2TreeHandle::iterator it, end = m_eventTrees.end();
+    for (it = m_eventTrees.begin(); it != end; ++it) {
+        int nbytes = it->second->fill();
+        LogDebug << "Wrote " << nbytes
+                 << " byte(s) to entry " << it->entries()
+                 << " of " << it->name()
+                 << " of path " << m_path
+                 << std::endl;
+        if (!nbytes) {
+            return false;
+        }
+    }
     return true;
 }
 
@@ -140,7 +152,7 @@ void RootFileWriter::fillBID(TObject* obj, int bid)
     TProcessID* pid = TProcessID::GetProcessWithUID(uid,obj);
     const char* guid = pid->GetTitle();
     int iid;
-    GUIDVector::const_iterator posPID = find( m_guid.begin(), m_guid.end(), guid);
+    StringVector::const_iterator posPID = find( m_guid.begin(), m_guid.end(), guid);
     if (posPID == m_guid.end()) {
         m_guid.push_back(guid);
         m_uid.push_back(std::vector<Int_t>());
@@ -183,7 +195,7 @@ bool RootFileWriter::close()
     // Reset file entry
     m_fileEntries = 0;
     // Clear and reclaim memory
-    m_guid = GUIDVector();
+    m_guid = StringVector();
     m_uid = UIDVector();
     m_bid = BIDVector();
     return true;
@@ -227,18 +239,13 @@ void RootFileWriter::initialize()
         rootFile->cd(subdir.c_str());
     }
 
-    // Make the TTree holding data
-    std::string title = "Tree at " + m_path + " holding " + m_eventName;
-    std::string treename = m_path.substr(last).substr(m_path.substr(last).rfind("::")+1);
-
-    std::string branchname_header = m_headerName.substr(m_headerName.rfind("::")+2);
-    std::string branchname_event = m_eventName.substr(m_eventName.rfind("::")+2);
-
-    m_tree = new TTree(treename.c_str(),title.c_str());
-    m_tree->Branch(branchname_header.c_str(),m_headerName.c_str(),&m_headerAddr,16000,1);
-    // TODO if it is nessesary for users to decide the buffsize and split level
-    // Set split to 1 by default
-    m_tree->Branch(branchname_event.c_str(),m_eventName.c_str(),&m_eventAddr,16000,1);
+    // Create the OutputTreeHandle for header
+    m_headerTree = new OutputTreeHandle(m_path, m_headerName);
+    // Create the OutputTreeHandle for event
+    const StringVector& eventNames = EDMManager::get()->getEventNameWithHeader(m_headerName);
+    for (StringVector::const_iterator it = eventNames.begin(); it != eventNames.end(); ++it) {
+        m_eventTrees.insert(std::make_pair(*it, new OutputTreeHandle(m_path, *it)));
+    }
 
     m_treeMetaData = new JM::TreeMetaData();
     m_treeMetaData->SetTreeName(m_path.substr(0,last)+treename);
@@ -264,11 +271,6 @@ void RootFileWriter::setHeaderName(const std::string& name)
     m_headerName = name;
 }
 
-int RootFileWriter::entries()
-{
-    return m_entries;
-}
-
 int RootFileWriter::fileEntries()
 {
     return m_fileEntries;
@@ -286,7 +288,10 @@ void RootFileWriter::checkFilePath()
 
 void RootFileWriter::resetAddress()
 {
-    m_headerAddr = 0;
-    m_eventAddr = 0;
     m_navAddr = 0; 
+    m_headerTree->resetAddress();
+    String2TreeHandle::iterator it, end = m_eventTrees.end();
+    for (it = m_eventTrees.begin(); it != end; ++it) {
+        it->second->resetAddress();
+    }
 }

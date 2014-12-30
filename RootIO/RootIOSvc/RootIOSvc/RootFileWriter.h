@@ -36,7 +36,7 @@ class RootFileWriter {
     public:
         typedef std::map<std::string, OutputTreeHandle*>  String2TreeHandle
         // Lazy-loading data types
-        typedef std::vector<std::string>                  GUIDVector;
+        typedef std::vector<std::string>                  StringVector;
         typedef std::vector<std::vector<Short_t> >        BIDVector;
         typedef std::vector<std::vector<Int_t> >          UIDVector;
         
@@ -90,7 +90,7 @@ class RootFileWriter {
         void*                   m_navAddr;  
 
         // For building TreeMetaData auto-loading data.
-        GUIDVector              m_guid;
+        StringVector            m_guid;
         BIDVector               m_bid;
         UIDVector               m_uid;
 };
