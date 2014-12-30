@@ -18,17 +18,22 @@ namespace JM {
 class OutputTreeHandle {
 
     public:
-        OutputTreeHandle();
+        OutputTreeHandle(const std::string& path, const std::string& name);
         ~OutputTreeHandle();
 
-        void setAddress(void* addr);
-        int fill();
-        int entries();
+        void setAddress(void* addr) { m_addr = addr; }
+        void resetAddress() { m_addr = 0; }
+        int entries() const { return m_entries; }
+        const std::string& name() const {return m_name;}
+        bool fill(int& nbytes);
+        void write();
 
     private:
-        TTree* m_tree;
-        void*  m_addr;
-        int    m_entries;
+        std::string  m_path;
+        std::string  m_name;
+        TTree*       m_tree;
+        void*        m_addr;
+        int          m_entries;
 };
 
 class RootFileWriter {

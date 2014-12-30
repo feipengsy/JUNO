@@ -11,6 +11,45 @@
 #include "TProcessID.h"
 #include "TDirectory.h"
 
+OutputTreeHandle::OutputTreeHandle(const std::string& path, const std::string& name)
+    : m_path(path)
+    , m_name(name)
+    , m_tree(0)
+    , m_addr(0)
+    , m_entries(0)
+{
+}
+
+OutputTreeHandle::~OutputTreeHandle()
+{
+    // Yes, we don't delete TTree*
+}
+
+bool OutputTreeHandle::fill(int& nbytes)
+{
+    if (!m_addr) {
+        return false;
+    }
+    if (!m_tree) {
+        // Create tree first
+        std::string title = "Tree at " + m_path + " holding " + m_name;
+        std::string treeName = m_name.substr(m_headerName.rfind("::")+1);
+        std::string branchName = treeName;
+        m_tree = new TTree(treeName.c_str(), title.c_str());
+        m_tree->Branch(branchName.c_str(), m_name.c_str(), &m_addr,16000,1);
+    }
+    nbytes = m_tree->Fill();
+    ++m_entries;
+    return true;
+}
+
+void OuputTreeHandle::write()
+{
+    if (m_tree) {
+        m_tree->Write(NULL,TObject::kOverwrite);
+    }
+}
+
 RootFileWriter::RootFileWriter(const std::string& path, const std::string& headerName)
     : m_file(0)
     , m_headerTree(0)
@@ -102,12 +141,14 @@ bool RootFileWriter::write()
 
 bool RootFileWriter::writeHeader()
 {
-    int nbytes = m_headerTree->Fill();
+    int nbytes = 0;
+    bool write = m_headerTree->fill(nbytes);
+
+    if (!write) return true;
     LogDebug <<  "Wrote " << nbytes
              << " byte(s) to entry " << m_entries
              << " of header of " << m_path
              << std::endl;
-
     return nbytes > 0;
 }
 
@@ -115,7 +156,10 @@ bool RootFileWriter::writeEvent()
 {
     String2TreeHandle::iterator it, end = m_eventTrees.end();
     for (it = m_eventTrees.begin(); it != end; ++it) {
-        int nbytes = it->second->fill();
+        int nbytes = 0;
+        bool write = it->second->fill(nbytes);
+        if (!write) continue;
+
         LogDebug << "Wrote " << nbytes
                  << " byte(s) to entry " << it->entries()
                  << " of " << it->name()
@@ -142,7 +186,6 @@ bool RootFileWriter::writeNav()
              << " bytes to entry " << m_entries
              << " of tree for EvtNavigator "
              << std::endl;
-
     return nbytes > 0;
 }
 
@@ -177,7 +220,11 @@ bool RootFileWriter::close()
     // Reset current dir
     m_dir->cd();
     // Write trees
-    m_tree->Write(NULL,TObject::kOverwrite);
+    m_headerTree->write();
+    String2TreeHandle::iterator it, end = m_eventTrees.end();
+    for (it = m_eventTrees.begin(); it != end; ++it) {
+        it->second->write();
+    }
     // Tree for EvtNavigator will be written by file handle
     //if (m_withNav) m_navTree->Write(NULL,TObject::kOverwrite);
     // Set TreeMetaData
@@ -188,7 +235,12 @@ bool RootFileWriter::close()
     RootOutputFileManager::get()->close_file(m_file->getName());
     // Reset pointers
     m_file = 0;
-    m_tree = 0;
+    delete m_headerTree;
+    m_headerTree = 0;
+    for (it = m_eventTrees.begin(); it != end; ++it) {
+        delete it->second;
+    }
+    m_eventTrees.clear();
     m_navTree = 0;
     m_dir = 0;
     m_withNav = false;
@@ -218,26 +270,26 @@ void RootFileWriter::initialize()
         // Still unknown stream, can not initialize
         return;
     }
-    // Make the directories up to but not including last one which is
-    // the tree name.
+    // Make the directories up to the path
     TFile* rootFile =  m_file->getFile();
     m_dir = rootFile;
-    std::string::size_type last = 0, slash = m_path.find('/');
-    for (; slash != std::string::npos; slash = m_path.find('/',last)) {
+    std::string tempPath;
+    if (m_path[m_path.length()-1] != '/') {
+        tempPath = m_path + '/';
+    }
+    std::string::size_type last = 0, slash = tempPath.find('/');
+    for (; slash != std::string::npos; slash = tempPpath.find('/',last)) {
         if (!slash) {
             last = slash + 1;
             continue;   // skip initial '/'
         }
-        std::string subdir = m_path.substr(last,slash-last);
+        std::string subdir = tempPath.substr(last,slash-last);
         TDirectory* dir = m_dir->GetDirectory(subdir.c_str());
         if (dir) m_dir = dir;
         else m_dir = m_dir->mkdir(subdir.c_str());
         last = slash + 1;
     }
-    if (last) {
-        std::string subdir = m_path.substr(0,last-1);
-        rootFile->cd(subdir.c_str());
-    }
+    rootFile->cd(tempPath.c_str());
 
     // Create the OutputTreeHandle for header
     m_headerTree = new OutputTreeHandle(m_path, m_headerName);
