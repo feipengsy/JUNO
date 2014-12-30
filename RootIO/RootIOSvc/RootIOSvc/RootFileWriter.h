@@ -92,7 +92,7 @@ class RootFileWriter {
         bool                    m_withNav;
         bool                    m_initialized;
         int                     m_fileEntries;
-        void*                   m_navAddr;  
+        JM::EvtNavigator*       m_navAddr;  
 
         // For building TreeMetaData auto-loading data.
         StringVector            m_guid;

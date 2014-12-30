@@ -5,7 +5,6 @@
 #include "RootIOUtil/TreeMetaData.h"
 #include "RootIOUtil/RootOutputFileManager.h"
 
-#include "TObject.h"
 #include "TTree.h"
 #include "TFile.h"
 #include "TProcessID.h"
@@ -49,6 +48,8 @@ void OuputTreeHandle::write()
         m_tree->Write(NULL,TObject::kOverwrite);
     }
 }
+
+//---------------------- RootFileWriter ------------------------
 
 RootFileWriter::RootFileWriter(const std::string& path, const std::string& headerName)
     : m_file(0)
@@ -100,7 +101,7 @@ bool RootFileWriter::write()
         this->initialize();
     }
 
-    bool write = static_cast<JM::EvtNavigator*>(m_navAddr)->writePath(m_path);
+    bool write = m_navAddr->writePath(m_path);
     if (!m_initialized || !write) {
         // Currently unknown stream or skipped entry, just idling
         ++m_fileEntries;
@@ -141,10 +142,12 @@ bool RootFileWriter::write()
 
 bool RootFileWriter::writeHeader()
 {
-    int nbytes = 0;
-    bool write = m_headerTree->fill(nbytes);
+    // Set entry number
+    m_navAddr->setHeaderEntry(m_path, m_headerTree->entries());
 
-    if (!write) return true;
+    int nbytes = 0;
+    // Header will always be written
+    m_headerTree->fill(nbytes);
     LogDebug <<  "Wrote " << nbytes
              << " byte(s) to entry " << m_entries
              << " of header of " << m_path
@@ -159,6 +162,9 @@ bool RootFileWriter::writeEvent()
         int nbytes = 0;
         bool write = it->second->fill(nbytes);
         if (!write) continue;
+
+        // Set entry number of this event
+        m_navAddr->getHeader(m_path)->setEventEntry(it->first, it->second->entries() - 1);
 
         LogDebug << "Wrote " << nbytes
                  << " byte(s) to entry " << it->entries()
@@ -175,8 +181,9 @@ bool RootFileWriter::writeEvent()
 bool RootFileWriter::writeNav()
 {
     if (0 == m_fileEntries) {
+        // TODO do we need to reset this?
         // Tell FileMetaData what paths EvtNavigator privides.
-        std::vector<std::string> eventNames, paths = static_cast<JM::EvtNavigator*>(m_navAddr)->getPath();
+        std::vector<std::string> eventNames, paths = m_navAddr->getPath();
         std::vector<std::string>::iterator it, end = paths.end();
         m_file->setNavPath(paths);
     }
@@ -310,6 +317,7 @@ void RootFileWriter::initialize()
 void RootFileWriter::setAddress(JM::EvtNavigator* nav)
 {
     m_navAddr = nav;
+    // TODO what if we can not find header?
     JM::HeaderObject* header = nav->getHeader(m_path);
     m_headerTree->setAddress(header);
     String2TreeHandle::iterator it, end = m_eventTrees.end();
