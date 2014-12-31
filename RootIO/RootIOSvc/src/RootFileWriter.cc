@@ -10,9 +10,10 @@
 #include "TProcessID.h"
 #include "TDirectory.h"
 
-OutputTreeHandle::OutputTreeHandle(const std::string& path, const std::string& name)
+OutputTreeHandle::OutputTreeHandle(const std::string& path, const std::string& objName)
     : m_path(path)
-    , m_name(name)
+    , m_objName(objName)
+    , m_fullTreeName(path + objName.substr(objName.rfind("::")+1))
     , m_tree(0)
     , m_addr(0)
     , m_entries(0)
@@ -31,14 +32,15 @@ bool OutputTreeHandle::fill(int& nbytes)
     }
     if (!m_tree) {
         // Create tree first
-        std::string title = "Tree at " + m_path + " holding " + m_name;
-        std::string treeName = m_name.substr(m_name.rfind("::")+1);
+        std::string title = "Tree at " + m_path + " holding " + m_objName;
+        std::string treeName = m_objName.substr(m_objName.rfind("::")+1);
         std::string branchName = treeName;
         m_tree = new TTree(treeName.c_str(), title.c_str());
-        m_tree->Branch(branchName.c_str(), m_name.c_str(), &m_addr,16000,1);
+        m_tree->Branch(branchName.c_str(), m_objName.c_str(), &m_addr,16000,1);
     }
     nbytes = m_tree->Fill();
     ++m_entries;
+    this->fillUID();
     return true;
 }
 
@@ -49,6 +51,33 @@ void OuputTreeHandle::write()
     }
 }
 
+void OutputTreeHandle::fillUID(int bid = -1)
+{
+    TObject* obj = static_cast<TObject*>(m_addr);
+    UInt_t uid = obj->GetUniqueID();
+    TProcessID* pid = TProcessID::GetProcessWithUID(uid,obj);
+    const char* guid = pid->GetTitle();
+    int iid;
+    StringVector::const_iterator posPID = find( m_guid.begin(), m_guid.end(), guid);
+    if (posPID == m_guid.end()) {
+        m_guid.push_back(guid);
+        m_uid.push_back(std::vector<Int_t>());
+        // When bid is -1, branch id won't be saved
+        if (-1 != bid) {
+            m_bid.push_back(std::vector<Short_t>());
+        }
+        iid = m_guid.size() - 1;
+    }
+    else {
+        iid = posPID - m_guid.begin();
+    }
+    uid = uid & 0xffffff;
+    m_uid[iid].push_back(uid);
+    if (-1 != bid) {
+        m_bid[iid].push_back(bid);
+    }
+}
+
 //---------------------- RootFileWriter ------------------------
 
 RootFileWriter::RootFileWriter(const std::string& path, const std::string& headerName)
@@ -56,14 +85,13 @@ RootFileWriter::RootFileWriter(const std::string& path, const std::string& heade
     , m_headerTree(0)
     , m_navTree(0)
     , m_dir(0)
-    , m_path(path)
+    , m_path(path[path.length()+1] == '/' ? path : path + '/' )
     , m_headerName(headerName)
     , m_withNav(false)
     , m_initialized(false)
     , m_fileEntries(0)
     , m_navAddr(0)
 {
-    
 }
 
 RootFileWriter::~RootFileWriter()
@@ -165,7 +193,7 @@ bool RootFileWriter::writeEvent()
 
         LogDebug << "Wrote " << nbytes
                  << " byte(s) to entry " << it->entries()
-                 << " of " << it->name()
+                 << " of " << it->objectName()
                  << " of path " << m_path
                  << std::endl;
         if (!nbytes) {
@@ -255,23 +283,19 @@ void RootFileWriter::initialize()
     // Make the directories up to the path
     TFile* rootFile =  m_file->getFile();
     m_dir = rootFile;
-    std::string tempPath;
-    if (m_path[m_path.length()-1] != '/') {
-        tempPath = m_path + '/';
-    }
-    std::string::size_type last = 0, slash = tempPath.find('/');
+    std::string::size_type last = 0, slash = m_path.find('/');
     for (; slash != std::string::npos; slash = tempPpath.find('/',last)) {
         if (!slash) {
             last = slash + 1;
             continue;   // skip initial '/'
         }
-        std::string subdir = tempPath.substr(last,slash-last);
+        std::string subdir = m_path.substr(last,slash-last);
         TDirectory* dir = m_dir->GetDirectory(subdir.c_str());
         if (dir) m_dir = dir;
         else m_dir = m_dir->mkdir(subdir.c_str());
         last = slash + 1;
     }
-    rootFile->cd(tempPath.c_str());
+    rootFile->cd(m_path.c_str());
 
     // Create the OutputTreeHandle for header
     m_headerTree = new OutputTreeHandle(m_path, m_headerName);
@@ -280,11 +304,11 @@ void RootFileWriter::initialize()
     for (std::vector<std::string>::const_iterator it = eventNames.begin(); it != eventNames.end(); ++it) {
         m_eventTrees.insert(std::make_pair(*it, new OutputTreeHandle(m_path, *it)));
         JM::TreeMetaData* etmd = new JM::TreeMetaData();
-        etmd->SetTreeName(tempPath + it->substr(it->rfind("::") + 1))
+        etmd->SetTreeName(m_path + it->substr(it->rfind("::") + 1))
     }
 
     JM::TreeMetaData* htmd = new JM::TreeMetaData();
-    htmd->SetTreeName(tempPath + m_headerName.substr(m_headerName.rfind("::") + 1));
+    htmd->SetTreeName(m_path + m_headerName.substr(m_headerName.rfind("::") + 1));
     m_treeMetaDatas.push_back(htmd);
 
     m_file->occupyPath(m_path);

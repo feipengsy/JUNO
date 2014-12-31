@@ -23,19 +23,23 @@ class OutputTreeHandle {
         typedef std::vector<std::vector<Short_t> >        BIDVector;
         typedef std::vector<std::vector<Int_t> >          UIDVector;
 
-        OutputTreeHandle(const std::string& path, const std::string& name);
+        OutputTreeHandle(const std::string& path, const std::string& objName);
         ~OutputTreeHandle();
 
         void setAddress(void* addr) { m_addr = addr; }
         void resetAddress() { m_addr = 0; }
         int entries() const { return m_entries; }
-        const std::string& name() const {return m_name;}
+        const std::string& objectName() const { return m_objName; }
+        const std::string& fullTreeName() const { return m_fullTreeName; }
         bool fill(int& nbytes);
         void write();
 
     private:
+        void fillUID(int bid = -1);
+
         std::string  m_path;
-        std::string  m_name;
+        std::string  m_objName;
+        std::string  m_fullTreeName;
         TTree*       m_tree;
         void*        m_addr;
         int          m_entries;
