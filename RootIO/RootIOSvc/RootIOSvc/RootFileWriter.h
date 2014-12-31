@@ -33,6 +33,7 @@ class OutputTreeHandle {
         const std::string& fullTreeName() const { return m_fullTreeName; }
         bool fill(int& nbytes);
         void write();
+        void writeUID(RootOutputFileHandle* file)
 
     private:
         void fillUID(int bid = -1);

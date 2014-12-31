@@ -51,6 +51,12 @@ void OuputTreeHandle::write()
     }
 }
 
+void OutputTreeHandle::writeUID(RootOutputFileHandle* file)
+{
+    file->addUniqueIDTable(m_fullTreeName, m_guid, m_uid, m_bid);
+    file->addUUID(m_guid);
+}
+
 void OutputTreeHandle::fillUID(int bid = -1)
 {
     TObject* obj = static_cast<TObject*>(m_addr);
@@ -225,23 +231,24 @@ bool RootFileWriter::close()
 {
     // Reset current dir
     m_dir->cd();
-    // Write trees
+    // Write trees and lazy-loading data
     m_headerTree->write();
+    m_headerTree->writeUID(m_file);
     String2TreeHandle::iterator it, end = m_eventTrees.end();
     for (it = m_eventTrees.begin(); it != end; ++it) {
         it->second->write();
+        it->second->writeUID(m_file);
+        delete it->second;
     }
 
     // Tree for EvtNavigator will be written by file handle
     //if (m_withNav) m_navTree->Write(NULL,TObject::kOverwrite);
 
-    // Set TreeMetaData and lazy-loading data
+    // Set TreeMetaData
     TMDVector::iterator tit, tend = m_treeMetaDatas.end();
     for (tit = m_treeMetaDatas.begin(); tit != tend; ++tit) {
         m_file->addTreeMetaData(*tit);
     }
-    //m_file->addUniqueIDTable(m_path, m_guid, m_uid, m_bid);
-    //m_file->addUUID(m_guid);
 
     // Dec file reference, close when it hits 0
     RootOutputFileManager::get()->close_file(m_file->getName());
@@ -250,9 +257,6 @@ bool RootFileWriter::close()
     m_file = 0;
     delete m_headerTree;
     m_headerTree = 0;
-    for (it = m_eventTrees.begin(); it != end; ++it) {
-        delete it->second;
-    }
     m_eventTrees.clear();
     m_navTree = 0;
     m_dir = 0;
