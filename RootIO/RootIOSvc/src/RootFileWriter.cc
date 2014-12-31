@@ -231,10 +231,7 @@ bool RootFileWriter::close()
     m_withNav = false;
     // Reset file entry
     m_fileEntries = 0;
-    // Clear and reclaim memory
-    m_guid = StringVector();
-    m_uid = UIDVector();
-    m_bid = BIDVector();
+    m_initialized = false;
     return true;
 }
 
@@ -279,8 +276,8 @@ void RootFileWriter::initialize()
     // Create the OutputTreeHandle for header
     m_headerTree = new OutputTreeHandle(m_path, m_headerName);
     // Create the OutputTreeHandle for event
-    const StringVector& eventNames = EDMManager::get()->getEventNameWithHeader(m_headerName);
-    for (StringVector::const_iterator it = eventNames.begin(); it != eventNames.end(); ++it) {
+    const std::vector<std::string>& eventNames = EDMManager::get()->getEventNameWithHeader(m_headerName);
+    for (std::vector<std::string>::const_iterator it = eventNames.begin(); it != eventNames.end(); ++it) {
         m_eventTrees.insert(std::make_pair(*it, new OutputTreeHandle(m_path, *it)));
         JM::TreeMetaData* etmd = new JM::TreeMetaData();
         etmd->SetTreeName(tempPath + it->substr(it->rfind("::") + 1))
