@@ -32,7 +32,7 @@ bool OutputTreeHandle::fill(int& nbytes)
     if (!m_tree) {
         // Create tree first
         std::string title = "Tree at " + m_path + " holding " + m_name;
-        std::string treeName = m_name.substr(m_headerName.rfind("::")+1);
+        std::string treeName = m_name.substr(m_name.rfind("::")+1);
         std::string branchName = treeName;
         m_tree = new TTree(treeName.c_str(), title.c_str());
         m_tree->Branch(branchName.c_str(), m_name.c_str(), &m_addr,16000,1);
@@ -55,7 +55,6 @@ RootFileWriter::RootFileWriter(const std::string& path, const std::string& heade
     : m_file(0)
     , m_headerTree(0)
     , m_navTree(0)
-    , m_treeMetaData(0)
     , m_dir(0)
     , m_path(path)
     , m_headerName(headerName)
@@ -110,8 +109,6 @@ bool RootFileWriter::write()
         }
         return true;  
     }
-
-    // TODO Build lazy-loading data for UniqueIDTable
 
     bool ok = this->writeEvent();
     if (!ok) {
@@ -196,32 +193,6 @@ bool RootFileWriter::writeNav()
     return nbytes > 0;
 }
 
-void RootFileWriter::fillBID(TObject* obj, int bid) 
-{
-    UInt_t uid = obj->GetUniqueID();
-    TProcessID* pid = TProcessID::GetProcessWithUID(uid,obj);
-    const char* guid = pid->GetTitle();
-    int iid;
-    StringVector::const_iterator posPID = find( m_guid.begin(), m_guid.end(), guid);
-    if (posPID == m_guid.end()) {
-        m_guid.push_back(guid);
-        m_uid.push_back(std::vector<Int_t>());
-        // When bid is -1, branch id won't be saved
-        if (-1 != bid) {
-            m_bid.push_back(std::vector<Short_t>());
-        }
-        iid = m_guid.size() - 1;
-    }
-    else {
-        iid = posPID - m_guid.begin();
-    }
-    uid = uid & 0xffffff;
-    m_uid[iid].push_back(uid);
-    if (-1 != bid) {
-        m_bid[iid].push_back(bid);
-    }
-}
-
 bool RootFileWriter::close()
 {
     // Reset current dir
@@ -232,15 +203,22 @@ bool RootFileWriter::close()
     for (it = m_eventTrees.begin(); it != end; ++it) {
         it->second->write();
     }
+
     // Tree for EvtNavigator will be written by file handle
     //if (m_withNav) m_navTree->Write(NULL,TObject::kOverwrite);
-    // Set TreeMetaData
-    m_file->addTreeMetaData(m_treeMetaData);
-    m_file->addUniqueIDTable(m_path, m_guid, m_uid, m_bid);
-    m_file->addUUID(m_guid);
+
+    // Set TreeMetaData and lazy-loading data
+    TMDVector::iterator tit, tend = m_treeMetaDatas.end();
+    for (tit = m_treeMetaDatas.begin(); tit != tend; ++tit) {
+        m_file->addTreeMetaData(*tit);
+    }
+    //m_file->addUniqueIDTable(m_path, m_guid, m_uid, m_bid);
+    //m_file->addUUID(m_guid);
+
     // Dec file reference, close when it hits 0
     RootOutputFileManager::get()->close_file(m_file->getName());
-    // Reset pointers
+
+    // Reset pointers and clean gabage
     m_file = 0;
     delete m_headerTree;
     m_headerTree = 0;
@@ -304,10 +282,13 @@ void RootFileWriter::initialize()
     const StringVector& eventNames = EDMManager::get()->getEventNameWithHeader(m_headerName);
     for (StringVector::const_iterator it = eventNames.begin(); it != eventNames.end(); ++it) {
         m_eventTrees.insert(std::make_pair(*it, new OutputTreeHandle(m_path, *it)));
+        JM::TreeMetaData* etmd = new JM::TreeMetaData();
+        etmd->SetTreeName(tempPath + it->substr(it->rfind("::") + 1))
     }
 
-    m_treeMetaData = new JM::TreeMetaData();
-    m_treeMetaData->SetTreeName(m_path.substr(0,last)+treename);
+    JM::TreeMetaData* htmd = new JM::TreeMetaData();
+    htmd->SetTreeName(tempPath + m_headerName.substr(m_headerName.rfind("::") + 1));
+    m_treeMetaDatas.push_back(htmd);
 
     m_file->occupyPath(m_path);
     this->checkFilePath();
@@ -317,7 +298,6 @@ void RootFileWriter::initialize()
 void RootFileWriter::setAddress(JM::EvtNavigator* nav)
 {
     m_navAddr = nav;
-    // TODO what if we can not find header?
     JM::HeaderObject* header = nav->getHeader(m_path);
     m_headerTree->setAddress(header);
     String2TreeHandle::iterator it, end = m_eventTrees.end();

@@ -18,6 +18,11 @@ namespace JM {
 class OutputTreeHandle {
 
     public:
+        // Lazy-loading data types
+        typedef std::vector<std::string>                  StringVector;
+        typedef std::vector<std::vector<Short_t> >        BIDVector;
+        typedef std::vector<std::vector<Int_t> >          UIDVector;
+
         OutputTreeHandle(const std::string& path, const std::string& name);
         ~OutputTreeHandle();
 
@@ -34,16 +39,19 @@ class OutputTreeHandle {
         TTree*       m_tree;
         void*        m_addr;
         int          m_entries;
+
+        // For lazy-loading data
+        StringVector            m_guid;
+        BIDVector               m_bid;
+        UIDVector               m_uid;
+        
 };
 
 class RootFileWriter {
 
     public:
         typedef std::map<std::string, OutputTreeHandle*>  String2TreeHandle
-        // Lazy-loading data types
-        typedef std::vector<std::string>                  StringVector;
-        typedef std::vector<std::vector<Short_t> >        BIDVector;
-        typedef std::vector<std::vector<Int_t> >          UIDVector;
+        typedef std::vector<JM::TreeMetaData*>            TMDVector;
         
         RootFileWriter(const std::string& treepath, const std::string& headerName);
         ~RootFileWriter();
@@ -73,8 +81,6 @@ class RootFileWriter {
         bool writeEvent();
         // Write Evtnavigators to tree
         bool writeNav();
-        // Build data for auto-loading
-        void fillBID(TObject* obj, int bid);
         // Check if this path is the last path of its output file
         void checkFilePath();
         /// Reset the addresses to 0
@@ -85,7 +91,7 @@ class RootFileWriter {
         OutputTreeHandle*       m_headerTree;
         String2TreeHandle       m_eventTrees;
         TTree*                  m_navTree;
-        JM::TreeMetaData*       m_treeMetaData;
+        TMDVector               m_treeMetaDatas;
         TDirectory*             m_dir;
         std::string             m_path;
         std::string             m_headerName;
@@ -93,11 +99,6 @@ class RootFileWriter {
         bool                    m_initialized;
         int                     m_fileEntries;
         JM::EvtNavigator*       m_navAddr;  
-
-        // For building TreeMetaData auto-loading data.
-        StringVector            m_guid;
-        BIDVector               m_bid;
-        UIDVector               m_uid;
 };
 
 
