@@ -84,8 +84,8 @@ void RootOutputFileHandle::close()
 {
     m_fileMetaData->SetUUIDList(m_UUIDList);
 
-    m_file->mkdir("NonUserData");
-    m_file->cd("NonUserData");
+    m_file->mkdir("Meta");
+    m_file->cd("Meta");
 
     // Write out TTree holding EvtNavigator
     m_navTree->Write(NULL,TObject::kOverwrite);
@@ -103,8 +103,7 @@ void RootOutputFileHandle::close()
         backup = std::cout.rdbuf();
         std::cout.rdbuf(fout.rdbuf());
         GeoVector::iterator it, end = m_geos.end();
-        m_file->mkdir("Geometry");
-        m_file->cd("Geometry");
+        m_file->cd();
         for (it = m_geos.begin(); it != end; ++it) {
             if (strlen((*it)->GetName()) == 0) (*it)->SetName("JunoGeo");
             (*it)->Write();

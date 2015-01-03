@@ -123,14 +123,14 @@ bool RootFileReader::ReadFiles(const vector<string>& fileList, NavTreeList* navs
 
 JM::FileMetaData* RootFileReader::GetFileMetaData(TFile* file)
 {
-  TObject* obj = file->Get("NonUserData/FileMetaData");
+  TObject* obj = file->Get("Meta/FileMetaData");
   if (!obj) return 0;
   return dynamic_cast<JM::FileMetaData*>(obj);
 }
 
 JM::UniqueIDTable* RootFileReader::GetUniqueIDTable(TFile* file)
 {
-  TObject* obj = file->Get("NonUserData/UniqueIDTable");
+  TObject* obj = file->Get("Meta/UniqueIDTable");
   if (!obj) return 0;
   return dynamic_cast<JM::UniqueIDTable*>(obj);
 }
@@ -177,8 +177,7 @@ bool RootFileReader::GetNavTreeList(map<int,JM::FileMetaData*>& fmetadatas, NavT
 
 TTree* RootFileReader::GetNavTree(TFile* file)
 {
-  // TODO Define the name of navigator tree
-  return dynamic_cast<TTree*>(file->Get("/Event/navigator"));
+  return dynamic_cast<TTree*>(file->Get("/Meta/navigator"));
 }
 
 TObject* RootFileReader::GetUserData(const std::vector<int>& fileList, const std::string& name)
@@ -214,11 +213,5 @@ TObject* RootFileReader::ReadObject(TDirectory* dir, const std::string& name)
 {
   TObject* obj = 0;
   obj = dir->Get(name.c_str());
-  if (!obj) {
-    // Just in case user forgets the path
-    // TODO hard code
-    std::string geoname = std::string("Geometry/") + name;
-    obj = dir->Get(geoname.c_str());
-  }
   return obj;
 }
