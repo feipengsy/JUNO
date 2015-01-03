@@ -8,9 +8,9 @@
 class EDMRegistration {
 
     public:
-        typedef std::vector<std::string> StringVector
+        typedef std::vector<std::string> StringVector;
 
-        EDMRegistration(const std::string& headerName, const StringVector& eventNames, int priority, std::string& path) 
+        EDMRegistration(const std::string& headerName, const StringVector& eventNames, int priority, const std::string& path) 
             : m_headerName(headerName)
             , m_eventNames(eventNames)
             , m_priority(priority)
@@ -50,11 +50,11 @@ class EDMManager {
         // Given header name, get default path
         std::string getPathWithHeader(const std::string& name);
         // Book a event type
-        bool book(const std::string& headerName, const EDMRegistration::StringVector& eventNames, int priority, const std::string& path);
+        bool book(const std::string& headerName, const std::string& eventNames, int priority, const std::string& path);
 
     private:
         EDMManager();
-        ~EDManager();
+        ~EDMManager();
         EDMRegistration* getRegWithEvent(const std::string& name);
         EDMRegistration* getRegWithHeader(const std::string& name);
 

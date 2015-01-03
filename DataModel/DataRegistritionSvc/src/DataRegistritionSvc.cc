@@ -90,9 +90,9 @@ std::string& DataRegistritionSvc::getEventName(const std::string& path)
     return reg->getEventName();
 }
 
-DataRegistrition* DataRegistritionSvc::getDataRegistration(const std::string& path)
+DataRegistration* DataRegistritionSvc::getDataRegistration(const std::string& path)
 {
-    std::map<std::string, DataRegistrition*>::iterator it = m_registrations.find(path);
+    std::map<std::string, DataRegistration*>::iterator it = m_registrations.find(path);
     if (it == m_registrations.end()) return 0;
     return it->second;
 }

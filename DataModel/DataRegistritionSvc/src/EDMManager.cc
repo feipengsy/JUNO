@@ -56,8 +56,8 @@ bool EDMManager::book(const std::string& headerName, const std::string& eventNam
 {
     RegVector::iterator it, end = m_regs.end();
     for (it = m_regs.begin(); it != end; ++it) {
-        if ((*it)->getEventName() == eventName) {
-            LogFatal << "Duplicated data type: " << eventName
+        if ((*it)->getHeaderName() == headerName) {
+            LogFatal << "Duplicated data type: " << headerName
                      << std::endl;
             return false;
         }
@@ -77,7 +77,7 @@ EDMRegistration* EDMManager::getRegWithEvent(const std::string& name)
 {
     RegVector::iterator it, end = m_regs.end();
     for (it = m_regs.begin(); it != end; ++it) {
-        const StringVector& eventNames = (*it)->getEventName();
+        const EDMRegistration::StringVector& eventNames = (*it)->getEventName();
         if (std::find(eventNames.begin(), eventNames.end(), name) != eventNames.end()) {
             return *it;
         }
