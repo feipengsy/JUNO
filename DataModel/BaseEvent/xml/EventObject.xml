@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE xdd SYSTEM "xdd.dtd">
+
+<xdd>
+    <package name="BaseEvent">
+
+        <import name="TObject"/>
+
+        <class name="EventObject"
+               author="LI Teng"
+               desc="Base class for event object">
+
+            <base name="TObject"/>
+            
+            <method name="AddRef"
+                    type="unsigned int"
+                    desc="Add the reference count by one"/>
+
+            <method name="DesRef"
+                    type="unsigned int"
+                    desc="Minus the reference count by one"/>
+            
+            <attribute name="RefCount"
+                       type="unsigned int"
+                       desc="reference count"
+                       init="0"
+                       access="PROTECTED"
+                       transient="TRUE" 
+                       setMeth="FALSE"
+                       getMeth="FALSE"/>
+
+        </class>
+    </package>
+</xdd>

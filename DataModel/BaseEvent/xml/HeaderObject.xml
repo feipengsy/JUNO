@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE xdd SYSTEM "xdd.dtd">
+
+<xdd>
+    <package name="BaseEvent">
+
+        <import name="EventObject"/>
+
+        <class name="HeaderObject"
+               author="LI Teng"
+               desc="Base class for event header">
+
+            <base name="EventObject"/>
+
+            <method name="setEventEntry"
+                    type="void"
+                    desc="Set the entry number of the event object"
+                    virtual="PURE">
+              <arg type="const Long64_t" />
+            </method>
+
+            <method name="event"
+                    type="JM::EventObject*"
+                    desc="Get the event object of header"
+                    virtual="PURE" />
+            
+            <attribute name="EventID"
+                       type="int"
+                       desc="id of event"
+                       init="0"/>
+
+            <attribute name="RunID"
+                       type="int"
+                       desc="id of run"
+                       init="0"/>
+
+        </class>
+    </package>
+</xdd>
