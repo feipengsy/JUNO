@@ -118,7 +118,7 @@ bool RootOutputSvc::initializeOutputStream(JM::EvtNavigator* nav)
         // RootOutputFileManager won't create dupilicated output files
         RootOutputFileManager::get()->new_file(m_outputFileMap[primary_path], path2priority);
         // Create output stream
-        RootOutputStream* stream = new RootOutputStream(m_path2typeMap[*oit], primary_path);
+        RootOutputStream* stream = new RootOutputStream(m_path2typeMap[primary_path], primary_path);
         // Start the output file
         stream->newFile(m_outputFileMap[primary_path]);
         // Then the vector is sorted according to priotity
