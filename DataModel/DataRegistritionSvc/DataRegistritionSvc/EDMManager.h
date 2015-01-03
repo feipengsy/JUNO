@@ -38,13 +38,13 @@ class EDMManager {
         // Singleton
         static EDMManager* get();
         // Given event name, get default priority
-        int getPriotiryWithEvent(const std::string& name);
+        int getPriorityWithEvent(const std::string& name);
         // Given event name, get headerName
         std::string getHeaderNameWithEvent(const std::string& name);
         // Given event name, get default path
         std::string getPathWithEvent(const std::string& name);
         // Given header name, get default priority
-        int getPriotiryWithHeader(const std::string& name);
+        int getPriorityWithHeader(const std::string& name);
         // Given header name, get event name
         EDMRegistration::StringVector getEventNameWithHeader(const std::string& name);
         // Given header name, get default path

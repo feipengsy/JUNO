@@ -44,8 +44,8 @@ bool DataRegistritionSvc::finalize()
 
 bool DataRegistritionSvc::registerData(const std::string& eventName, std::string path)
 {
-    int defaultPriotiry = m_EDMMgr->getPriotiryWithEvent(eventName);
-    if (-1 == defaultPriotiry) {
+    int defaultPriority = m_EDMMgr->getPriorityWithEvent(eventName);
+    if (-1 == defaultPriority) {
         LogError << "Failed to get default priority for " << eventName
                  << std::endl;
         return false;
@@ -62,9 +62,9 @@ bool DataRegistritionSvc::registerData(const std::string& eventName, std::string
     for (it = m_registrations.begin(); it != end; ++it) {
         if (eventName == it->second->getEventName()) ++repetition;
     }
-    defaultPriotiry += repetition;
+    defaultPriority += repetition;
 
-    DataRegistration* registration = new DataRegistration(path, defaultPriotiry, headerName, eventName);
+    DataRegistration* registration = new DataRegistration(path, defaultPriority, headerName, eventName);
     m_registrations.insert(std::make_pair(path, registration));
     LogDebug << "Registered data path :" << path
              << std::endl;

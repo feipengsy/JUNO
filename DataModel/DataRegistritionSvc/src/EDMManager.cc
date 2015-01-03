@@ -16,7 +16,7 @@ EDMManager* EDMManager::get()
     return (s_manager != 0) ? s_manager : (s_manager = new EDMManager);
 }
 
-int EDMManager::getPriotiryWithEvent(const std::string& name)
+int EDMManager::getPriorityWithEvent(const std::string& name)
 {
     EDMRegistration* reg = this->getRegWithEvent(name);
     return reg ? reg->getPriority() : -1;
@@ -34,7 +34,7 @@ std::string EDMManager::getPathWithEvent(const std::string& name)
     return reg ? reg->getPath() : "unknown";
 }
 
-int EDMManager::getPriotiryWithHeader(const std::string& name)
+int EDMManager::getPriorityWithHeader(const std::string& name)
 {
     EDMRegistration* reg = this->getRegWithHeader(name);
     return reg ? reg->getPriority() : -1;
