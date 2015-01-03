@@ -19,6 +19,12 @@ OutputTreeHandle::OutputTreeHandle(const std::string& path, const std::string& o
     , m_addr(0)
     , m_entries(0)
 {
+    if (m_path[m_path.length() + 1] == '/') {
+        m_fullTreeName = path + objName.substr(objName.rfind("::")+1);
+    }
+    else {
+        m_fullTreeName = path + '/' + objName.substr(objName.rfind("::")+1);
+    }
 }
 
 OutputTreeHandle::~OutputTreeHandle()
@@ -92,7 +98,7 @@ RootFileWriter::RootFileWriter(const std::string& path, const std::string& heade
     , m_headerTree(0)
     , m_navTree(0)
     , m_dir(0)
-    , m_path(path[path.length()+1] == '/' ? path : path + '/' )
+    , m_path(path)
     , m_headerName(headerName)
     , m_withNav(false)
     , m_initialized(false)
@@ -286,13 +292,14 @@ void RootFileWriter::initialize()
     // Make the directories up to the path
     TFile* rootFile =  m_file->getFile();
     m_dir = rootFile;
-    std::string::size_type last = 0, slash = m_path.find('/');
-    for (; slash != std::string::npos; slash = m_path.find('/',last)) {
+    std::string tempPath = m_path[m_path.length() + 1] == '/' ? m_path : m_path + '/';
+    std::string::size_type last = 0, slash = tempPath.find('/');
+    for (; slash != std::string::npos; slash = tempPath.find('/',last)) {
         if (!slash) {
             last = slash + 1;
             continue;   // skip initial '/'
         }
-        std::string subdir = m_path.substr(last,slash-last);
+        std::string subdir = tempPath.substr(last,slash-last);
         TDirectory* dir = m_dir->GetDirectory(subdir.c_str());
         if (dir) m_dir = dir;
         else m_dir = m_dir->mkdir(subdir.c_str());
@@ -307,11 +314,12 @@ void RootFileWriter::initialize()
     for (std::vector<std::string>::const_iterator it = eventNames.begin(); it != eventNames.end(); ++it) {
         m_eventTrees.insert(std::make_pair(*it, new OutputTreeHandle(m_path, *it)));
         JM::TreeMetaData* etmd = new JM::TreeMetaData();
-        etmd->SetTreeName(m_path + it->substr(it->rfind("::") + 1));
+        etmd->SetTreeName(tempPath + it->substr(it->rfind("::") + 1));
+        m_treeMetaDatas.push_back(etmd);
     }
 
     JM::TreeMetaData* htmd = new JM::TreeMetaData();
-    htmd->SetTreeName(m_path + m_headerName.substr(m_headerName.rfind("::") + 1));
+    htmd->SetTreeName(tempPath + m_headerName.substr(m_headerName.rfind("::") + 1));
     m_treeMetaDatas.push_back(htmd);
 
     m_file->occupyPath(m_path);
