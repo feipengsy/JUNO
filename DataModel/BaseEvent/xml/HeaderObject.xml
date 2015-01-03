@@ -16,13 +16,16 @@
                     type="void"
                     desc="Set the entry number of the event object"
                     virtual="PURE">
+              <arg type="const std::string" />
               <arg type="const Long64_t" />
             </method>
 
             <method name="event"
                     type="JM::EventObject*"
                     desc="Get the event object of header"
-                    virtual="PURE" />
+                    virtual="PURE" >
+              <arg type="const std::string" />
+            </method>
             
             <attribute name="EventID"
                        type="int"
