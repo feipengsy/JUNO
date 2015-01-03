@@ -12,7 +12,7 @@ DECLARE_SERVICE(RootInputSvc);
 RootInputSvc::RootInputSvc(const std::string& name) 
   : BaseIOSvc(name),
     m_inputStream(0), 
-    m_keeper(0),
+    m_keeper(0)
 {
     declProp("InputFile", m_inputFile);
 }

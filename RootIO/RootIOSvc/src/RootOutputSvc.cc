@@ -3,6 +3,7 @@
 #include "SniperKernel/SvcFactory.h"
 #include "SniperKernel/SniperPtr.h"
 #include "RootIOSvc/RootOutputStream.h"
+#include "DataRegistritionSvc/EDMManager.h"
 #include "RootIOUtil/RootOutputFileManager.h"
 
 DECLARE_SERVICE(RootOutputSvc);
@@ -203,7 +204,6 @@ bool RootOutputSvc::reviseOutputStream(const std::string& path, const std::strin
         if (path == (*it)->path()) {
             // Reset the header and event name of this stream
             (*it)->setHeaderName(headerName);
-            (*it)->setEventName(EDMManager::get()->getEventNameWithHeader(headerName));
             // Notify the output file
             int priority = EDMManager::get()->getPriorityWithHeader(headerName);
             RootOutputFileManager::get()->reviseOutputFile(m_outputFileMap[path], path, priority);

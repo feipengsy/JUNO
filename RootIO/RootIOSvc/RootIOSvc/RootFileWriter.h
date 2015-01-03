@@ -5,6 +5,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 class RootOutputFileHandle;
 class TTree;
@@ -12,7 +13,7 @@ class TDirectory;
 
 namespace JM {
     class TreeMetaData;
-    class EvtNavigator
+    class EvtNavigator;
 }
 
 class OutputTreeHandle {
@@ -33,7 +34,7 @@ class OutputTreeHandle {
         const std::string& fullTreeName() const { return m_fullTreeName; }
         bool fill(int& nbytes);
         void write();
-        void writeUID(RootOutputFileHandle* file)
+        void writeUID(RootOutputFileHandle* file);
 
     private:
         void fillUID(int bid = -1);
@@ -55,7 +56,7 @@ class OutputTreeHandle {
 class RootFileWriter {
 
     public:
-        typedef std::map<std::string, OutputTreeHandle*>  String2TreeHandle
+        typedef std::map<std::string, OutputTreeHandle*>  String2TreeHandle;
         typedef std::vector<JM::TreeMetaData*>            TMDVector;
         
         RootFileWriter(const std::string& treepath, const std::string& headerName);

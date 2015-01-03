@@ -27,7 +27,7 @@ std::string RootOutputStream::path()
 
 int RootOutputStream::entries()
 {
-    return m_writer->entries();
+    return m_writer->fileEntries();
 }
 
 bool RootOutputStream::write()

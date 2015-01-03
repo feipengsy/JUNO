@@ -1,6 +1,7 @@
 #include "RootIOSvc/RootFileWriter.h"
 #include "SniperKernel/SniperLog.h"
 #include "EvtNavigator/EvtNavigator.h"
+#include "DataRegistritionSvc/EDMManager.h"
 #include "Event/HeaderObject.h"
 #include "RootIOUtil/TreeMetaData.h"
 #include "RootIOUtil/RootOutputFileManager.h"
@@ -44,7 +45,7 @@ bool OutputTreeHandle::fill(int& nbytes)
     return true;
 }
 
-void OuputTreeHandle::write()
+void OutputTreeHandle::write()
 {
     if (m_tree) {
         m_tree->Write(NULL,TObject::kOverwrite);
@@ -57,7 +58,7 @@ void OutputTreeHandle::writeUID(RootOutputFileHandle* file)
     file->addUUID(m_guid);
 }
 
-void OutputTreeHandle::fillUID(int bid = -1)
+void OutputTreeHandle::fillUID(int bid)
 {
     TObject* obj = static_cast<TObject*>(m_addr);
     UInt_t uid = obj->GetUniqueID();
@@ -180,7 +181,7 @@ bool RootFileWriter::writeHeader()
     // Header will always be written
     m_headerTree->fill(nbytes);
     LogDebug <<  "Wrote " << nbytes
-             << " byte(s) to entry " << m_entries
+             << " byte(s) to entry " << m_headerTree->entries()
              << " of header of " << m_path
              << std::endl;
     return nbytes > 0;
@@ -198,8 +199,8 @@ bool RootFileWriter::writeEvent()
         m_navAddr->getHeader(m_path)->setEventEntry(it->first, it->second->entries() - 1);
 
         LogDebug << "Wrote " << nbytes
-                 << " byte(s) to entry " << it->entries()
-                 << " of " << it->objectName()
+                 << " byte(s) to entry " << it->second->entries()
+                 << " of " << it->second->objectName()
                  << " of path " << m_path
                  << std::endl;
         if (!nbytes) {
@@ -221,7 +222,7 @@ bool RootFileWriter::writeNav()
     m_file->setNavAddr(m_navAddr);
     int nbytes = m_navTree->Fill();
     LogDebug <<  "Wrote " << nbytes
-             << " bytes to entry " << m_entries
+             << " bytes to entry " << m_fileEntries
              << " of tree for EvtNavigator "
              << std::endl;
     return nbytes > 0;
@@ -288,7 +289,7 @@ void RootFileWriter::initialize()
     TFile* rootFile =  m_file->getFile();
     m_dir = rootFile;
     std::string::size_type last = 0, slash = m_path.find('/');
-    for (; slash != std::string::npos; slash = tempPpath.find('/',last)) {
+    for (; slash != std::string::npos; slash = m_path.find('/',last)) {
         if (!slash) {
             last = slash + 1;
             continue;   // skip initial '/'
@@ -308,7 +309,7 @@ void RootFileWriter::initialize()
     for (std::vector<std::string>::const_iterator it = eventNames.begin(); it != eventNames.end(); ++it) {
         m_eventTrees.insert(std::make_pair(*it, new OutputTreeHandle(m_path, *it)));
         JM::TreeMetaData* etmd = new JM::TreeMetaData();
-        etmd->SetTreeName(m_path + it->substr(it->rfind("::") + 1))
+        etmd->SetTreeName(m_path + it->substr(it->rfind("::") + 1));
     }
 
     JM::TreeMetaData* htmd = new JM::TreeMetaData();
