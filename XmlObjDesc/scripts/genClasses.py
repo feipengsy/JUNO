@@ -371,7 +371,7 @@ class genClasses(genSrcUtils.genSrcUtils):
         if not rflag:
           s += ' \n{\n  return m_%s;\n}\n\n' % rel['name']
         else:
-          s += ' \n{\n  m_%s.SetBranchID(1); \n  return (%s*)m_%s.GetObject();\n}\n\n' % (rel['name'],rel['type'],rel['name'])
+          s += ' \n{\n  m_%s.SetBranchID(0); \n  return (%s*)m_%s.GetObject();\n}\n\n' % (rel['name'],rel['type'],rel['name'])
       elif what == 'set'       : s += ' \n{\n  m_%s = value;\n}\n\n' % rel['name']
       elif what == 'setse'     : s += ' \n{\n  m_%s.setEntry(value);\n}\n\n' % rel['name']
       elif what == 'getse'     : s += ' \n{\n  return m_%s.entry();\n}\n\n' % rel['name']
