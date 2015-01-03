@@ -40,10 +40,10 @@ int EDMManager::getPriotiryWithHeader(const std::string& name)
     return reg ? reg->getPriority() : -1;
 }
 
-std::string EDMManager::getEventNameWithHeader(const std::string& name)
+EDMRegistration::StringVector EDMManager::getEventNameWithHeader(const std::string& name)
 {
     EDMRegistration* reg = this->getRegWithHeader(name);
-    return reg ? reg->getEventName() : "unknown";
+    return reg ? reg->getEventName() : EDMRegistration::StringVector();
 }
 
 std::string EDMManager::getPathWithHeader(const std::string& name)
@@ -52,7 +52,7 @@ std::string EDMManager::getPathWithHeader(const std::string& name)
     return reg ? reg->getPath() : "unknown";
 }
 
-bool EDMManager::book(std::string headerName, std::string eventName, int priority, std::string path)
+bool EDMManager::book(const std::string& headerName, const std::string& eventName, int priority, const std::string& path)
 {
     RegVector::iterator it, end = m_regs.end();
     for (it = m_regs.begin(); it != end; ++it) {
@@ -62,7 +62,13 @@ bool EDMManager::book(std::string headerName, std::string eventName, int priorit
             return false;
         }
     }
-    EDMRegistration* reg = new EDMRegistration(headerName, eventName, priority, path);
+    EDMRegistration::StringVector eventNames;
+    std::string::size_type last = 0, apos = eventName.find('&');
+    for (; apos != std::string::npos; apos = eventName.find('&',last)) {
+        eventNames.push_back(eventName.substr(last, apos - last));
+        last = apos + 1;
+    }
+    EDMRegistration* reg = new EDMRegistration(headerName, eventNames, priority, path);
     m_regs.push_back(reg);
     return true;
 }
@@ -71,7 +77,8 @@ EDMRegistration* EDMManager::getRegWithEvent(const std::string& name)
 {
     RegVector::iterator it, end = m_regs.end();
     for (it = m_regs.begin(); it != end; ++it) {
-        if ((*it)->getEventName() == name) {
+        const StringVector& eventNames = (*it)->getEventName();
+        if (std::find(eventNames.begin(), eventNames.end(), name) != eventNames.end()) {
             return *it;
         }
     }

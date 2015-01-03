@@ -5,11 +5,11 @@
 
 struct BookEDM {
     
-    BookEDM(const std::string& headerName, const std::string& eventName, int priority, const std::string& path);
+    BookEDM(const std::string& headerName, const std::string& eventNames, int priority, const std::string& path);
 
 };
 
-#define JUNO_BOOK_EDM(headerName, eventName, defaultPriority, defaultPath) \
-BookEDM BookEDM_##defaultPriority##_(#headerName, #eventName, defaultPriority, #defaultPath)
+#define JUNO_BOOK_EDM(headerName, eventNames, defaultPriority, defaultPath) \
+BookEDM BookEDM_##defaultPriority##_(#headerName, #eventNames, defaultPriority, #defaultPath)
 
 #endif
