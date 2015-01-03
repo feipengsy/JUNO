@@ -28,15 +28,14 @@ public:
     void addHeader(JM::HeaderObject* header);
     // Get the event header of a certain path
     JM::HeaderObject* getHeader(const std::string& path);
-    const JM::HeaderObject* getHeader(const std::string& path) const;
     // Set the entry of an event header, called by output system
     void setHeaderEntry(const std::string& path, int entry);
     // Get the list of the paths holded by EvtNavigator
     std::vector<std::string>& getPath();
     const std::vector<std::string>& getPath() const;
     // Get the list of SmartRefs
-    std::vector<SmartRef*>& getRef();
-    const std::vector<SmartRef*>& getRef();
+    std::vector<JM::SmartRef*>& getRef();
+    const std::vector<JM::SmartRef*>& getRef() const;
     // Set m_paths after EvtNavigator is loaded, called by input system
     void setPath(const std::vector<std::string>& paths);
     // Set whether a path will be written out

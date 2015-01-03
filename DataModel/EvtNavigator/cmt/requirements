@@ -2,6 +2,7 @@ package EvtNavigator
 
 use ROOT v* Externals
 use BaseEvent v* DataModel
+use DataRegistritionSvc v* DataModel
 use RootIOUtil v* RootIO
 
 apply_pattern install_more_includes more=EvtNavigator

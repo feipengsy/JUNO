@@ -1,4 +1,5 @@
 #include "EvtNavigator/EvtNavigator.h"
+#include "DataRegistritionSvc/EDMManager.h"
 #include <algorithm>
 
 ClassImp(JM::EvtNavigator);
@@ -57,6 +58,21 @@ std::vector<std::string>& JM::EvtNavigator::getPath()
     return m_paths;
 }
 
+const std::vector<std::string>& JM::EvtNavigator::getPath() const
+{
+    return m_paths;
+}
+
+std::vector<JM::SmartRef*>& JM::EvtNavigator::getRef()
+{
+    return m_refs;
+}
+
+const std::vector<JM::SmartRef*>& JM::EvtNavigator::getRef() const
+{   
+    return m_refs;
+}
+
 void JM::EvtNavigator::setHeaderEntry(const std::string& path, int entry)
 {
     std::vector<std::string>::iterator pos = find(m_paths.begin(), m_paths.end(), path);
@@ -70,6 +86,15 @@ void JM::EvtNavigator::addHeader(const std::string& path, JM::HeaderObject* head
     SmartRef* ref = new SmartRef();
     m_refs.push_back(ref);
     m_refs.back() -> SetObject(header);
+    m_writeFlag.push_back(true);
+}
+
+void JM::EvtNavigator::addHeader(JM::HeaderObject* header) 
+{
+    m_paths.push_back(EDMManager::get()->getPathWithHeader(header->ClassName()));
+    SmartRef* ref = new SmartRef();
+    m_refs.push_back(ref);
+    m_refs.back()->SetObject(header);
     m_writeFlag.push_back(true);
 }
 
