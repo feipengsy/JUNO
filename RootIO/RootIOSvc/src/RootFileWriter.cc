@@ -111,7 +111,7 @@ RootOutputFileHandle* RootFileWriter::getFile()
     return m_file;
 }
 
-bool RootFileWriter::write()
+bool RootFileWriter::write(JM::EvtNavigator* nav)
 {
     // Check rationality
     if (!m_file) {
@@ -124,16 +124,14 @@ bool RootFileWriter::write()
                  << std::endl;
         return false;
     }
-    if (!m_navAddr) {
-        LogError << "Address not set, can not write"
-                 << std::endl;
-        return false;
-    }
 
     // Try to initialize if nessassry
     if (!m_initialized) {
         this->initialize();
     }
+   
+    // Set Address
+    this->setAddress(nav);
 
     bool write = m_navAddr->writePath(m_path);
     if (!m_initialized || !write) {

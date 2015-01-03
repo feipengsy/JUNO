@@ -184,9 +184,7 @@ bool RootOutputSvc::write(JM::EvtNavigator* nav)
         }
         LogDebug << "Writing path: " << (*it)->path()
                  << std::endl;
-        // Set address
-        (*it)->setAddress(nav);
-        bool ok = (*it)->write();
+        bool ok = (*it)->write(nav);
         if (!ok) {
             LogError << "Fail to write stream for path: " << (*it)->path()
                      << std::endl;

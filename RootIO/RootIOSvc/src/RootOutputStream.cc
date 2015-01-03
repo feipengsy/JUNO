@@ -30,10 +30,10 @@ int RootOutputStream::entries()
     return m_writer->fileEntries();
 }
 
-bool RootOutputStream::write()
+bool RootOutputStream::write(JM::EvtNavigator* nav)
 {
     // Write data and EvtNavigator(if nesserary)
-    bool ok = m_writer->write();
+    bool ok = m_writer->write(nav);
     return ok;
 }
 
@@ -56,11 +56,6 @@ void RootOutputStream::setHeaderName(const std::string& name)
 {
     m_headerName = name;
     m_writer->setHeaderName(name);
-}
-
-void RootOutputStream::setAddress(JM::EvtNavigator* nav)
-{
-    m_writer->setAddress(nav);
 }
 
 void RootOutputStream::newFile(const std::string& filename)

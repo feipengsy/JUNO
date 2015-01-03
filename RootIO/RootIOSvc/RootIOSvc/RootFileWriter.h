@@ -64,7 +64,7 @@ class RootFileWriter {
         // Get current file handle
         RootOutputFileHandle* getFile();
         // Write current state of addr to disk.
-        bool write();
+        bool write(JM::EvtNavigator* nav);
         // Write tree to file and close file.
         bool close();
 
@@ -73,8 +73,6 @@ class RootFileWriter {
         void newFile(RootOutputFileHandle* file);
         // Return the number of entries in the output stream
         int fileEntries();
-        // Set Address of branches to be filled
-        void setAddress(JM::EvtNavigator* nav);
         // Set the name of event header
         void setHeaderName(const std::string& name);
 
@@ -89,6 +87,8 @@ class RootFileWriter {
         bool writeNav();
         // Check if this path is the last path of its output file
         void checkFilePath();
+        // Set Address of branches to be filled
+        void setAddress(JM::EvtNavigator* nav);
         /// Reset the addresses to 0
         void resetAddress();
 

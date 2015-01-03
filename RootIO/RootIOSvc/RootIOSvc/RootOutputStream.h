@@ -26,15 +26,13 @@ public:
     /// RootIOStream interface
     std::string path();
     /// Write current state of addr to disk.
-    bool write();
+    bool write(JM::EvtNavigator* nav);
     /// Write tree to file and close file.
     bool close();
 
     void revise();
     /// Set the header name
     void setHeaderName(const std::string& value);
-    /// Set address for the event to be written
-    void setAddress(JM::EvtNavigator* nav);
     /// Start a new output file
     void newFile(const std::string& filename);
     /// Return the number of entries in the output stream
