@@ -14,16 +14,15 @@
 OutputTreeHandle::OutputTreeHandle(const std::string& path, const std::string& objName)
     : m_path(path)
     , m_objName(objName)
-    , m_fullTreeName(path + objName.substr(objName.rfind("::")+1))
     , m_tree(0)
     , m_addr(0)
     , m_entries(0)
 {
     if (m_path[m_path.length() + 1] == '/') {
-        m_fullTreeName = path + objName.substr(objName.rfind("::")+1);
+        m_fullTreeName = path + objName.substr(objName.rfind("::")+2);
     }
     else {
-        m_fullTreeName = path + '/' + objName.substr(objName.rfind("::")+1);
+        m_fullTreeName = path + '/' + objName.substr(objName.rfind("::")+2);
     }
 }
 
@@ -40,7 +39,7 @@ bool OutputTreeHandle::fill(int& nbytes)
     if (!m_tree) {
         // Create tree first
         std::string title = "Tree at " + m_path + " holding " + m_objName;
-        std::string treeName = m_objName.substr(m_objName.rfind("::")+1);
+        std::string treeName = m_objName.substr(m_objName.rfind("::")+2);
         std::string branchName = treeName;
         m_tree = new TTree(treeName.c_str(), title.c_str());
         m_tree->Branch(branchName.c_str(), m_objName.c_str(), &m_addr,16000,1);
@@ -314,12 +313,12 @@ void RootFileWriter::initialize()
     for (std::vector<std::string>::const_iterator it = eventNames.begin(); it != eventNames.end(); ++it) {
         m_eventTrees.insert(std::make_pair(*it, new OutputTreeHandle(m_path, *it)));
         JM::TreeMetaData* etmd = new JM::TreeMetaData();
-        etmd->SetTreeName(tempPath + it->substr(it->rfind("::") + 1));
+        etmd->SetTreeName(tempPath + it->substr(it->rfind("::") + 2));
         m_treeMetaDatas.push_back(etmd);
     }
 
     JM::TreeMetaData* htmd = new JM::TreeMetaData();
-    htmd->SetTreeName(tempPath + m_headerName.substr(m_headerName.rfind("::") + 1));
+    htmd->SetTreeName(tempPath + m_headerName.substr(m_headerName.rfind("::") + 2));
     m_treeMetaDatas.push_back(htmd);
 
     m_file->occupyPath(m_path);
