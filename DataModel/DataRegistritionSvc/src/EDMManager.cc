@@ -63,9 +63,10 @@ bool EDMManager::book(const std::string& headerName, const std::string& eventNam
         }
     }
     EDMRegistration::StringVector eventNames;
-    std::string::size_type last = 0, apos = eventName.find('&');
-    for (; apos != std::string::npos; apos = eventName.find('&',last)) {
-        eventNames.push_back(eventName.substr(last, apos - last));
+    std::string tempName = eventName[eventName.length() + 1] == '&' ? eventName  : eventName + '&'
+    std::string::size_type last = 0, apos = tempName.find('&');
+    for (; apos != std::string::npos; apos = tempName.find('&',last)) {
+        eventNames.push_back(tempName.substr(last, apos - last));
         last = apos + 1;
     }
     EDMRegistration* reg = new EDMRegistration(headerName, eventNames, priority, path);
