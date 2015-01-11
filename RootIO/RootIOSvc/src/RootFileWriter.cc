@@ -225,7 +225,7 @@ bool RootFileWriter::writeNav()
     m_file->setNavAddr(m_navAddr);
     int nbytes = m_navTree->Fill();
     LogDebug <<  "Wrote " << nbytes
-             << " bytes to entry " << m_fileEntries
+             << " bytes to entry " << m_fileEntries + 1
              << " of tree for EvtNavigator "
              << std::endl;
     return nbytes > 0;
