@@ -233,7 +233,8 @@ bool RootFileWriter::writeNav()
 
 bool RootFileWriter::close()
 {
-    // Reset current dir
+    if (!m_initialized) return true;
+    // Reset current directory
     m_dir->cd();
     // Write trees and lazy-loading data
     m_headerTree->write();
