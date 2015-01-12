@@ -77,7 +77,7 @@ bool RootOutputSvc::initializeOutputStream(JM::EvtNavigator* nav)
             // The EvtNavigator does not hold this output path
             m_path2typeMap.insert(std::make_pair<std::string, std::string>(it->first, "unknown"));
             LogWarn << "Can not find path: " << it->first 
-                    << "Skipped for now" << std::endl;
+                    << ". Skipped for now" << std::endl;
             m_notYetInitPaths.push_back(it->first);
         }
     }
@@ -91,7 +91,14 @@ bool RootOutputSvc::initializeOutputStream(JM::EvtNavigator* nav)
     String2String::iterator it, it2, end  = m_outputFileMap.end();
     for (it = m_outputFileMap.begin(); it != end; ++it) {
         // Get priority of this path, get 0 out of a "unknown" path
-        int priority = EDMManager::get()->getPriorityWithHeader(m_path2typeMap[it->first]);
+        int priority;
+        const std::string& headerType = m_path2typeMap[it->first];
+        if ("unknown" == headerType) {
+            priority = 0;
+        }
+        else {
+            priority = EDMManager::get()->getPriorityWithHeader(headerType);
+        }
         std::vector<std::string> paths;
         paths.push_back(it->first);
         for (it2 = m_outputFileMap.begin(); it2 != end; ++it2) {
@@ -111,7 +118,14 @@ bool RootOutputSvc::initializeOutputStream(JM::EvtNavigator* nav)
         std::map<std::string, int> path2priority;
         std::vector<std::string>::iterator oit, oend = pit->second.end();
         for (oit = pit->second.begin(); oit != oend; ++oit) {
-            int opriority = EDMManager::get()->getPriorityWithHeader(m_path2typeMap[*oit]);
+            int opriority;
+            const std::string& headerType = m_path2typeMap[*oit];
+            if ("unknown" == headerType) {
+                opriority = 0;
+            }
+            else {
+                opriority = EDMManager::get()->getPriorityWithHeader(headerType);
+            }
             path2priority.insert(std::make_pair(*oit, opriority));
         }
         std::string primary_path = pit->second[0];
