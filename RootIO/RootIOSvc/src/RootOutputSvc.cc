@@ -228,6 +228,7 @@ bool RootOutputSvc::reviseOutputStream(const std::string& path, const std::strin
         }
         (*it)->revise();
     }
+    // TODO sort output streams again
     return true;
 }
 
