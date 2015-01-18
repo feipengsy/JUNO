@@ -211,7 +211,7 @@ bool RootOutputSvc::write(JM::EvtNavigator* nav)
 
 bool RootOutputSvc::reviseOutputStream(const std::string& path, const std::string& headerName)
 {
-    OutputStreamVector::iterator it, end = m_outputStreams.end();
+    OutputStreamVector::iterator it, pos, end = m_outputStreams.end();
     for (it = m_outputStreams.begin(); it != end; ++it) {
         if (path == (*it)->path()) {
             // Reset the header and event name of this stream
@@ -219,6 +219,13 @@ bool RootOutputSvc::reviseOutputStream(const std::string& path, const std::strin
             // Notify the output file
             int priority = EDMManager::get()->getPriorityWithHeader(headerName);
             RootOutputFileManager::get()->reviseOutputFile(m_outputFileMap[path], path, priority);
+            for (pos = it + 1; pos != end; ++pos) {
+                if (priority >= EDMManager::get()->getPriorityWithHeader((*pos)->name())) {
+                    swap(*it, *pos);
+                } 
+            }
+            // Here we assume that one path has only one stream
+            break;
         }
     }
     // Notify other output streams
@@ -228,7 +235,6 @@ bool RootOutputSvc::reviseOutputStream(const std::string& path, const std::strin
         }
         (*it)->revise();
     }
-    // TODO sort output streams again
     return true;
 }
 
