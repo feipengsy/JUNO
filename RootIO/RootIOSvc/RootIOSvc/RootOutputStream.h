@@ -24,7 +24,8 @@ public:
                      const std::string& treepath);
     virtual ~RootOutputStream();
     /// RootIOStream interface
-    std::string path();
+    const std::string& path() const;
+    const std::string& name() const;
     /// Write current state of addr to disk.
     bool write(JM::EvtNavigator* nav);
     /// Write tree to file and close file.

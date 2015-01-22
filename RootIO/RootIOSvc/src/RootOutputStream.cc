@@ -20,9 +20,14 @@ RootOutputStream::~RootOutputStream()
     delete m_writer;
 }
 
-std::string RootOutputStream::path()
+const std::string& RootOutputStream::path() const
 {
     return m_path;
+}
+
+const std::string& RootOutputStream::name() const
+{
+    return m_headerName;
 }
 
 int RootOutputStream::entries()

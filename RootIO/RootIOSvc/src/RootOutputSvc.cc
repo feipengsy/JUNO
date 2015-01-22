@@ -6,6 +6,8 @@
 #include "DataRegistritionSvc/EDMManager.h"
 #include "RootIOUtil/RootOutputFileManager.h"
 
+#include <algorithm>
+
 DECLARE_SERVICE(RootOutputSvc);
 
 RootOutputSvc::RootOutputSvc(const std::string& name)
@@ -221,7 +223,7 @@ bool RootOutputSvc::reviseOutputStream(const std::string& path, const std::strin
             RootOutputFileManager::get()->reviseOutputFile(m_outputFileMap[path], path, priority);
             for (pos = it + 1; pos != end; ++pos) {
                 if (priority >= EDMManager::get()->getPriorityWithHeader((*pos)->name())) {
-                    swap(*it, *pos);
+                    std::swap(*it, *pos);
                 } 
             }
             // Here we assume that one path has only one stream
