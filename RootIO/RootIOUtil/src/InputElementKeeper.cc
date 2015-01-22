@@ -205,21 +205,15 @@ TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Int_t b
     String2FileIDs::iterator pos = m_uuid2FileList.find(pid->GetTitle());
     if (pos != m_uuid2FileList.end()) {
       std::vector<int>::iterator it, end = pos->second.end();
+      // Open rest file that holds same TProcessID uuid
       for (it = pos->second.begin(); it != end; ++it) {
         // If this file is closed, open it
         if (!CheckFileStatus(*it)) {
           OpenFile(*it);
-          // Search branch id again
-          treeid = m_table->GetTreeID(uid, pid);
-          if (-1 == treeid) {
-            // oops! Opened the wrong file
-            m_fileMgr->CloseFile(*it);
-          }
-          else {
-            break;
-          }
         }
       }
+      // Search branch id again
+      treeid = m_table->GetTreeID(uid, pid);
     }
     // Sorry, the object is not in the input file list
     if (-1 == treeid) return 0;
