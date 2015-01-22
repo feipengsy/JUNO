@@ -11,21 +11,21 @@ class TTree;
 class InputTreeHandle {
 
   public:
-    InputTreeHandle(int fileid) : m_fileID(fileid), m_activeEntries(0), m_entries(0), m_opened(false), m_tree(0) {}
+    InputTreeHandle(int fileid) : m_fileID(fileid), m_activeEntries(0), m_entries(0), m_active(false), m_tree(0) {}
     // Destructor dosen't have to delete m_tree
     ~InputTreeHandle() {}
     int AddRef() { return ++m_activeEntries; }
     bool LastObj(Long64_t entry);
     TTree* GetTree() { return m_tree; }
     void SetTree(TTree* tree);
-    void Close() { m_opened = false; }
+    void Close() { m_active = false; }
     int GetFileID() { return m_fileID; }
 
   private:
     int m_fileID;
     int m_activeEntries;
     int m_entries;
-    bool m_opened;
+    bool m_active;
     TTree* m_tree;
 
 };

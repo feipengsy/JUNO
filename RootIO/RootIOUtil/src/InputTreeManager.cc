@@ -7,14 +7,13 @@ void InputTreeHandle::SetTree(TTree* tree)
 {
     m_tree = tree;
     m_entries = tree->GetEntries();
-    m_opened = true;
+    m_active = true;
 }
 
 bool InputTreeHandle::LastObj(Long64_t entry)
 {
     if (!m_opened) return false;
     if (m_entries == entry + 1) {
-        m_opened = false;
         return true;
     }
     return false;
@@ -50,6 +49,7 @@ void InputTreeManager::DelObj(int treeid, Long64_t entry)
 {
   bool fdel = m_trees[treeid]->LastObj(entry);
   if (fdel) {
+    m_trees[treeid]->Close();
     InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
     int fileid = m_trees[treeid]->GetFileID();
     keeper->DecTreeRef(fileid);
