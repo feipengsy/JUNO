@@ -51,6 +51,8 @@ public:
     void StartNewTable(Int_t fileid);
     // Delete the table for a given file
     void DeleteTable(Int_t fileid);
+    // Check if table of a given file exists
+    bool InspectFileID(Int_t fileid);
     
 private:
     std::list<SmartRefTableImpl*>  m_tableList;  // List of the SmartRefTableImpl*(one for each file) 

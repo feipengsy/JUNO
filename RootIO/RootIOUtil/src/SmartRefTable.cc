@@ -68,3 +68,13 @@ void SmartRefTable::DeleteTable(Int_t fileid)
         }
     }
 }
+
+bool SmartRefTable::InspectFileID(Int_t fileid)
+{
+    SRTIterator it, end = m_tableList.end();
+    for (it = m_tableList.begin();it != end; ++it) {
+        if (fileid == (*it)->GetFileID()) {
+            return true;
+        }
+    return false;
+}
