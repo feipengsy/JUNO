@@ -27,8 +27,6 @@ InputFileHandle::~InputFileHandle()
 void InputFileHandle::Close()
 {
   m_file->Close();
-  InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
-  keeper->ClearTable(m_fileID);
   m_status = false;
 }
 
@@ -48,6 +46,8 @@ void InputFileHandle::DecTreeRef()
   --m_activeTrees;
   if (m_activeTrees <= 0 && !m_navTreeRefFlag) {
     this->Close();
+    InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
+    keeper->ClearTable();
   }
 }
 

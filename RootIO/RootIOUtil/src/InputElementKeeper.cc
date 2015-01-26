@@ -12,7 +12,11 @@
 
 InputElementKeeper* InputElementKeeper::m_keeper = 0;
 
-InputElementKeeper::InputElementKeeper() : m_table(new SmartRefTable), m_treeMgr(new InputTreeManager), m_fileMgr(new InputFileManager), m_refCount(0)
+InputElementKeeper::InputElementKeeper() 
+            : m_table(new SmartRefTable)
+            , m_treeMgr(new InputTreeManager)
+            , m_fileMgr(new InputFileManager)
+            , m_refCount(0)
 {
   m_keeper = this;
 }
@@ -30,8 +34,9 @@ void InputElementKeeper::AddRef()
   ++m_refCount;
 }
 
-void InputElementKeeper::ClearTable(int fileid)
+void InputElementKeeper::ClearTable()
 {
+  // TODO delete table get all file id
   m_table->DeleteTable(fileid);
 }
 
@@ -126,9 +131,11 @@ void InputElementKeeper::ResetNavTreeRef(int fileid)
 
 void InputElementKeeper::DelObj(Int_t uid, TProcessID* pid, Long64_t entry)
 {
-  int treeid = m_table->GetTreeID(uid, pid, true);
+  int treeid = m_table->GetTreeID(uid, pid);
   if (-1 == treeid) return;
+  m_tempUUID = pid->GetTitle();
   m_treeMgr->DelObj(treeid, entry);
+  m_tempUUID.clear();
 }
 
 InputElementKeeper* InputElementKeeper::GetInputElementKeeper(bool create)
@@ -201,18 +208,18 @@ TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Int_t b
 {
   int treeid = m_table->GetTreeID(uid, pid);
   if (-1 == treeid) {
-    // Try to open a new input file and search again
+    // Try to load meta data from other files and search again
     String2FileIDs::iterator pos = m_uuid2FileList.find(pid->GetTitle());
     if (pos != m_uuid2FileList.end()) {
       std::vector<int>::iterator it, end = pos->second.end();
       // Open rest file that holds same TProcessID uuid
       for (it = pos->second.begin(); it != end; ++it) {
-        // If this file is closed, open it
-        if (!CheckFileStatus(*it)) {
-          OpenFile(*it);
+        // If meta data of this file is not in memory, load it
+        if (!m_table->InspectFileID(*it)) {
+          RootFileReader::LoadUniqueID(m_fileMgr->GetFileName(*it), *it);
         }
       }
-      // Search branch id again
+      // Search tree id again
       treeid = m_table->GetTreeID(uid, pid);
     }
     // Sorry, the object is not in the input file list
