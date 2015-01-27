@@ -186,7 +186,7 @@ TObject* RootFileReader::GetUserData(const std::vector<int>& fileList, const std
   // Get instance of InputElementKeeper
   InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
   if (!keeper) {
-    return false;
+    return 0;
   }
 
   TObject* obj = 0;

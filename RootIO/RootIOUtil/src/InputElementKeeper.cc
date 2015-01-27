@@ -163,7 +163,7 @@ bool InputElementKeeper::CheckFileStatus(int fileid) const
 bool InputElementKeeper::GetNavTree(int fileid, TTree*& tree)
 {
     if (!CheckFileStatus(fileid)) {
-        OpenFile(fileid); // TODO if fail to open file
+        OpenFile(fileid); // TODO rubust check: fail to open file
     }
     TFile* file = m_fileMgr->GetFile(fileid);
     tree = RootFileReader::GetNavTree(file);
@@ -189,7 +189,18 @@ void InputElementKeeper::LoadUniqueID(int fileid)
     std::map<int,std::string> treeInfo = m_fileMgr->GetTreeInfo(fileid);
 
     m_table->StartNewTable(fileid);
-    JM::UniqueIDTable* uidTable = RootFileReader::GetUniqueIDTable(m_fileMgr->GetFileName(fileid));
+    JM::UniqueIDTable* uidTable = 0;
+    bool preStatus = CheckFileStatus(fileid);
+    // TODO robust check: fail to get uidTable
+    if (preStatus) {
+        uidTable = RootFileReader::GetUniqueIDTable(GetFile(fileid));
+    }
+    else {
+        TFile* file = RootFileReader::OpenFile(GetFileName(fileid));
+        uidTable = RootFileReader::GetUniqueIDTable(GetFile(fileid));
+        // Do not leave the file opened
+        file->Close();
+    }
     // TableMap : std::map<std::string, TablePerTree*>
     JM::UniqueIDTable::TableMap tables = uidTable->GetTable();
     std::map<int,std::string>::iterator it, end = treeInfo.end();
@@ -209,7 +220,7 @@ void InputElementKeeper::OpenFile(int fileid)
     std::map<int,std::string> treeInfo = m_fileMgr->GetTreeInfo(fileid);
     std::vector<TTree*> trees;
     if (!RootFileReader::ReOpen(filename, file, treeInfo, trees)) {
-        //TODO failed to open file and get trees
+        //TODO robust check: failed to open file and get trees
         return;
     }
     // Update InputFileHandle and InputTreeHandles
@@ -222,7 +233,7 @@ void InputElementKeeper::OpenFile(int fileid)
         m_treeMgr->ResetTree(it1->first, *it2);
     }
     // Load meta data if nesessary
-    this->LoadUniqueID(fileid, filename);
+    this->LoadUniqueID(fileid);
 }
 
 TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Int_t branchID)
