@@ -56,7 +56,7 @@ class InputElementKeeper {
         // Add active trees number of one file by 1
         void AddTreeRef(int fileid);
         // Clear the SmartRefTable, reclaim memory
-        void ClearTable();
+        void ClearTable(int fileid);
         // Minus active trees number of one file by 1, if goes to 0, close the file
         void DecTreeRef(int fileid);
         // Called by SmartRef::clear()
