@@ -169,6 +169,28 @@ TFile* InputElementKeeper::GetFile(int fileid)
   return m_fileMgr->GetFile(fileid);
 }
 
+void InputElementKeeper::LoadUniqueID(int fileid)
+{
+    if (m_table->InspectFileID(fileid)) {
+        // Meta data already in-momory, do nothing
+        return;
+    }
+    std::map<int,std::string> treeInfo = m_fileMgr->GetTreeInfo(fileid);
+
+    m_table->StartNewTable(fileid);
+    JM::UniqueIDTable* uidTable = RootFileReader::GetUniqueIDTable(m_fileMgr->GetFileName(fileid));
+    // TableMap : std::map<std::string, TablePerTree*>
+    JM::UniqueIDTable::TableMap tables = uidTable->GetTable();
+    std::map<int,std::string>::iterator it, end = treeInfo.end();
+    for (it = treeInfo.begin(); it != end; ++it) {
+        JM::UniqueIDTable::TableMap::iterator tpos = tables.find(it->second);
+        if (tpos != tables.end()) {
+            m_table->ReadMetaData(tpos->second, it->first);
+        }
+    }
+    delete uidTable;
+}
+
 void InputElementKeeper::OpenFile(int fileid)
 {
   std::string filename = m_fileMgr->GetFileName(fileid);
@@ -179,29 +201,17 @@ void InputElementKeeper::OpenFile(int fileid)
     //TODO failed to open file and get trees
     return;
   }
+  // Update InputFileHandle and InputTreeHandles
   m_fileMgr->UpdateFile(fileid, file);
-
-  // Register meta data to SmartRefTable and update pointer to TTree
-  m_table->StartNewTable(fileid);
-
-  JM::UniqueIDTable* uidTable = RootFileReader::GetUniqueIDTable(file);
-  // TableMap : std::map<std::string, TablePerTree*>
-  JM::UniqueIDTable::TableMap tables = uidTable->GetTable();
   std::map<int,std::string>::iterator it1 = treeInfo.begin();
   std::vector<TTree*>::iterator it2 = trees.begin();
   // The vector of poniters to TTree is of the same order with the treeInfo map
   for (; it1 != treeInfo.end(); ++it1, ++it2) {
     // Reset the pointer to TTree
     m_treeMgr->ResetTree(it1->first, *it2);
-
-    // Put meta data into SmartRefTable when opening file
-    JM::UniqueIDTable::TableMap::iterator tpos = tables.find(it1->second);
-    if (tpos != tables.end()) {
-      m_table->ReadMetaData(tpos->second, it1->first);
-    }
   }
-  
-  delete uidTable;
+  // Load meta data if nesessary
+  this->LoadUniqueID(fileid, filename);
 }
 
 TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Int_t branchID)
@@ -215,9 +225,7 @@ TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Int_t b
       // Open rest file that holds same TProcessID uuid
       for (it = pos->second.begin(); it != end; ++it) {
         // If meta data of this file is not in memory, load it
-        if (!m_table->InspectFileID(*it)) {
-          RootFileReader::LoadUniqueID(m_fileMgr->GetFileName(*it), *it);
-        }
+        this->LoadUniqueID(*it);
       }
       // Search tree id again
       treeid = m_table->GetTreeID(uid, pid);

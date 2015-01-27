@@ -87,7 +87,7 @@ class InputElementKeeper {
         InputElementKeeper();
         void RegisterFileMap(const String2FileIDs& value, const std::string& type);
         // Load meta data of one file into SmartRefTable
-        void LoadUniqueID(int fileid, const std::string& filename);
+        void LoadUniqueID(int fileid);
 
     private:
         SmartRefTable*              m_table;
