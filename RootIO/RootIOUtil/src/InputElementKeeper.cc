@@ -36,9 +36,15 @@ void InputElementKeeper::AddRef()
     ++m_refCount;
 }
 
-void InputElementKeeper::ClearTable(int fileid)
+void InputElementKeeper::ClearTable()
 {
-    m_table->DeleteTable(fileid);
+    String2FileIDs::iterator list = m_uuid2FileList.find(m_tempUUID);
+    if (list != m_uuid2FileList.end()) {
+        std::vector<int>::iterator it, end = list->second.end();
+        for (it = list->second.begin(); it != end; ++it) {
+            m_table->DeleteTable(*it);
+        }
+    }
 }
 
 void InputElementKeeper::DecRef()

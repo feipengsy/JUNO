@@ -56,7 +56,7 @@ class InputElementKeeper {
         // Add active trees number of one file by 1
         void AddTreeRef(int fileid);
         // Clear the SmartRefTable, reclaim memory
-        void ClearTable(int fileid);
+        void ClearTable();
         // Minus active trees number of one file by 1, if goes to 0, close the file
         void DecTreeRef(int fileid);
         // Called by SmartRef::clear()
@@ -95,6 +95,7 @@ class InputElementKeeper {
         InputFileManager*           m_fileMgr;
         String2FileIDs              m_path2FileList;
         String2FileIDs              m_uuid2FileList;
+        std::string                 m_tempUUID;
         // Singleton class
         int                         m_refCount;   // Reference count
         static InputElementKeeper*  m_keeper;     // Current InputElementKeeper
