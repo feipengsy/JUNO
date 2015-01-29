@@ -314,12 +314,35 @@ class genClasses(genSrcUtils.genSrcUtils):
       elif what == 'set' : s += ' \n{\n  m_%s = value;\n}\n\n' % att['name'] 
     return s
 #--------------------------------------------------------------------------------
+  def genSmartRefFunctionalMethod(self, srs, scopeName='')
+    s = ''
+    if not scopeName:
+      #declaration
+      s += '  /// Set entry number of events\n'
+      s += '  void setEventEntry(const std::string& eventName, Long64_t value);\n'
+      s += '  /// Get event\n'
+      s += '  JM::EventObject* event(const std::string& eventName);\n'
+    else:
+      #definition
+      s += 'inline void ' + scopeName + '::setEventEntry(const std::string& eventName, Long64_t value)\n{\n'
+      for sr in srs:
+        s += '  if (eventName == ' + sr['attrs']['type'] + ') { \n'
+        s += '    m_' + sr['attrs']['name'] + '.setEntry(value);\n'
+        s += '  }\n'
+      s += '}\n\n'
+      s += 'inline void ' + scopeName + '::event(const std::string& eventName)\n{\n'
+      for sr in srs:
+        s += '  if (eventName == ' + sr['attrs']['type'] + ') { \n'
+        s += '    return m_' + sr['attrs']['name'] + '.GetObject();\n'
+        s += '  }\n'
+      s += '}\n\n'
+#--------------------------------------------------------------------------------
   def genGetSetRelMethod(self,rel,what,scopeName=''):
     desc = {'gett':'Retrieve ', 'gett_c':'Retrieve (const) ', 'sett':'Update ', \
             'gettr':'Retrieve referenced ', 'gettr_c':'Retrieve referenced (const) ', \
             'gets':'Retrieve ', 'gets_c':'Retrieve (const) ', 'sets':'Update ', \
-            'getsr':'Retrieve referenced ', 'getse_c':'Retrieve', 'setse':'Update', \
-            'settr':'Update referenced ', 'setsr':'Update referenced ', 'addTo':'Add to ', \
+            'getsr':'Retrieve referenced ', 'settr':'Update referenced ', 
+            'setsr':'Update referenced ', 'addTo':'Add to ', \
             'addTo_p':'Att to (pointer) ', 'removeFrom':'Remove from ', \
             'removeFrom_p':'Remove from (pointer) ', 'clear':'Clear '}
     s = ''
@@ -339,14 +362,12 @@ class genClasses(genSrcUtils.genSrcUtils):
       ret = self.tools.genReturnFromStrg(rel['type'] + '*',self.generatedTypes,scopeName) + ' '
     if what in ['gets', 'gets_c']:
       ret = self.tools.genReturnFromStrg('JM::SmartRef&',self.generatedTypes,scopeName) + ' '
-    if what == 'getse_c':
-      ret = self.tools.genReturnFromStrg('Long64_t',self.generatedTypes,scopeName) + ' '
     metName = ''
     if what in ['gett', 'gett_c', 'gets', 'gets_c'] :
       metName = self.tools.lowerGetterName(rel['name']) + 'Ref'
     if what in ['gettr', 'gettr_c', 'getsr']:
       metName = self.tools.lowerGetterName(rel['name'])
-    if what in ['sett', 'settr', 'sets', 'setse', 'getse_c', 'setsr', 'addTo', 'addTo_p', 'removeFrom', 'removeFrom_p', 'clear'] :
+    if what in ['sett', 'settr', 'sets', 'setsr', 'addTo', 'addTo_p', 'removeFrom', 'removeFrom_p', 'clear'] :
       metName = rel['name'][0].upper() + rel['name'][1:]
     param = ''
     if what == 'sett' and rel['multiplicity'] != '1': 
@@ -355,12 +376,10 @@ class genClasses(genSrcUtils.genSrcUtils):
       param = self.tools.genParamFromStrg('TRef') + ' value'
     elif what == 'sets':
       param = self.tools.genParamFromStrg('JM::SmartRef') + ' value'
-    elif what == 'setse':
-      param = self.tools.genParamFromStrg('Long64_t') + ' value'
     elif what in ['settr', 'setsr', 'addTo_p', 'removeFrom_p']:
       param = self.tools.genParamFromStrg( rel['type'] + '*') + ' value'
     constF = ''
-    if what in ['gett_c', 'getr_c', 'gets_c', 'getse_c'] : 
+    if what in ['gett_c', 'getr_c', 'gets_c'] : 
         constF = ' const'
         ret = 'const ' + ret
     if what[-2] == '_' : what = what[:-2]
@@ -372,10 +391,6 @@ class genClasses(genSrcUtils.genSrcUtils):
       rflag = 1
     if what in ['sett', 'sets', 'settr', 'setsr']:
       what = 'set'
-    if what == 'getse':
-      s += ret + scopeName + 'get' + metName + 'Entry(' + param + ')' + ' const'
-    elif what == 'setse':
-      s += ret + scopeName + 'set' + metName + 'Entry(' + param + ')'
     elif what in ['','set','addTo','clear','removeFrom']:
       s += ret + scopeName + what + metName + '(' + param + ')' + constF
     if ( not scopeName )       : s += ';\n\n'                                       # this is a declaration
@@ -386,8 +401,6 @@ class genClasses(genSrcUtils.genSrcUtils):
         else:
           s += ' \n{\n  m_%s.SetBranchID(0); \n  return (%s*)m_%s.GetObject();\n}\n\n' % (rel['name'],rel['type'],rel['name'])
       elif what == 'set'       : s += ' \n{\n  m_%s = value;\n}\n\n' % rel['name']
-      elif what == 'setse'     : s += ' \n{\n  m_%s.setEntry(value);\n}\n\n' % rel['name']
-      elif what == 'getse'     : s += ' \n{\n  return m_%s.entry();\n}\n\n' % rel['name']
       elif what == 'addTo'     : s += ' \n{\n  m_%s.Add(value);\n}\n\n' % rel['name']
       elif what == 'clear'     : s += ' \n{\n  m_%s.Clear();\n}\n\n' % rel['name']
       elif what == 'removeFrom': s += ' \n{\n  m_%s.Remove(value);\n}\n\n' % rel['name']
@@ -508,14 +521,12 @@ class genClasses(genSrcUtils.genSrcUtils):
           s += self.genGetSetRelMethod(relAtt,'gets_c',clname)
           if relAtt['nonconstaccessor'] == 'TRUE' :
             s += self.genGetSetRelMethod(relAtt,'gets',clname)
-        if relAtt['getRMeth'] == 'TRUE':
-          s += self.genGetSetRelMethod(relAtt,'getsr',clname)
+        s += self.genGetSetRelMethod(relAtt,'getsr',clname)
         if relAtt['setMeth'] == 'TRUE':
           s += self.genGetSetRelMethod(relAtt,'sets',clname)
         if relAtt['setRMeth'] == 'TRUE':
           s += self.genGetSetRelMethod(relAtt,'setsr',clname)
-        if relAtt['setEntryMeth'] == 'TRUE':
-          s += self.genGetSetRelMethod(relAtt,'setse',clname)
+      s += self.genSmartRefFunctionalMethod(godClass['SmartRelation'], clname)
     return s[:-1]
 #--------------------------------------------------------------------------------
   def genBitfield(self,att):

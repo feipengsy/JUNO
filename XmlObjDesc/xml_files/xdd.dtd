@@ -159,15 +159,12 @@
 <!ELEMENT SmartRelation EMPTY>
 <!ATTLIST SmartRelation
         type             CDATA                            #REQUIRED
-        name             CDATA                            "event"
+        name             CDATA                            #REQUIRED
         desc             CDATA                            #REQUIRED
         access           (PUBLIC | PROTECTED | PRIVATE)   "PRIVATE"
         serialize        (TRUE | FALSE)                   "TRUE"
         setMeth          (TRUE | FALSE)                   "FALSE"
         getMeth          (TRUE | FALSE)                   "FALSE"
-        setRMeth         (TRUE | FALSE)                   "TRUE"
-        getRMeth         (TRUE | FALSE)                   "TRUE"
-        setEntryMeth     (TRUE | FALSE)                   "TRUE"
         nonconstaccessor (TRUE | FALSE)                   "FALSE"
 >
 <!ELEMENT bitfield EMPTY>
