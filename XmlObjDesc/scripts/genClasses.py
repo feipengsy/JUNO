@@ -27,12 +27,8 @@ class genClasses(genSrcUtils.genSrcUtils):
     self.bitfieldEnums = {'public':'', 'protected':'', 'private':''}
     self.gKeyedContainerTypedef = 0
     self.gContainedObjectTypedef = 0
-    if godClass['attrs']['serializers'] == 'TRUE' :
-      self.genOStream = 1
-      self.genFillStream = 1
-    else:
-      self.genOStream = 0
-      self.genFillStream = 0
+    self.genOStream = 0
+    self.genFillStream = 0
     if godClass.has_key('id') : self.isEventClass = 1
     else                      : self.isEventClass = 0
 #--------------------------------------------------------------------------------
@@ -45,15 +41,6 @@ class genClasses(genSrcUtils.genSrcUtils):
 #--------------------------------------------------------------------------------
   def parseClassImport(self, dict):
     self.parseImport(dict, self.include, self.stdIncludes, self.forwardDeclLHCb, self.forwardDeclGlob, self.forwardIncl)
-#--------------------------------------------------------------------------------
-  def genClassID(self, godClass):
-    s = ''
-    classAtt = godClass['attrs']
-    if classAtt.has_key('id'):
-      s += '\n'
-      s += '// Class ID definition\n'
-      s += 'static const CLID CLID_%s = %s;\n' % ( classAtt['name'], classAtt['id']) 
-    return s
 #--------------------------------------------------------------------------------
   def genEDMBook(self, godClass, scopeName=''):
     s = ''
