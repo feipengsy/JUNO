@@ -12,7 +12,7 @@ void InputTreeHandle::SetTree(TTree* tree)
 
 bool InputTreeHandle::LastObj(Long64_t entry)
 {
-    if (!m_opened) return false;
+    if (!m_active) return false;
     if (m_entries == entry + 1) {
         return true;
     }

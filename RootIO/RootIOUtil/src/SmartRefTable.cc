@@ -76,5 +76,6 @@ bool SmartRefTable::InspectFileID(Int_t fileid)
         if (fileid == (*it)->GetFileID()) {
             return true;
         }
+    }
     return false;
 }
