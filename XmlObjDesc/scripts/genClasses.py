@@ -76,23 +76,6 @@ class genClasses(genSrcUtils.genSrcUtils):
       s += 'static const unsigned int Version_%s = %s;\n' % (classAtt['name'], classAtt['version'])
     return s
 #--------------------------------------------------------------------------------
-  def genLocations(self, godClass):
-    s = ''
-    s2 = ''
-    classAtt = godClass['attrs']
-    if classAtt.has_key('location'):                                             # add class attribute location
-      s2 += '  static const std::string& Default = "%s";\n' % classAtt['location']
-    if godClass.has_key('location'):                                             # add elements location
-      for loc in godClass['location']:
-        locAtt = loc['attrs']
-        place = locAtt['place']
-        if locAtt['noQuote'] == 'FALSE': place = '"' + place + '"'
-        s2 += '  static const std::string& %s = %s;\n' % ( locAtt['name'], place )
-    if len(s2):                                                                  # if found something put namespace around it
-      s =  '// Namespace for locations in TDS\n'
-      s += 'namespace %sLocation {\n%s}\n' % ( classAtt['name'], s2 )
-    return s
-#--------------------------------------------------------------------------------
   def genInheritance(self, godClass):
     s = ''
     if godClass.has_key('base'):
@@ -314,7 +297,7 @@ class genClasses(genSrcUtils.genSrcUtils):
       elif what == 'set' : s += ' \n{\n  m_%s = value;\n}\n\n' % att['name'] 
     return s
 #--------------------------------------------------------------------------------
-  def genSmartRefFunctionalMethod(self, srs, scopeName='')
+  def genSmartRefFunctionalMethod(self, srs, scopeName=''):
     s = ''
     if not scopeName:
       #declaration
@@ -566,62 +549,6 @@ class genClasses(genSrcUtils.genSrcUtils):
           s += '%s = %s' % ((bfAtt['name']+'Mask').ljust(maxLenName+4), mask[:-3])
       s += '\n%s};\n\n' % indent[1:]
     return s
-#--------------------------------------------------------------------------------
-  def genClassIDFun(self,godClass,scopeName=''):
-    s = ''
-    if godClass['attrs'].has_key('id') :                                        # then we know that it is an event class
-      if (not scopeName) :                                                       # we are inside the class (declaration)
-        s  = '  // Retrieve pointer to class definition structure\n'
-        s += '  virtual const CLID& clID() const;\n'
-        s += '  static const CLID& classID();\n'
-      else :                                                                     # we are outside the class (definition)
-        s  = 'inline const CLID& %s::clID() const\n{\n' % scopeName 
-        s += '  return %s::classID();\n}\n\n' % scopeName                        
-        s += 'inline const CLID& %s::classID()\n{\n' % scopeName 
-        s += '  return CLID_%s;\n}\n' % scopeName.split('::')[-1]
-    return s                                                                    
-#--------------------------------------------------------------------------------
-  def genClassTypedefs(self, godClass):
-    s = ''
-    classname =  godClass['attrs']['name']
-    if self.gKeyedContainerTypedef or godClass['attrs']['keyedContTypeDef'] == 'TRUE':
-      self.addInclude('GaudiKernel/KeyedContainer')
-      s += '/// Definition of Keyed Container for %s\n' % classname
-      s += 'typedef KeyedContainer<%s, Containers::HashMap> %s;\n' \
-           % (classname, self.genClassnamePlurial(classname))
-    if self.gContainedObjectTypedef or godClass['attrs']['contObjectTypeDef'] == 'TRUE':
-      self.addInclude('GaudiKernel/ObjectVector')
-      s += '/// Definition of vector container type for %s\n' % classname
-      s += 'typedef ObjectVector<%s> %s;\n' % (classname, self.genClassnamePlurial(classname))
-    return s
-#--------------------------------------------------------------------------------
-  def genDefaultLocation(self, godClass):
-    s = ''
-    classAtt = godClass['attrs']
-    if classAtt.has_key('location'):                                             # add class attribute location
-      s += '/// Give access to default location from class scope.\n'
-      s += 'static const std::string& defaultLocation() { return %sLocation::Default; }\n' % classAtt['name']
-      s += 'virtual const std::string& defLoc() const { return %sLocation::Default; }\n' % classAtt['name']
-    return s
-
-#--------------------------------------------------------------------------------
-  def genClassContainerTypedefs(self, godClass):
-    s = ''
-    classname = godClass['attrs']['name']
-    if godClass['attrs']['stdVectorTypeDef'] == 'TRUE':
-      self.addInclude('vector',1)
-      s += '  /// typedef for std::vector of %s\n' % classname
-      s += '  typedef std::vector<%s*> Vector;\n' % ( classname )
-      s += '  typedef std::vector<const %s*> ConstVector;\n\n' % ( classname )
-    if self.gKeyedContainerTypedef or godClass['attrs']['keyedContTypeDef'] == 'TRUE':
-      self.addInclude('GaudiKernel/KeyedContainer')
-      s += '  /// typedef for KeyedContainer of %s\n' % classname
-      s += '  typedef KeyedContainer<%s, Containers::HashMap> Container;\n' % (classname)
-    if self.gContainedObjectTypedef or godClass['attrs']['contObjectTypeDef'] == 'TRUE':
-      self.addInclude('GaudiKernel/ObjectVector')
-      s += '/// typedef for ObjectVector of %s\n' % classname
-      s += 'typedef ObjectVector<%s> Container;\n' % (classname)
-    return s
 #-------------------------------------------------------------------------------- added by Li
   def genClassDefine( self, godClass, className ):
     s = ''
@@ -858,15 +785,12 @@ class genClasses(genSrcUtils.genSrcUtils):
       classDict['classID']                      = self.genClassID(godClass)
       classDict['EDMBook']                      = self.genEDMBook(godClass,scoped_classname)
       #classDict['classVersion']                = self.genClassVersion(godClass)
-      classDict['locations']                    = self.genLocations(godClass)
       classDict['desc']                         = self.genDesc(godClass)
       classDict['author']                       = godClass['attrs']['author']
       classDict['today']                        = time.ctime()
       classDict['classNamespace']               = namespace
       classDict['inheritance']                  = self.genInheritance(godClass)
       #classDict['defaultLocation']             = self.genDefaultLocation(godClass)
-      classDict['classContainerTypedefs']       = self.genClassContainerTypedefs(godClass)
-      classDict['classTypedefs']                = self.genClassTypedefs(godClass)
       classDict['constructorDecls']             = self.genConstructors(godClass)
       classDict['destructorDecl']               = self.genDestructors(godClass)
       classDict['classIDDecl']                  = self.genClassIDFun(godClass)
@@ -879,14 +803,9 @@ class genClasses(genSrcUtils.genSrcUtils):
         classDict[modifier+'Enums']             = self.genEnums(modifier,godClass)
         classDict[modifier+'MethodDecls']       = self.genMethods(modifier,godClass)
         classDict[modifier+'MethodDefs']        = self.genMethods(modifier,godClass,scoped_classname)
-      #classDict['streamerDecl']                 = self.genStreamer(godClass)
-      #classDict['streamerDef']                  = self.genStreamer(godClass,scoped_classname)
-      #classDict['classOstreamOverload']         = self.genClassOstreamOverload(godClass)
-      #classDict['enumOstreamOverloads']         = self.genEnumOstreamOverloads(godClass, scoped_classname)
       classDict['getSetMethodDecls']            = self.genGetSetMethods(godClass)
       classDict['constructorDefs']              = self.genConstructors(godClass,scoped_classname)
       classDict['destructorDef']                = self.genDestructors(godClass,scoped_classname)
-      classDict['classIDDef']                   = self.genClassIDFun(godClass,scoped_classname)
       classDict['getSetMethodDefs']             = self.genGetSetMethods(godClass,scoped_classname)
       defs,maps,dcls = self.genEnumConversions(godClass, scoped_classname)
       classDict['enumConversionDefs']  = defs

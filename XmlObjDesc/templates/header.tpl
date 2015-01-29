@@ -25,8 +25,6 @@ namespace @@@classNamespace@@@
 
   // Forward declarations
   @@@forwardDeclsLHCb@@@
-  @@@classID@@@
-  @@@locations@@@
 
   /** @class @@@classname@@@ @@@classname@@@.h
    *
@@ -57,16 +55,13 @@ namespace @@@classNamespace@@@
   @@@protectedBitfieldEnums@@@
   @@@protectedAttributes@@@
   @@@protectedTemplateAttr@@@
-  @@@classTypedefs@@@
 
   public:
 
-  @@@classContainerTypedefs@@@
   @@@publicTypedefs@@@
   @@@publicEnums@@@
   @@@constructorDecls@@@
   @@@destructorDecl@@@
-  @@@classIDDecl@@@
   @@@enumConversionDecls@@@
   @@@publicMethodDecls@@@
   @@@getSetMethodDecls@@@
@@ -88,7 +83,6 @@ namespace @@@classNamespace@@@
 
 @@@constructorDefs@@@
 @@@destructorDef@@@
-@@@classIDDef@@@
 @@@enumConversionDefs@@@
 @@@getSetMethodDefs@@@
 @@@publicMethodDefs@@@
