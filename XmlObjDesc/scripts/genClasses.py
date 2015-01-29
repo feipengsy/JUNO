@@ -55,6 +55,19 @@ class genClasses(genSrcUtils.genSrcUtils):
       s += 'static const CLID CLID_%s = %s;\n' % ( classAtt['name'], classAtt['id']) 
     return s
 #--------------------------------------------------------------------------------
+  def genEDMBook(self, godClass, scopeName=''):
+    s = ''
+    classAtt = godClass['attrs']
+    if not classAtt.has_key('path') or not classAtt.has_key('priority'):
+      return s
+    if not godClass.has_key('SmartRelation'):
+      return s
+    s += 'JUNO_BOOK_EDM(' + scopeName + ', '
+    for sr in godClass['SmartRelation']:
+      s += sr['attrs']['name'] + '&'
+    s += ', ' + classAtt['priority'] + ', ' + classAtt['path'] + ');\n' 
+    return s
+#--------------------------------------------------------------------------------
   def genClassVersion(self, godClass):
     s = ''
     classAtt = godClass['attrs']
@@ -832,20 +845,21 @@ class genClasses(genSrcUtils.genSrcUtils):
       classDict['classname']                    = classname
       classDict['uclassname']                   = classname.upper()  #added by Li
       classDict['classID']                      = self.genClassID(godClass)
-      #classDict['classVersion']                 = self.genClassVersion(godClass)
+      classDict['EDMBook']                      = self.genEDMBook(godClass,scoped_classname)
+      #classDict['classVersion']                = self.genClassVersion(godClass)
       classDict['locations']                    = self.genLocations(godClass)
       classDict['desc']                         = self.genDesc(godClass)
       classDict['author']                       = godClass['attrs']['author']
       classDict['today']                        = time.ctime()
       classDict['classNamespace']               = namespace
       classDict['inheritance']                  = self.genInheritance(godClass)
-      #classDict['defaultLocation']              = self.genDefaultLocation(godClass)
+      #classDict['defaultLocation']             = self.genDefaultLocation(godClass)
       classDict['classContainerTypedefs']       = self.genClassContainerTypedefs(godClass)
       classDict['classTypedefs']                = self.genClassTypedefs(godClass)
       classDict['constructorDecls']             = self.genConstructors(godClass)
       classDict['destructorDecl']               = self.genDestructors(godClass)
       classDict['classIDDecl']                  = self.genClassIDFun(godClass)
-      #classDict['allocatorOperators']           = self.genAllocatorOperators(godClass,allocatorType)
+      #classDict['allocatorOperators']          = self.genAllocatorOperators(godClass,allocatorType)
       for modifier in ['public','protected','private']:
         classDict[modifier+'Typedefs']          = self.genTypedefs(modifier,godClass)
         classDict[modifier+'Attributes']        = self.genAttributes(modifier,godClass)

@@ -24,16 +24,11 @@
         name              CDATA                            #REQUIRED
         author            CDATA                            #REQUIRED
         desc              CDATA                            #REQUIRED
-        id                CDATA                            #IMPLIED
         version           CDATA                            #IMPLIED
-        location          CDATA                            #IMPLIED
         namespace         CDATA                            #IMPLIED
-        stdVectorTypeDef  (TRUE | FALSE)                   "FALSE"  
-        keyedContTypeDef  (TRUE | FALSE)                   "FALSE"  
-        contObjectTypeDef (TRUE | FALSE)                   "FALSE"
-        serializers       (TRUE | FALSE)                   "TRUE"    
+        path              CDATA                            #IMPLIED
+        priority          CDATA                            #IMPLIED
         virtual           (TRUE | FALSE)                   "TRUE"
-        allocator         (DEFAULT | NO | BOOST | BOOST2 | DEBUG )  "DEFAULT"    
         streamer          (TRUE | FALSE)                   "TRUE"
         classdef          (TRUE | FALSE)                   "TRUE"
 >       
