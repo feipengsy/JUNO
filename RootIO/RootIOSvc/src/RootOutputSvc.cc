@@ -6,6 +6,7 @@
 #include "DataRegistritionSvc/EDMManager.h"
 #include "RootIOUtil/RootOutputFileManager.h"
 
+#include "TGeoManager.h"
 #include <algorithm>
 
 DECLARE_SERVICE(RootOutputSvc);
@@ -142,7 +143,6 @@ bool RootOutputSvc::initializeOutputStream(JM::EvtNavigator* nav)
     }
 
     OutputObjMap::iterator eit, eend = m_exOutputObjs.end();
-    LogDebug << "+ m_exOutputObjs size: " << m_exOutputObjs.size() << std::endl;
     for (eit = m_exOutputObjs.begin(); eit != eend; ++eit) {
         LogDebug << "Attach Obj: " << eit->first << std::endl;
         doAttachObj(eit->first, eit->second);
@@ -242,6 +242,15 @@ bool RootOutputSvc::reviseOutputStream(const std::string& path, const std::strin
 
 bool RootOutputSvc::attachObj(const std::string& path, TObject* obj) 
 {
+    if ("all" == path) {
+        for (String2String::iterator it = m_outputFileMap.begin();it != m_outputFileMap.end(); ++it) {
+            bool ok = this->attachObj(it->first, obj);
+            if (!ok) {
+                return false;
+            }
+        }
+        return true;
+    }
     std::pair<OutputObjMap::iterator, OutputObjMap::iterator> pos = m_exOutputObjs.equal_range(path);
     OutputObjMap::iterator it;
     for (it = pos.first; it != pos.second; ++it) {
@@ -253,7 +262,6 @@ bool RootOutputSvc::attachObj(const std::string& path, TObject* obj)
     }
     m_exOutputObjs.insert(std::make_pair<std::string, TObject*>(path,obj));
     LogDebug << "Attach Obj: " << path << std::endl;
-    LogDebug << "+ m_exOutputObjs size: " << m_exOutputObjs.size() << std::endl;
     if (m_streamInitialized) {
         return doAttachObj(path, obj);
     }
@@ -269,7 +277,10 @@ bool RootOutputSvc::doAttachObj(const std::string& path, TObject* obj)
             file->addGeoManager(static_cast<TGeoManager*>(obj));
             return true;
         }
-        // TODO Other object type... 
+        if (strcmp(obj->ClassName(), "JobInfo") == 0) { 
+            file->setJobInfo(static_cast<JobInfo*>(obj)); 
+            return true; 
+        }
         return true;
     }
     // Miss
