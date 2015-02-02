@@ -1,0 +1,11 @@
+package EDMUtil
+
+use ROOT v* Externals
+use BaseEvent v* DataModel
+use SniperKernel v*
+
+apply_pattern cint_dictionary files=../include/*.h
+
+library EDMUtil *.cc
+apply_pattern linker_library library=EDMUtil
+include_dirs "$(EDMUTILROOT)/include"
