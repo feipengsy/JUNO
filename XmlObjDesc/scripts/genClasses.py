@@ -292,6 +292,8 @@ class genClasses(genSrcUtils.genSrcUtils):
       s += '  void setEventEntry(const std::string& eventName, Long64_t& value);\n\n'
       s += '  /// Get event\n'
       s += '  JM::EventObject* event(const std::string& eventName);\n\n'
+      s += '  //Check if event exists\n'
+      s += '  bool hasEvent(const std::string& eventName="");\n\n'
     else:
       #definition
       s += 'inline void ' + scopeName + '::setEventEntry(const std::string& eventName, Long64_t& value)\n{\n'
@@ -307,6 +309,26 @@ class genClasses(genSrcUtils.genSrcUtils):
         s += '    return m_' + sr['attrs']['name'] + '.GetObject();\n'
         s += '  }\n'
       s += '  return 0; \n}\n\n'
+      s += 'bool ' + scopeName + 'hasEvent(const std::string& eventName)\n{\n'
+      if srs.length() == 1:
+        s += '  if (!eventName) {\n'
+        s += '    return m_' + srs[0]['attrs']['name'] + '.HasObject();\n'
+        s += '  }\n'
+        eventBaseName = srs[0]['attrs']['type'].split("::")[-1]
+        s += '  if (eventName.substr(eventName.rfind("::")) == "' + eventBaseName + '") { \n'
+        s += '    return m_' + srs[0]['attrs']['name'] + '.HasObject();\n'
+        s += '  }\n'
+        s += '  return false; \n} \n\n'
+      else:
+        s += '  if (!eventName) {\n'
+        s += '    return false;\n'
+        s += '  }\n'
+        for sr in srs:
+          eventBaseName = sr['attrs']['type'].split("::")[-1]
+          s += '  if (eventName.substr(eventName.rfind("::")) == "' + eventBaseName + '") { \n'
+          s += '    return m_' + sr['attrs']['name'] + '.HasObject();\n'
+          s += '  }\n'
+        s += '  return false; \n} \n\n'
     return s
 #--------------------------------------------------------------------------------
   def genGetSetRelMethod(self,rel,what,scopeName=''):
