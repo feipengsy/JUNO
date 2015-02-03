@@ -184,6 +184,14 @@ JM::EventObject* JM::SmartRef::GetObject()
   return obj;
 }
 
+bool JM::SmartRef::HasObject()
+{
+    if (m_refObjTemp) {
+        return true;
+    }
+    return m_entry != -1;
+}
+
 void JM::SmartRef::Streamer(TBuffer &R__b)
 {
    // Stream an object of class JM::SmartRef.

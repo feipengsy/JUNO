@@ -56,6 +56,9 @@ namespace JM
   // Get the refernced object
   EventObject* GetObject();
 
+  // Return whether SmartRef has a referenced object
+  bool HasObject();
+
   // Get the TProcessID of the SmartRef
   TProcessID* GetPID() const { return m_pid; }
   
