@@ -18,7 +18,7 @@ def genSrc( fullName , namespace="JM"):
   fileName = fullName.split('/')[-1]
   srcFile = open( fullName + '.cc', 'w' )
   src = '#include "Event/%s"\n' % (fileName + '.h')
-  src += 'ClassImp(%s::%s);' % (namespace, fileName)
+  src += 'ClassImp(%s::%s);\n' % (namespace, fileName)
   srcFile.write( src )
   srcFile.close()
 
