@@ -296,13 +296,13 @@ class genClasses(genSrcUtils.genSrcUtils):
       #definition
       s += 'inline void ' + scopeName + '::setEventEntry(const std::string& eventName, Long64_t& value)\n{\n'
       for sr in srs:
-        s += '  if (eventName == ' + sr['attrs']['type'] + ') { \n'
+        s += '  if ("eventName == "' + sr['attrs']['type'] + '") { \n'
         s += '    m_' + sr['attrs']['name'] + '.setEntry(value);\n'
         s += '  }\n'
       s += '}\n\n'
-      s += 'inline JM::EventObject ' + scopeName + '::event(const std::string& eventName)\n{\n'
+      s += 'inline JM::EventObject* ' + scopeName + '::event(const std::string& eventName)\n{\n'
       for sr in srs:
-        s += '  if (eventName == ' + sr['attrs']['type'] + ') { \n'
+        s += '  if (eventName == "' + sr['attrs']['type'] + '") { \n'
         s += '    m_' + sr['attrs']['name'] + '.SetBranchID(0);\n'
         s += '    return m_' + sr['attrs']['name'] + '.GetObject();\n'
         s += '  }\n'
@@ -367,6 +367,8 @@ class genClasses(genSrcUtils.genSrcUtils):
       rflag = 1
     if what in ['sett', 'sets', 'settr', 'setsr']:
       what = 'set'
+    if ( not scopeName ):
+      s += '  '
     if what == 'getse':
       s += ret + scopeName + 'get' + metName + 'Entry(' + param + ')' + ' const'
     elif what == 'setse':
@@ -780,7 +782,6 @@ class genClasses(genSrcUtils.genSrcUtils):
 
       classDict['classname']                    = classname
       classDict['uclassname']                   = classname.upper()  #added by Li
-      classDict['classID']                      = self.genClassID(godClass)
       classDict['EDMBook']                      = self.genEDMBook(godClass,scoped_classname)
       #classDict['classVersion']                = self.genClassVersion(godClass)
       classDict['desc']                         = self.genDesc(godClass)
@@ -788,11 +789,8 @@ class genClasses(genSrcUtils.genSrcUtils):
       classDict['today']                        = time.ctime()
       classDict['classNamespace']               = namespace
       classDict['inheritance']                  = self.genInheritance(godClass)
-      #classDict['defaultLocation']             = self.genDefaultLocation(godClass)
       classDict['constructorDecls']             = self.genConstructors(godClass)
       classDict['destructorDecl']               = self.genDestructors(godClass)
-      classDict['classIDDecl']                  = self.genClassIDFun(godClass)
-      #classDict['allocatorOperators']          = self.genAllocatorOperators(godClass,allocatorType)
       for modifier in ['public','protected','private']:
         classDict[modifier+'Typedefs']          = self.genTypedefs(modifier,godClass)
         classDict[modifier+'Attributes']        = self.genAttributes(modifier,godClass)
