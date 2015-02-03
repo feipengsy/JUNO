@@ -1,7 +1,7 @@
 #include "RootIOSvc/RootFileWriter.h"
 #include "SniperKernel/SniperLog.h"
 #include "EvtNavigator/EvtNavigator.h"
-#include "DataRegistritionSvc/EDMManager.h"
+#include "EDMManager.h"
 #include "Event/HeaderObject.h"
 #include "RootIOUtil/TreeMetaData.h"
 #include "RootIOUtil/RootOutputFileManager.h"

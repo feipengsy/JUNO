@@ -1,5 +1,5 @@
 #include "EvtNavigator/EvtNavigator.h"
-#include "DataRegistritionSvc/EDMManager.h"
+#include "EDMManager.h"
 #include <algorithm>
 
 ClassImp(JM::EvtNavigator);

@@ -5,7 +5,7 @@ use Boost v* Externals
 use RootIOUtil v* RootIO
 use ROOT v* Externals
 use EvtNavigator v* DataModel
-use DataRegistritionSvc v* DataModel
+use EDMUtil v* DataModel
 
 apply_pattern install_more_includes more=RootIOSvc
 apply_pattern install_python_modules

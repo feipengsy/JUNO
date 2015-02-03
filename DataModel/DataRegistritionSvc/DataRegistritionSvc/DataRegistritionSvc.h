@@ -2,11 +2,11 @@
 #define DATA_REGISTRITION_SVC_H
 
 #include "SniperKernel/SvcBase.h"
-#include "DataRegistritionSvc/EDMManager.h"
-#include "DataRegistritionSvc/DataRegistration.h"
-
 #include <string>
 #include <map>
+
+class EDMManager;
+class DataRegistration;
 
 class DataRegistritionSvc : public SvcBase {
 

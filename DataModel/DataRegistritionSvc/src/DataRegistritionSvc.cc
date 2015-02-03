@@ -1,5 +1,6 @@
 #include "DataRegistritionSvc/DataRegistritionSvc.h"
-#include "DataRegistritionSvc/EDMManager.h"
+#include "EDMManager.h"
+#include "DataRegistration.h"
 #include "SniperKernel/SvcFactory.h"
 #include "SniperKernel/SniperLog.h"
 
