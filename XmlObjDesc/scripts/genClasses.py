@@ -51,7 +51,7 @@ class genClasses(genSrcUtils.genSrcUtils):
       return s
     s += 'JUNO_BOOK_EDM(' + scopeName + ', '
     for sr in godClass['SmartRelation']:
-      s += sr['attrs']['name'] + '&'
+      s += sr['attrs']['type'] + '&'
     s += ', ' + classAtt['priority'] + ', ' + classAtt['path'] + ');\n' 
     return s
 #--------------------------------------------------------------------------------
@@ -782,7 +782,7 @@ class genClasses(genSrcUtils.genSrcUtils):
 
       classDict['classname']                    = classname
       classDict['uclassname']                   = classname.upper()  #added by Li
-      classDict['EDMBook']                      = self.genEDMBook(godClass,scoped_classname)
+      #classDict['EDMBook']                      = self.genEDMBook(godClass,scoped_classname)
       #classDict['classVersion']                = self.genClassVersion(godClass)
       classDict['desc']                         = self.genDesc(godClass)
       classDict['author']                       = godClass['attrs']['author']
