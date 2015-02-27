@@ -28,7 +28,7 @@ class MergeRootFilesAlg : public AlgBase {
         int                       m_index;
         std::vector<std::string>  m_inputFileNames
         std::string               m_outputFileName;
-        std::vector<IMerger*>     m_merger;
+        std::vector<IMerger*>     m_objMergers;
         TFile*                    m_outputFile;
         TreeMerger*               m_treeMerger;
 

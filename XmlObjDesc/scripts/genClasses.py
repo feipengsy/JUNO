@@ -315,7 +315,7 @@ class genClasses(genSrcUtils.genSrcUtils):
         s += '    return m_' + srs[0]['attrs']['name'] + '.HasObject();\n'
         s += '  }\n'
         eventBaseName = srs[0]['attrs']['type'].split("::")[-1]
-        s += '  if (eventName.substr(eventName.rfind("::")) == "' + eventBaseName + '") { \n'
+        s += '  if (eventName.substr(eventName.rfind("::")+2) == "' + eventBaseName + '") { \n'
         s += '    return m_' + srs[0]['attrs']['name'] + '.HasObject();\n'
         s += '  }\n'
         s += '  return false; \n} \n\n'
@@ -325,7 +325,7 @@ class genClasses(genSrcUtils.genSrcUtils):
         s += '  }\n'
         for sr in srs:
           eventBaseName = sr['attrs']['type'].split("::")[-1]
-          s += '  if (eventName.substr(eventName.rfind("::")) == "' + eventBaseName + '") { \n'
+          s += '  if (eventName.substr(eventName.rfind("::")+2) == "' + eventBaseName + '") { \n'
           s += '    return m_' + sr['attrs']['name'] + '.HasObject();\n'
           s += '  }\n'
         s += '  return false; \n} \n\n'

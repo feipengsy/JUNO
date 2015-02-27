@@ -37,8 +37,8 @@ bool MergeRootFilesAlg::initialize()
     // Create all the mergers
     IMerger* metaDataMerger = new FileMetaDataMerger;
     IMerger* uidMerger = new UniqueIDTableMerger;
-    m_mergers.push_back(metaDataMerger);
-    m_mergers.push_back(uidMerger);
+    m_objMergers.push_back(metaDataMerger);
+    m_objMergers.push_back(uidMerger);
     m_treeMerger = new TreeMerger(dataPathList);
     m_treeMerger->initialize();
 
@@ -67,7 +67,7 @@ bool MergeRootFilesAlg::finalize()
     // Merge the additionally TObjects
     std::vector<IMerger*>::iterator it;
     TObject* obj = 0;
-    for (it = m_mergers.begin(); it != m_mergers.end(); ++it) {
+    for (it = m_objMergers.begin(); it != m_objMergers.end(); ++it) {
         (*it)->setInputFile(m_inputFileNames);
         std::string path, name;
         (*it)->merge(obj, path, name);
@@ -76,7 +76,7 @@ bool MergeRootFilesAlg::finalize()
 
     // finalize
     m_treeMerger->finalize();
-    for (it = m_mergers.begin(); it != m_mergers.end(); ++it) {
+    for (it = m_objMergers.begin(); it != m_objMergers.end(); ++it) {
         delete *it;
     }
     delete m_treeMerger;
