@@ -1,6 +1,6 @@
 #include "TreeLooper.h"
 
-TreeLooper::TreeLooper()
+TreeLooper::TreeLooper(const PathMap& dataPathMap)
 {
 }
 
@@ -21,4 +21,11 @@ bool TreeLooper::next()
 void TreeLooper::finalize()
 {
 
+}
+
+void TreeLooper::newInputFile(const std::string& value)
+{
+    //Set break point of previous file
+    
+    //Read trees
 }

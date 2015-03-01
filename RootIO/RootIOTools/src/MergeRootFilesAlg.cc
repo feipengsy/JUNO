@@ -24,8 +24,8 @@ MergeRootFilesAlg::~MergeRootFilesAlg()
 bool MergeRootFilesAlg::initialize()
 {
     // Reasonableness check
-    std::vector<std::string> dataPathList;
-    bool ok = this->rationalityCheck(dataPathList);
+    PathMap dataPathMap;
+    bool ok = this->rationalityCheck(dataPathMap);
     if (!ok) {
         LogError << "Failed on rationality check, can not merge. Please check input files."
                  << std::endl;
@@ -40,7 +40,7 @@ bool MergeRootFilesAlg::initialize()
     IMerger* uidMerger = new UniqueIDTableMerger;
     m_objMergers.push_back(metaDataMerger);
     m_objMergers.push_back(uidMerger);
-    m_treeLooper = new TreeLooper(dataPathList);
+    m_treeLooper = new TreeLooper(dataPathMap);
     m_treeLooper->initialize();
 
     LogInfo << "Successfully initialized!" << std::endl;
@@ -53,8 +53,7 @@ bool MergeRootFilesAlg::execute()
     if (!ok) {
         if (m_index < m_inputFileNames.size()) {
             // Start a new file
-            m_treeLooper->setInputFile(m_inputFileNames[m_index]);
-            ++m_index;
+            m_treeLooper->newInputFile(m_inputFileNames[m_index++]);
         }
         else {
             Incident::fire("StopRun");
@@ -84,7 +83,7 @@ bool MergeRootFilesAlg::finalize()
     return true;
 }
 
-bool MergeRootFilesAlg::rationalityCheck(std::vector<std::string>& dataPathList)
+bool MergeRootFilesAlg::rationalityCheck(PathMap& dataPathMap)
 {
     return true;
 }

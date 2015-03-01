@@ -13,6 +13,7 @@ class TreeLooper;
 class MergeRootFilesAlg : public AlgBase {
 
     public:
+        typedef std::map<std::string, std::pair<std::string, std::string> > PathMap; // Data path to header name and event name
         MergeRootFilesAlg(const std::string* name);
         ~MergeRootFilesAlg();
 
@@ -21,7 +22,7 @@ class MergeRootFilesAlg : public AlgBase {
         bool finalize();
 
     private:
-        bool rationalityCheck(std::vector<std::string>& dataPathList);
+        bool rationalityCheck(PathMap& dataPathMap);
         void writeObj(TObject* obj, const std::string& path, const std::string& name);
 
     private:
