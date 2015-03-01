@@ -8,7 +8,7 @@
 
 class TObject;
 class TFile;
-class TreeMerger;
+class TreeLooper;
 
 class MergeRootFilesAlg : public AlgBase {
 
@@ -30,7 +30,7 @@ class MergeRootFilesAlg : public AlgBase {
         std::string               m_outputFileName;
         std::vector<IMerger*>     m_objMergers;
         TFile*                    m_outputFile;
-        TreeMerger*               m_treeMerger;
+        TreeLooper*               m_treeLooper;
 
 };
 

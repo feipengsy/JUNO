@@ -1,15 +1,15 @@
-#ifndef ROOTIOTOOLS_TREEMERGER_H
-#define ROOTIOTOOLS_TREEMERGER_H
+#ifndef ROOTIOTOOLS_TREELOOPER_H
+#define ROOTIOTOOLS_TREELOOPER_H
 
 #include <string>
 #include <vector>
 
-class TreeMerger {
+class TreeLooper {
 
     public:
         typedef std::vector<std::string> StringVector
-        TreeMerger(const StringVector& dataPathList);
-        ~TreeMerger();
+        TreeLooper(const StringVector& dataPathList);
+        ~TreeLooper();
         
         void initialize();
         bool next();

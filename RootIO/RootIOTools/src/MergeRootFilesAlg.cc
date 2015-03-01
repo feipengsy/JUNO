@@ -1,4 +1,5 @@
 #include "MergeRootFilesAlg.h"
+#include "TreeLooper.h"
 #include "SniperKernel/AlgFactory.h"
 #include "SniperKernel/SniperLog.h"
 
@@ -10,10 +11,10 @@ MergeRootFilesAlg::MergeRootFilesAlg(const std::string& name)
     : AlgBase(name)
     , m_index(0)
     , m_outputFile(0)
-    , m_treeMerger(0)
+    , m_treeLooper(0)
 {
     declProp("InputFiles", m_inputFileNames);
-    declProp("OutputFile", m_outputFileName)
+    declProp("OutputFile", m_outputFileName);
 }
 
 MergeRootFilesAlg::~MergeRootFilesAlg()
@@ -39,8 +40,8 @@ bool MergeRootFilesAlg::initialize()
     IMerger* uidMerger = new UniqueIDTableMerger;
     m_objMergers.push_back(metaDataMerger);
     m_objMergers.push_back(uidMerger);
-    m_treeMerger = new TreeMerger(dataPathList);
-    m_treeMerger->initialize();
+    m_treeLooper = new TreeLooper(dataPathList);
+    m_treeLooper->initialize();
 
     LogInfo << "Successfully initialized!" << std::endl;
     return true;
@@ -48,11 +49,11 @@ bool MergeRootFilesAlg::initialize()
 
 bool MergeRootFilesAlg::execute()
 {
-    bool ok = m_treeMerger->next();
+    bool ok = m_treeLooper->next();
     if (!ok) {
         if (m_index < m_inputFileNames.size()) {
             // Start a new file
-            m_treeMerger->setInputFile(m_inputFileNames[m_index]);
+            m_treeLooper->setInputFile(m_inputFileNames[m_index]);
             ++m_index;
         }
         else {
@@ -75,11 +76,11 @@ bool MergeRootFilesAlg::finalize()
     }
 
     // finalize
-    m_treeMerger->finalize();
+    m_treeLooper->finalize();
     for (it = m_objMergers.begin(); it != m_objMergers.end(); ++it) {
         delete *it;
     }
-    delete m_treeMerger;
+    delete m_treeLooper;
     return true;
 }
 
