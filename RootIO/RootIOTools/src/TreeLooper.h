@@ -20,6 +20,7 @@ class TreeMerger {
         TTree* m_iTree;
         void* m_addr;
         int m_idx;
+        int m_entries;
 
 };
 

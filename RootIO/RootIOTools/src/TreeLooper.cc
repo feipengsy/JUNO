@@ -1,6 +1,7 @@
 #include "TreeLooper.h"
 
 #include "TTree.h"
+#include "Event/EventObject.h"
 
 //------------------- TreeMerger ---------------------
 
@@ -9,6 +10,7 @@ TreeMerger::TreeMerger(const std::string& path, const std::string& objName)
        , m_iTree(0)
        , m_addr(0)
        , m_idx(0)
+       , m_entries(0)
 {
     std::string title = "Tree at " + path + " holding " + objName;
     std::string treeName = objName.substr(objName.rfind("::")+2);
@@ -24,10 +26,22 @@ TreeMerger::~TreeMerger()
 
 bool TreeMerger::next()
 {
+    if (!m_iTree || m_idx >= m_entries) {
+        return false;
+    }
+    m_iTree->GetEntry(m_idx++);
+    m_oTree->Fill();
+    delete static_cast<JM::EventObject*>(m_addr);
+    m_addr = 0;
+    return true;
 }
 
 void TreeMerger::newTree(TTree* tree)
 {
+    m_idx = 0;
+    m_iTree = tree;
+    static_cast<TBranch*>(m_iTree->GetListOfBranches()->At(0))->SetAddress(m_addr);
+    m_entries = m_iTree->GetEntries();
 }
 
 
