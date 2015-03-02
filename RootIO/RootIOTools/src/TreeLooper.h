@@ -14,6 +14,7 @@ class TreeMerger {
 
         bool next();
         void newTree(TTree* tree);
+        void writeTree();
 
     private:
         TTree* m_oTree;
@@ -28,18 +29,24 @@ class TreeLooper {
 
     public:
         typedef std:map<std::string, TreeMerger*> TreeMap; // Key: data path; Value: TreeMerger
-        typedef std::map<std::string, std::pair<std::string, std::string> > PathMap;
-        TreeLooper(const PathMap& dataPathMap);
+        typedef std::map<std::string, std::string> PathMap;
+        TreeLooper(const PathMap& dataPathMap, TFile* file);
         ~TreeLooper();
         
-        void initialize();
         bool next();
         void finalize();
         void newInputFile(const std::string& value);
 
     private:
+        TFile*   m_outputFile;
+        // For event data trees
         TreeMap  m_treeMap;
-
+        // For EvtNavigator tree
+        TTree*   m_iNavTree;
+        TTree*   m_oNavTree;
+        void*    m_addr;
+        int      m_idx;
+        int      m_entries;
 };
 
 #endif

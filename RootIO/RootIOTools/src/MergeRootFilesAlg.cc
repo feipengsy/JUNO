@@ -40,8 +40,7 @@ bool MergeRootFilesAlg::initialize()
     IMerger* uidMerger = new UniqueIDTableMerger;
     m_objMergers.push_back(metaDataMerger);
     m_objMergers.push_back(uidMerger);
-    m_treeLooper = new TreeLooper(dataPathMap);
-    m_treeLooper->initialize();
+    m_treeLooper = new TreeLooper(dataPathMap, m_outputFile);
 
     LogInfo << "Successfully initialized!" << std::endl;
     return true;
