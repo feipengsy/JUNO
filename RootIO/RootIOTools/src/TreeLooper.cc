@@ -4,20 +4,17 @@
 
 //------------------- TreeMerger ---------------------
 
-TreeMerger::TreeMerger(const std::string path, const std::string headerName, const std::string eventName)
-       : m_oHeader(0)
-       , m_oEvent(0)
-       , m_iHeader(0)
-       , m_iEvent(0)
-       , m_hAddr(0)
-       , m_eAddr(0)
-       , mhIdx(0) 
-       , m_eIdx(0)
+TreeMerger::TreeMerger(const std::string& path, const std::string& objName)
+       : m_oTree(0)
+       , m_iTree(0)
+       , m_addr(0)
+       , m_idx(0)
 {
-    m_oHeader = new TTree();
-    m_oHeader->Branch();
-    m_oEvent = new TTree();
-    m_oEvent->Branch();
+    std::string title = "Tree at " + path + " holding " + objName;
+    std::string treeName = objName.substr(objName.rfind("::")+2);
+    std::string branchName = treeName;
+    m_oTree = new TTree(treeName.c_str(), title.c_str());
+    m_oTree->Branch(branchName.c_str(), objName.c_str(), &m_addr,16000,1);
 }
 
 TreeMerger::~TreeMerger()
@@ -29,7 +26,7 @@ bool TreeMerger::next()
 {
 }
 
-void TreeMerger::newTree(TTree* header, TTree* event)
+void TreeMerger::newTree(TTree* tree)
 {
 }
 
