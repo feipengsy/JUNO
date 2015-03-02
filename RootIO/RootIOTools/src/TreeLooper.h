@@ -9,7 +9,7 @@ class TTree;
 class TreeMerger {
     
     public:
-        TreeMerger(const std::string headerName, const std::string eventName);
+        TreeMerger(const std::string& path, const std::string& headerName, const std::string& eventName);
         ~TreeMerger();
 
         bool next();
@@ -18,7 +18,8 @@ class TreeMerger {
     private:
         TTree* m_oHeader, m_oEvent;
         TTree* m_iHeader, m_iEvent;
-        int m_headerIndex, m_eventIndex;
+        void* m_hAddr, m_eAddr;
+        int m_hIdx, m_eIdx;
 
 };
 
