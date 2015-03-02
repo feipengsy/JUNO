@@ -49,7 +49,7 @@ void TreeMerger::writeTree()
 //------------------- TreeLooper ---------------------
 
 TreeLooper::TreeLooper(const PathMap& dataPathMap, TFile* file)
-      : m_outputFile(file), m_iNavTree(0), m_oNavTree(0), m_addr(0), m_idx(0), m_entries(0)
+      : m_outputFile(file), m_inputFile(0), m_iNavTree(0), m_oNavTree(0), m_addr(0), m_idx(0), m_entries(0)
 {
     // Build data tree map
     PathMap::iterator it, end = dataPathMap.end();
@@ -116,4 +116,21 @@ void TreeLooper::newInputFile(const std::string& value)
     //Set break point of previous file
     
     //Read trees
+    if (m_inputFile) {
+        m_inputFile->Close();
+        delete m_inputFile;
+        m_inputFile = 0;
+    }
+    m_inputFile = new TFile(value, "read");
+    // Get nav tree
+    m_iNavTree = static_cast<TTree*>(m_inputFile->Get("/Meta/navigator"));
+    static_cast<TBranch*>(m_iNavTree->GetListOfBranches()->At(0))->SetAddress(m_addr);
+    m_entries = m_iNavTree->GetEntries();
+    m_idx = 0;
+    // Get data trees
+    TreeMap::iterator it, end = m_treeMap.end();
+    for (it = m_treeMap.begin(); it != end; ++it) {
+        TTree* dataTree = static_cast<TTree*>(m_inputFile->Get(it->first));
+        it->second->newTree(tree);
+    }
 }

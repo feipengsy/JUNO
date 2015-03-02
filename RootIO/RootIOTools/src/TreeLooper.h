@@ -39,6 +39,7 @@ class TreeLooper {
 
     private:
         TFile*   m_outputFile;
+        TFile*   m_inputFile;
         // For event data trees
         TreeMap  m_treeMap;
         // For EvtNavigator tree
