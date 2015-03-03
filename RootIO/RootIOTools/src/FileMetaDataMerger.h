@@ -9,8 +9,6 @@ class FileMetaDataMerger : public IMerger {
 
         void merge(TObject*& obj, std::string& path, std::string& name);
 
-    private:
-
 };
 
 #endif

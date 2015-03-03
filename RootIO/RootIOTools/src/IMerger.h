@@ -4,14 +4,15 @@
 class IMerger {
 
     public:
+        typedef std::vector<std::string> StringVector;
         IMerger() {}
         virtual ~IMerger() {}
         
-        virtual void merge() =0;
-        void setInputFile(const std::vector<std::string>& value) { m_inputFiles = value; }
+        virtual void merge(TObject*& obj, std::string& path, std::string& name) =0;
+        void setInputFile(const StringVector& value) { m_inputFiles = value; }
 
     private:
-        std::vector<std::string>  m_inputFiles;
+        StringVector  m_inputFiles;
 
 };
 
