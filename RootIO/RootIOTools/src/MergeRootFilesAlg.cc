@@ -91,8 +91,9 @@ void MergeRootFilesAlg::writeObj(TObject* obj, const std::string& path, const st
 {
     m_outputFile->cd();
     if (!gDirectory->cd(path)) {
-        gDirectory->mkdir("path");
+        gDirectory->mkdir(path);
         gDirectory->cd(path);
     }
     obj->Write(name);
+    delete obj;
 }
