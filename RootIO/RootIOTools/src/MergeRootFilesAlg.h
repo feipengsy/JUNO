@@ -14,6 +14,7 @@ class MergeRootFilesAlg : public AlgBase {
 
     public:
         typedef std::map<std::string, std::string> PathMap; // Data path to header name and event name
+        typedef std::map<std::string, std::vector<int> > BreakPointsMap;
         MergeRootFilesAlg(const std::string* name);
         ~MergeRootFilesAlg();
 
@@ -32,6 +33,7 @@ class MergeRootFilesAlg : public AlgBase {
         std::vector<IMerger*>     m_objMergers;
         TFile*                    m_outputFile;
         TreeLooper*               m_treeLooper;
+        BreakPointsMap            m_mdBreakPoints;
 
 };
 
