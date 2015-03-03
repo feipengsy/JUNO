@@ -15,6 +15,7 @@ class FileMetaData : public TObject {
         typedef std::vector<std::string> StringVector;
 
         FileMetaData() : m_NavPriority(-1) {}
+        FileMetaData(const FileMetaData& fmd);
         ~FileMetaData();
 
         // Add a TreeMetaData to this FileMetaData
