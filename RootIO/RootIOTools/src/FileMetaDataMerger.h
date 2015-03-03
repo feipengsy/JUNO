@@ -4,7 +4,7 @@
 class FileMetaDataMerger : public IMerger {
 
     public:
-        FileMetaDataMerger(const std::map<std::string, std::vector<int> >& breakPoints);
+        FileMetaDataMerger();
         ~FileMetaDataMerger();
 
         void merge(TObject*& obj, std::string& path, std::string& name);
