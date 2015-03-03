@@ -17,3 +17,16 @@ void JM::UniqueIDTable::AddTable(const std::string& treename,
     table->SetIDs(uid, bid);
     m_tables.insert(std::make_pair(treename, table));
 }
+
+void JM::UniqueIDTable::MergeTable(const UniqueIDTable& table)
+{
+    for (TableMap::iterator it = table.m_tables.begin(); it != table.m_tables.end(); ++it) {
+        if (m_tables.find(it->first) == m_tables.end()) {
+            TablePerTree* newTPR = new TablePerTree(*it->second);
+            m_tables.insert(TableMap::value_type(it->first, newTPR));
+        }
+        else {
+            m_tables[it->first]->MergeTable(*it->second);
+        }
+    }
+}

@@ -15,7 +15,7 @@ void UniqueIDTableMerger::merge(TObject*& obj, std::string& path, std::string& n
     IMerger::StringVector::iterator it, end = m_inputFiles.end();
     for (it = m_inputFiles.begin(); it != end; ++it) {
         JM::UniqueIDTable* iTable = RootFileReader::GetUniqueIDTable(*it);
-        oTable->AddTable(iTable);
+        oTable->MergeTable(iTable);
         delete iTable;
     }
     oTable->SetBreakPoints(*m_breakPoints);

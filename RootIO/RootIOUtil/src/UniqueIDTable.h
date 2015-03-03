@@ -57,7 +57,7 @@ class UniqueIDTable : public TObject {
                       const TablePerTree::GUIDVector& guid, 
                       const TablePerTree::UIDVector& uid, 
                       const TablePerTree::BIDVector& bid);
-        void AddTable(const UniqueIDTable& another);
+        void MergeTable(const UniqueIDTable& table);
 
         TableMap& GetTable() { return m_tables; }
         const TableMap& GetTable() const { return m_tables; } 
