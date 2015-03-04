@@ -63,6 +63,10 @@ bool MergeRootFilesAlg::execute()
 
 bool MergeRootFilesAlg::finalize()
 {
+    // Finalize tree looper
+    m_treeLooper->finalize();
+    m_mdBreakPoints = m_treeLooper->getBreakPoints();
+
     // Merge the additionally TObjects
     std::vector<IMerger*>::iterator it;
     TObject* obj = 0;
@@ -73,8 +77,6 @@ bool MergeRootFilesAlg::finalize()
         this->writeObj(obj, path, name);
     }
 
-    // finalize
-    m_treeLooper->finalize();
     for (it = m_objMergers.begin(); it != m_objMergers.end(); ++it) {
         delete *it;
     }

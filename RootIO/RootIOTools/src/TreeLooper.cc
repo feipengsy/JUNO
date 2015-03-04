@@ -34,6 +34,9 @@ bool TreeMerger::next()
 
 void TreeMerger::newTree(TTree* tree)
 {
+    if (m_oTree.GetEntries()) {
+        m_breakPoints.push_back(m_oTree.GetEntries());
+    }
     m_idx = 0;
     m_iTree = tree;
     static_cast<TBranch*>(m_iTree->GetListOfBranches()->At(0))->SetAddress(m_addr);
@@ -109,12 +112,14 @@ void TreeLooper::finalize()
         it->second->writeTree();
     }
     // Get break points
+    TreeMap::iterator it, end = m_treeMap.end();
+    for (it = m_treeMap.begin(); it != end; ++it) {
+        m_breakPoints[it->first] = it->second->getBreakPoints();
+    }
 }
 
 void TreeLooper::newInputFile(const std::string& value)
 {
-    //Set break point of previous file
-    
     //Read trees
     if (m_inputFile) {
         m_inputFile->Close();
