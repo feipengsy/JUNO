@@ -31,6 +31,8 @@ class TablePerTree : public TObject {
         void SetGUIDs(const GUIDVector& guids) { m_GUIDs = guids; }
         void SetIDs(const UIDVector& uids, const BIDVector& bids);
 
+        void MergeTable(const TablePerTree& table);
+
     private:
         UIDVector m_UniqueIDs;
         BIDVector m_BranchIDs;
