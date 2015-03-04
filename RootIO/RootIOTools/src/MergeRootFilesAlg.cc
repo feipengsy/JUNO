@@ -36,8 +36,8 @@ bool MergeRootFilesAlg::initialize()
     m_outputFile = new TFile(m_outputFileName, "recreate");
 
     // Create all the mergers
-    IMerger* metaDataMerger = new FileMetaDataMerger();
-    IMerger* uidMerger = new UniqueIDTableMerger(&m_mdBreakPoints);
+    IMerger* metaDataMerger = new FileMetaDataMerger(&m_mdBreakPoints);
+    IMerger* uidMerger = new UniqueIDTableMerger();
     m_objMergers.push_back(metaDataMerger);
     m_objMergers.push_back(uidMerger);
     m_treeLooper = new TreeLooper(dataPathMap, m_outputFile);

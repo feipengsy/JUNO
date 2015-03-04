@@ -1,7 +1,7 @@
 #include "UniqueIDTableMerger.h"
 
-UniqueIDTableMerger::UniqueIDTableMerger(const std::map<std::string, std::vector<int> >* breakPoints)
-    : IMerger(), m_breakPoints(breakPoints)
+UniqueIDTableMerger::UniqueIDTableMerger()
+    : IMerger()
 {
 }
 
@@ -18,7 +18,6 @@ void UniqueIDTableMerger::merge(TObject*& obj, std::string& path, std::string& n
         oTable->MergeTable(iTable);
         delete iTable;
     }
-    oTable->SetBreakPoints(*m_breakPoints);
     obj = oTable;
     path = "Meta";
     name = "UniqueIDTable";
