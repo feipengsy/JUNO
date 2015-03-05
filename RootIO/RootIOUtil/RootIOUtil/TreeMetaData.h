@@ -15,7 +15,7 @@ class TreeMetaData : public TObject {
         bool IsSameAs(const TreeMetaData* other);
         std::string& GetTreeName() { return m_TreeName; }
         std::string& GetObjName() { return m_ObjName; }
-        const std::string& GetObjName() { return m_ObjName; }
+        const std::string& GetObjName() const { return m_ObjName; }
         const std::string& GetTreeName() const { return m_TreeName; }
         void SetTreeName(const std::string& value) { m_TreeName = value; }
 

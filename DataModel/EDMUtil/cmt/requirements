@@ -4,7 +4,7 @@ use ROOT v* Externals
 use BaseEvent v* DataModel
 use SniperKernel v*
 
-apply_pattern cint_dictionary files=../include/*.h
+apply_pattern cint_dictionary files=../include/JobInfo.h
 
 library EDMUtil *.cc
 apply_pattern linker_library library=EDMUtil

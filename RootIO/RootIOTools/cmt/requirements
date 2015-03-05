@@ -3,4 +3,8 @@ package RootIOTools
 use SniperKernel v*
 use DataModelRelease v*
 use RootIOSvc v*
+use RootIOUtil v*
 
+library RootIOTools *.cc
+apply_pattern linker_library library=RootIOTools
+apply_pattern install_python_modules

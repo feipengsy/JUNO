@@ -3,7 +3,7 @@
 void JM::TablePerTree::MergeTable(const JM::TablePerTree& table) 
 {
     size_t len = table.m_GUIDs.size();
-    for (size_t i = 0;; i < len; ++i) {
+    for (size_t i = 0; i < len; ++i) {
         GUIDVector::iterator pos = std::find(m_GUIDs.begin(), m_GUIDs.end(), table.m_GUIDs[i]);
         if (pos == m_GUIDs.end()) {
             // A new guid added into table
@@ -19,10 +19,10 @@ void JM::TablePerTree::MergeTable(const JM::TablePerTree& table)
             // Same guid found
             size_t idx = pos - m_GUIDs.begin();
             if (table.m_UniqueIDs.size() > i && m_UniqueIDs.size() > idx) {
-                m_UniqueIDs[idx].insert(m_UniqueIDs[idx].end(), table.m_UniqueIDs[i].begin(), table.m_UniqueIDs[i].end())
+                m_UniqueIDs[idx].insert(m_UniqueIDs[idx].end(), table.m_UniqueIDs[i].begin(), table.m_UniqueIDs[i].end());
             }
             if (table.m_BranchIDs.size() > i && m_BranchIDs.size() > idx) {
-                m_BranchIDs[idx].insert(m_BranchIDs[idx].end(), table.m_BranchIDs[i].begin(), table.m_BranchIDs[i].end())
+                m_BranchIDs[idx].insert(m_BranchIDs[idx].end(), table.m_BranchIDs[i].begin(), table.m_BranchIDs[i].end());
             }
         }
     }
@@ -48,7 +48,7 @@ void JM::UniqueIDTable::AddTable(const std::string& treename,
 
 void JM::UniqueIDTable::MergeTable(const UniqueIDTable& table)
 {
-    for (TableMap::iterator it = table.m_tables.begin(); it != table.m_tables.end(); ++it) {
+    for (TableMap::const_iterator it = table.m_tables.begin(); it != table.m_tables.end(); ++it) {
         if (m_tables.find(it->first) == m_tables.end()) {
             TablePerTree* newTPR = new TablePerTree(*it->second);
             m_tables.insert(TableMap::value_type(it->first, newTPR));

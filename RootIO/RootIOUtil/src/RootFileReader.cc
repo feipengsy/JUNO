@@ -182,7 +182,7 @@ TTree* RootFileReader::GetNavTree(TFile* file)
 
 TTree* RootFileReader::GetDataTree(TFile* file, const std::string& treename) 
 {
-  return dynamic_cast<TTree*>(file->Get(treename));
+  return dynamic_cast<TTree*>(file->Get(treename.c_str()));
 }
 
 TObject* RootFileReader::GetUserData(const std::vector<int>& fileList, const std::string& name)

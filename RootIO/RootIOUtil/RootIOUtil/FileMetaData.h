@@ -37,7 +37,7 @@ class FileMetaData : public TObject {
         const TMDVector& GetTreeMetaData() const { return m_TreeMetaDatas; }
         const StringVector& GetNavPath() const { return m_NavPath; }
         const StringVector& GetUUIDList() const { return m_UUIDList; }
-        BreakPointsMap& GetBreakPoints() { return m_BreakPoints; }
+        const BreakPointsMap& GetBreakPoints() const { return m_BreakPoints; }
 
     private:
         StringVector m_NavPath;       // The data path holded by EvtNavigator in this file
