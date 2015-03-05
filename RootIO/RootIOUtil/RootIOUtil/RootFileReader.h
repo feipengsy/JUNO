@@ -29,28 +29,22 @@ class RootFileReader {
 public:
 
     ~RootFileReader() {}
-
     // Open a registered input file again, called by InputElementKeeper
     static bool ReOpen(const std::string& filename, TFile*& file, const std::map<int,std::string>& treeinfo, std::vector<TTree*>& trees);
-
     // Open a input file and register it to InputElementKeeper
     static bool ReadFiles(const std::vector<std::string>& fileList, NavTreeList* navs, std::vector<std::string>& path);
-
     // Static function to open a file
     static TFile* OpenFile(const std::string& filename);
-
-    // Static function to get the tree owning EvtNavigator
+    // Static function to get the tree holding EvtNavigator
     static TTree* GetNavTree(TFile* file);
-
+    // Static function to get the tree holding event data
+    static TTree* GetDataTree(TFile* file, const std::string& treename);
     // Given FileMetaDatas and file ids, initialize NavTreeList
     static bool GetNavTreeList(std::map<int,JM::FileMetaData*>& fmetadatas, NavTreeList* navs, std::vector<std::string>& path);
-
     // Get the FileMetaData of a TFile
     static JM::FileMetaData* GetFileMetaData(TFile* file);
-
     // Get the UniqueIDTable of a TFile
     static JM::UniqueIDTable* GetUniqueIDTable(TFile* file);
-
     // Get addtional TObject of input file(s)
     static TObject* GetUserData(const std::vector<int>& fileList, const std::string& name);
 

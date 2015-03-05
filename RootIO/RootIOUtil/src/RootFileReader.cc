@@ -180,6 +180,11 @@ TTree* RootFileReader::GetNavTree(TFile* file)
   return dynamic_cast<TTree*>(file->Get("/Meta/navigator"));
 }
 
+TTree* RootFileReader::GetDataTree(TFile* file, const std::string& treename) 
+{
+  return dynamic_cast<TTree*>(file->Get(treename));
+}
+
 TObject* RootFileReader::GetUserData(const std::vector<int>& fileList, const std::string& name)
 {
 
