@@ -86,6 +86,46 @@ bool MergeRootFilesAlg::finalize()
 
 bool MergeRootFilesAlg::rationalityCheck(PathMap& dataPathMap)
 {
+    // Check the input file list to see if they were capable of being merged.
+    if (m_inputFileNames.size() <= 1) {
+        LogError << "No input file or just one input file specified, can not merge." << std::endl;
+        return false;
+    }
+    std::vector<std::string>::iterator it, end = m_inputFileNames.end();
+    JM::FileMetaData* firstFmd = 0;
+    JM::FileMetaData* fmd = 0;
+    for (it = m_inputFileNames.begin(); it != end; ++it) {
+        TFile* file = new TFile(*it, "read");
+        if (!file->IsOpen()) {
+            LogError << "Failed to open file: " << *it << std::endl;
+            delete file;
+            return false;
+        }
+        fmd = RootFileReader::GetFileMetaData(file);
+        file->Close();
+        delete file;
+        if (!fmd) {
+            LogError << "Failed to read file meta data from file: " << *it << std::endl;
+            return false;
+        }
+        if (!firstFmd) {
+            // First file, made as reference
+            firstFmd = fmd;
+            continue;
+        }
+        it (!firstFmd->IsSameAs(fmd)) {
+            LogError << "File: " << *it << " is not same, can not merge" << std::endl;
+            delete fmd;
+            return false;
+        }
+        delete fmd;
+    } 
+    const JM::FileMetaData::TMDVector& tmds = fistFmd->GetTreeMetaData();
+    JM::FileMetaData::TMDVector::const_iterator it, end = tmds.end();
+    for (it = tmds.begin(); it != end; ++it) {
+        dataPathMap.insert(std::make_pair((*it)->GetTreeName(),(*it)->GetObjName()));
+    }
+    delete firstFmd;
     return true;
 }
 
