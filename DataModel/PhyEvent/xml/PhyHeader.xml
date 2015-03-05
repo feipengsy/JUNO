@@ -14,6 +14,7 @@
             <base name="HeaderObject"/>
  
             <SmartRelation  type="JM::PhyEvent"
+                            name="event"
                             desc="SmartRef to the phyEvent"
                             nonconstaccessor="TRUE"/>
  

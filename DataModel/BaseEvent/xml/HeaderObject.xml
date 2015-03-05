@@ -17,7 +17,7 @@
                     desc="Set the entry number of the event object"
                     virtual="PURE">
               <arg type="const std::string" />
-              <arg type="const Long64_t" />
+              <arg type="Long64_t" />
             </method>
 
             <method name="event"

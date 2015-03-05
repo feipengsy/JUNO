@@ -298,7 +298,7 @@ class genClasses(genSrcUtils.genSrcUtils):
       #definition
       s += 'inline void ' + scopeName + '::setEventEntry(const std::string& eventName, Long64_t& value)\n{\n'
       for sr in srs:
-        s += '  if ("eventName == "' + sr['attrs']['type'] + '") { \n'
+        s += '  if (eventName == "' + sr['attrs']['type'] + '") { \n'
         s += '    m_' + sr['attrs']['name'] + '.setEntry(value);\n'
         s += '  }\n'
       s += '}\n\n'
@@ -309,9 +309,9 @@ class genClasses(genSrcUtils.genSrcUtils):
         s += '    return m_' + sr['attrs']['name'] + '.GetObject();\n'
         s += '  }\n'
       s += '  return 0; \n}\n\n'
-      s += 'bool ' + scopeName + 'hasEvent(const std::string& eventName)\n{\n'
-      if srs.length() == 1:
-        s += '  if (!eventName) {\n'
+      s += 'inline bool ' + scopeName + '::hasEvent(const std::string& eventName)\n{\n'
+      if len(srs) == 1:
+        s += '  if (!eventName.size()) {\n'
         s += '    return m_' + srs[0]['attrs']['name'] + '.HasObject();\n'
         s += '  }\n'
         eventBaseName = srs[0]['attrs']['type'].split("::")[-1]
