@@ -4,6 +4,7 @@
 #include "SniperKernel/SniperPtr.h"
 #include "RootIOSvc/RootOutputStream.h"
 #include "EDMManager.h"
+#include "JobInfo.h"
 #include "RootIOUtil/RootOutputFileManager.h"
 
 #include "TGeoManager.h"

@@ -29,7 +29,7 @@ class OutputTreeHandle {
 
         void setAddress(void* addr) { m_addr = addr; }
         void resetAddress() { m_addr = 0; }
-        int entries() const { return m_entries; }
+        Long64_t entries() const { return m_entries; }
         const std::string& objectName() const { return m_objName; }
         const std::string& fullTreeName() const { return m_fullTreeName; }
         bool fill(int& nbytes);
@@ -44,7 +44,7 @@ class OutputTreeHandle {
         std::string  m_fullTreeName;
         TTree*       m_tree;
         void*        m_addr;
-        int          m_entries;
+        Long64_t     m_entries;
 
         // For lazy-loading data
         StringVector            m_guid;

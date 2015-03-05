@@ -199,7 +199,8 @@ bool RootFileWriter::writeEvent()
         if (!write) continue;
 
         // Set entry number of this event
-        m_navAddr->getHeader(m_path)->setEventEntry(it->first, it->second->entries() - 1);
+        Long64_t nentry = it->second->entries() - 1;
+        m_navAddr->getHeader(m_path)->setEventEntry(it->first, nentry);
 
         LogDebug << "Wrote " << nbytes
                  << " byte(s) to entry " << it->second->entries()

@@ -2,6 +2,7 @@ package RootIOUtil
 
 use SniperKernel v*
 use BaseEvent v* DataModel
+use EDMUtil v* DataModel
 use ROOT v* Externals
 
 macro_append TreeMetaData_cintflags "-I$(CMTINSTALLAREA)/include"

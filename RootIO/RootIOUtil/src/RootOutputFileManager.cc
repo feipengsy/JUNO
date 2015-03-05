@@ -3,6 +3,7 @@
 #include "TTree.h"
 #include "TFile.h"
 #include "TGeoManager.h"
+#include "JobInfo.h"
 #include "RootIOUtil/FileMetaData.h"
 #include "UniqueIDTable.h"
 
@@ -16,6 +17,7 @@ RootOutputFileHandle::RootOutputFileHandle(const std::string& filename,
     , m_navTree(new TTree("navigator", "Tree for EvtNavigator"))
     , m_fileMetaData(new JM::FileMetaData())
     , m_IDTable(new JM::UniqueIDTable())
+    , m_jobInfo(0)
     , m_refCount(0)
     , m_navAddr(0)
 {
@@ -58,6 +60,14 @@ void RootOutputFileHandle::addGeoManager(TGeoManager* geo)
     }
 }
 
+void RootOutputFileHandle::setJobInfo(JobInfo* jobInfo)
+{
+    if (!m_jobInfo) {
+        m_jobInfo = jobInfo;
+        jobInfo->addRef();
+    }
+}
+
 void RootOutputFileHandle::addUniqueIDTable(const std::string& treename,
                                             const std::vector<std::string>& guid,
                                             const std::vector<std::vector<Int_t> >& uid,
@@ -86,6 +96,13 @@ void RootOutputFileHandle::close()
 
     m_file->mkdir("Meta");
     m_file->cd("Meta");
+
+    // Write out job info
+    if (!m_jobInfo) {
+        m_jobInfo = new JobInfo;
+    }
+    m_jobInfo->Write();
+    m_jobInfo->decRef();
 
     // Write out TTree holding EvtNavigator
     m_navTree->Write(NULL,TObject::kOverwrite);

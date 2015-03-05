@@ -5,10 +5,12 @@
 #include <vector>
 #include <string>
 
-#include "TGeoManager.h"
+#include "TObject.h"
 
 class TFile;
 class TTree;
+class TGeoManager;
+class JobInfo;
 
 namespace JM {
     class FileMetaData;
@@ -37,6 +39,8 @@ public:
     void addTreeMetaData(JM::TreeMetaData* treemetadata);
 
     void addGeoManager(TGeoManager* geo);
+
+    void setJobInfo(JobInfo* jobinfo);
 
     void addRef();
 
@@ -69,6 +73,7 @@ private:
     StringVector        m_UUIDList;
     PathMap             m_paths;
     GeoVector           m_geos;
+    JobInfo*            m_jobInfo;
     int                 m_refCount;
     void*               m_navAddr;
 };
