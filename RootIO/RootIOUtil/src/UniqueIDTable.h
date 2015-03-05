@@ -30,7 +30,6 @@ class TablePerTree : public TObject {
 
         void SetGUIDs(const GUIDVector& guids) { m_GUIDs = guids; }
         void SetIDs(const UIDVector& uids, const BIDVector& bids);
-
         void MergeTable(const TablePerTree& table);
 
     private:
@@ -62,7 +61,7 @@ class UniqueIDTable : public TObject {
         void MergeTable(const UniqueIDTable& table);
 
         TableMap& GetTable() { return m_tables; }
-        const TableMap& GetTable() const { return m_tables; } 
+        const TableMap& GetTable() const { return m_tables; }
 
     private:
         TableMap m_tables;
