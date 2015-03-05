@@ -16,3 +16,20 @@ JM::FileMetaData::~FileMetaData()
         delete *it;
     }
 }
+
+bool JM::FileMetaData::IsSameAs(const JM::FileMetaData* other)
+{
+    bool similar = m_NavPath == other->m_NavPath &&\
+                   m_NavPriority == other->m_NavPriority &&\
+                   m_TreeMetaDatas.size() == other->m_TreeMetaDatas.size() ;
+    if (!similar) {
+        return false;
+    }
+    for (size_t i = 0; i < m_TreeMetaDatas.size(); ++i) {
+        similar = m_TreeMetaDatas[i]->IsSameAs(other->m_TreeMetaDatas[i]);
+        if (!similar) {
+            return false;
+        }
+    }
+    return true;
+}

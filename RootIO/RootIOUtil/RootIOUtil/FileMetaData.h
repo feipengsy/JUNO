@@ -21,7 +21,8 @@ class FileMetaData : public TObject {
 
         // Add a TreeMetaData to this FileMetaData
         void AddTreeMetaData(JM::TreeMetaData* tmd) { m_TreeMetaDatas.push_back(tmd); }
-
+        // Test wether another FileMetaData is same(capable of merging)
+        bool IsSameAs(const JM::FileMetaData* other);
         // Setter and Getter functions
         void SetNavPriority(int value) { m_NavPriority = value; }
         void SetNavPath(const StringVector& path) { m_NavPath = path; }
