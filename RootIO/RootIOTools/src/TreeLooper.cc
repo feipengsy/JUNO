@@ -32,10 +32,21 @@ bool TreeMerger::next()
     return true;
 }
 
-void TreeMerger::newTree(TTree* tree)
+void TreeMerger::newTree(TTree* tree, const std::vector<int>& iBreakPoints)
 {
     if (m_oTree.GetEntries()) {
         m_breakPoints.push_back(m_oTree.GetEntries());
+    }
+    if (m_breakPoints.size()) {
+        // Link the break points
+        std::vector<int>::const_iterator it, end = iBreakPoints.end();
+        for (it = iBreakPoints.begin() it != end; ++it) {
+            m_breakPoints.push_back(*it + m_oTree.GetEntries());
+        }
+    }
+    else {
+        // Replace the break points directly
+        m_breakPoints = iBreakPoints;
     }
     m_idx = 0;
     m_iTree = tree;
@@ -128,14 +139,17 @@ void TreeLooper::newInputFile(const std::string& value)
     }
     m_inputFile = new TFile(value, "read");
     // Get nav tree
-    m_iNavTree = static_cast<TTree*>(m_inputFile->Get("/Meta/navigator"));
+    m_iNavTree = RootFileReader::GetNavTree(m_inputFile);
     static_cast<TBranch*>(m_iNavTree->GetListOfBranches()->At(0))->SetAddress(m_addr);
     m_entries = m_iNavTree->GetEntries();
     m_idx = 0;
+    // Get break points from FileMetaData
+    JM::FileMetaData* fmd = RootFileReader::GetFileMetaData(m_inputFile);
+    BreakPointsMap& breakPoints = fmd->GetBreakPoints();
     // Get data trees
     TreeMap::iterator it, end = m_treeMap.end();
     for (it = m_treeMap.begin(); it != end; ++it) {
-        TTree* dataTree = static_cast<TTree*>(m_inputFile->Get(it->first));
-        it->second->newTree(tree);
+        TTree* dataTree = RootFileReader::GetDataTree(m_inputFile, it->first);
+        it->second->newTree(tree, breakPoints[it->first]);
     }
 }

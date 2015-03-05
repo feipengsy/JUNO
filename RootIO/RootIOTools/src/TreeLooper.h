@@ -13,7 +13,7 @@ class TreeMerger {
         ~TreeMerger();
 
         bool next();
-        void newTree(TTree* tree);
+        void newTree(TTree* tree, const std::vector<int>& iBreakPoints);
         void writeTree();
         const std::vector<int>& getBreakPoints() const { return m_breakPoints; }
 
