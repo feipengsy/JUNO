@@ -315,11 +315,13 @@ void RootFileWriter::initialize()
         m_eventTrees.insert(std::make_pair(*it, new OutputTreeHandle(m_path, *it)));
         JM::TreeMetaData* etmd = new JM::TreeMetaData();
         etmd->SetTreeName(tempPath + it->substr(it->rfind("::") + 2));
+        etmd->SetObjName(*it);
         m_treeMetaDatas.push_back(etmd);
     }
 
     JM::TreeMetaData* htmd = new JM::TreeMetaData();
     htmd->SetTreeName(tempPath + m_headerName.substr(m_headerName.rfind("::") + 2));
+    htmd->SetObjName(m_headerName);
     m_treeMetaDatas.push_back(htmd);
 
     m_file->occupyPath(m_path);
