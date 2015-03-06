@@ -15,7 +15,7 @@ class MergeRootFilesAlg : public AlgBase {
     public:
         typedef std::map<std::string, std::string> PathMap; // Data path to object name
         typedef std::map<std::string, std::vector<int> > BreakPointsMap;
-        MergeRootFilesAlg(const std::string* name);
+        MergeRootFilesAlg(const std::string& name);
         ~MergeRootFilesAlg();
 
         bool initialize();
@@ -27,8 +27,8 @@ class MergeRootFilesAlg : public AlgBase {
         void writeObj(TObject* obj, const std::string& path, const std::string& name);
 
     private:
-        int                       m_index;
-        std::vector<std::string>  m_inputFileNames
+        unsigned int              m_index;
+        std::vector<std::string>  m_inputFileNames;
         std::string               m_outputFileName;
         std::vector<IMerger*>     m_objMergers;
         TFile*                    m_outputFile;

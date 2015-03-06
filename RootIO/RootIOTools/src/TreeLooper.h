@@ -3,8 +3,10 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 class TTree;
+class TFile;
 
 class TreeMerger {
     
@@ -30,7 +32,7 @@ class TreeMerger {
 class TreeLooper {
 
     public:
-        typedef std:map<std::string, TreeMerger*> TreeMap; // Key: data path; Value: TreeMerger
+        typedef std::map<std::string, TreeMerger*> TreeMap; // Key: data path; Value: TreeMerger
         typedef std::map<std::string, std::string> PathMap;
         typedef std::map<std::string, std::vector<int> > BreakPointsMap;
         TreeLooper(const PathMap& dataPathMap, TFile* file);
@@ -39,6 +41,7 @@ class TreeLooper {
         bool next();
         void finalize();
         void newInputFile(const std::string& value);
+        BreakPointsMap& getBreakPoints() { return m_breakPoints; }
 
     private:
         TFile*          m_outputFile;

@@ -1,7 +1,12 @@
 #ifndef UNIQUEIDTABLEMERGER_H
 #define UNIQUEIDTABLEMERGER_H
 
-class UniqueIDTableMerger {
+#include "IMerger.h"
+#include <string>
+
+class TObject;
+
+class UniqueIDTableMerger : public IMerger {
 
     public:
         UniqueIDTableMerger();

@@ -2,8 +2,15 @@
 #include "TreeLooper.h"
 #include "SniperKernel/AlgFactory.h"
 #include "SniperKernel/SniperLog.h"
+#include "SniperKernel/Incident.h"
+#include "FileMetaDataMerger.h"
+#include "UniqueIDTableMerger.h"
+#include "RootIOUtil/FileMetaData.h"
+#include "RootIOUtil/TreeMetaData.h"
+#include "RootIOUtil/RootFileReader.h"
 
 #include "TObject.h"
+#include "TFile.h"
 
 DECLARE_ALGORITHM(MergeRootFilesAlg);
 
@@ -33,7 +40,7 @@ bool MergeRootFilesAlg::initialize()
     }
 
     // Create output file
-    m_outputFile = new TFile(m_outputFileName, "recreate");
+    m_outputFile = new TFile(m_outputFileName.c_str(), "recreate");
 
     // Create all the mergers
     IMerger* metaDataMerger = new FileMetaDataMerger(&m_mdBreakPoints);
@@ -95,7 +102,7 @@ bool MergeRootFilesAlg::rationalityCheck(PathMap& dataPathMap)
     JM::FileMetaData* firstFmd = 0;
     JM::FileMetaData* fmd = 0;
     for (it = m_inputFileNames.begin(); it != end; ++it) {
-        TFile* file = new TFile(*it, "read");
+        TFile* file = new TFile(it->c_str(), "read");
         if (!file->IsOpen()) {
             LogError << "Failed to open file: " << *it << std::endl;
             delete file;
@@ -113,17 +120,17 @@ bool MergeRootFilesAlg::rationalityCheck(PathMap& dataPathMap)
             firstFmd = fmd;
             continue;
         }
-        it (!firstFmd->IsSameAs(fmd)) {
+        if (!firstFmd->IsSameAs(fmd)) {
             LogError << "File: " << *it << " is not same, can not merge" << std::endl;
             delete fmd;
             return false;
         }
         delete fmd;
     } 
-    const JM::FileMetaData::TMDVector& tmds = fistFmd->GetTreeMetaData();
-    JM::FileMetaData::TMDVector::const_iterator it, end = tmds.end();
-    for (it = tmds.begin(); it != end; ++it) {
-        dataPathMap.insert(std::make_pair((*it)->GetTreeName(),(*it)->GetObjName()));
+    const JM::FileMetaData::TMDVector& tmds = firstFmd->GetTreeMetaData();
+    JM::FileMetaData::TMDVector::const_iterator tit, tend = tmds.end();
+    for (tit = tmds.begin(); tit != tend; ++tit) {
+        dataPathMap.insert(std::make_pair((*tit)->GetTreeName(),(*tit)->GetObjName()));
     }
     delete firstFmd;
     return true;
@@ -132,10 +139,10 @@ bool MergeRootFilesAlg::rationalityCheck(PathMap& dataPathMap)
 void MergeRootFilesAlg::writeObj(TObject* obj, const std::string& path, const std::string& name)
 {
     m_outputFile->cd();
-    if (!gDirectory->cd(path)) {
-        gDirectory->mkdir(path);
-        gDirectory->cd(path);
+    if (!gDirectory->cd(path.c_str())) {
+        gDirectory->mkdir(path.c_str());
+        gDirectory->cd(path.c_str());
     }
-    obj->Write(name);
+    obj->Write(name.c_str());
     delete obj;
 }

@@ -1,9 +1,9 @@
 package RootIOTools
 
 use SniperKernel v*
-use DataModelRelease v*
-use RootIOSvc v*
-use RootIOUtil v*
+use DataModelRelease v* DataModel
+use RootIOSvc v* RootIO
+use RootIOUtil v* RootIO
 
 library RootIOTools *.cc
 apply_pattern linker_library library=RootIOTools
