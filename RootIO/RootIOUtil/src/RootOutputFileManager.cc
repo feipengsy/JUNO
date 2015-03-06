@@ -5,7 +5,7 @@
 #include "TGeoManager.h"
 #include "JobInfo.h"
 #include "RootIOUtil/FileMetaData.h"
-#include "UniqueIDTable.h"
+#include "RootIOUtil/UniqueIDTable.h"
 
 #include <iostream>
 #include <fstream>

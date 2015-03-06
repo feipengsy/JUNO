@@ -4,7 +4,7 @@
 #include "RootIOUtil/SmartRefTable.h"
 #include "RootIOUtil/RootFileReader.h"
 #include "RootIOUtil/FileMetaData.h"
-#include "UniqueIDTable.h"
+#include "RootIOUtil/UniqueIDTable.h"
 
 #include "TTree.h"
 #include "TFile.h"

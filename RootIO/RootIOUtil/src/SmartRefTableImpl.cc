@@ -1,5 +1,5 @@
 #include "SmartRefTableImpl.h"
-#include "UniqueIDTable.h"
+#include "RootIOUtil/UniqueIDTable.h"
 #include "TProcessID.h"
 
 #include <algorithm>

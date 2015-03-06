@@ -3,7 +3,7 @@
 #include "RootIOUtil/NavTreeList.h"
 #include "RootIOUtil/TreeMetaData.h"
 #include "RootIOUtil/FileMetaData.h"
-#include "UniqueIDTable.h"
+#include "RootIOUtil/UniqueIDTable.h"
 #include "SniperKernel/SniperLog.h"
 
 #include "TTree.h"
