@@ -79,6 +79,7 @@ bool MergeRootFilesAlg::finalize()
     TObject* obj = 0;
     for (it = m_objMergers.begin(); it != m_objMergers.end(); ++it) {
         (*it)->setInputFile(m_inputFileNames);
+        (*it)->setOutputFile(m_outputFileName);
         std::string path, name;
         (*it)->merge(obj, path, name);
         this->writeObj(obj, path, name);

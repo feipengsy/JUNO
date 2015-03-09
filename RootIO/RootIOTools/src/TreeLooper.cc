@@ -54,7 +54,7 @@ void TreeMerger::newTree(TTree* tree, const std::vector<int>& iBreakPoints)
     }
     m_idx = 0;
     m_iTree = tree;
-    static_cast<TBranch*>(m_iTree->GetListOfBranches()->At(0))->SetAddress(m_addr);
+    static_cast<TBranch*>(m_iTree->GetListOfBranches()->At(0))->SetAddress(&m_addr);
     m_entries = m_iTree->GetEntries();
 }
 
