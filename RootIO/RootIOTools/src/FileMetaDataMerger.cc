@@ -14,7 +14,7 @@ FileMetaDataMerger::~FileMetaDataMerger()
 
 void FileMetaDataMerger::merge(TObject*& obj, std::string& path, std::string& name)
 {
-    TFile* file = new TFile(m_outputFile.c_str(), "recreate");
+    TFile* file = new TFile(m_inputFiles[0].c_str(), "read");
     JM::FileMetaData* ifmd = RootFileReader::GetFileMetaData(file);
     JM::FileMetaData* ofmd = new JM::FileMetaData(*ifmd);
     ofmd->SetBreakPoints(*m_breakPoints);

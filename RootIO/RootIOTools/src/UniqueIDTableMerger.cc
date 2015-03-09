@@ -17,7 +17,7 @@ void UniqueIDTableMerger::merge(TObject*& obj, std::string& path, std::string& n
     JM::UniqueIDTable* oTable = new JM::UniqueIDTable;
     IMerger::StringVector::iterator it, end = m_inputFiles.end();
     for (it = m_inputFiles.begin(); it != end; ++it) {
-        TFile* file = new TFile(it->c_str(), "recreate");
+        TFile* file = new TFile(it->c_str(), "read");
         JM::UniqueIDTable* iTable = RootFileReader::GetUniqueIDTable(file);
         oTable->MergeTable(*iTable);
         file->Close();
