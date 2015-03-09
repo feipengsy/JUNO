@@ -140,7 +140,7 @@ void TreeLooper::newInputFile(const std::string& value)
     m_inputFile = new TFile(value.c_str(), "read");
     // Get nav tree
     m_iNavTree = RootFileReader::GetNavTree(m_inputFile);
-    static_cast<TBranch*>(m_iNavTree->GetListOfBranches()->At(0))->SetAddress(m_addr);
+    static_cast<TBranch*>(m_iNavTree->GetListOfBranches()->At(0))->SetAddress(&m_addr);
     m_entries = m_iNavTree->GetEntries();
     m_idx = 0;
     // Get break points from FileMetaData
