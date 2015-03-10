@@ -119,10 +119,11 @@ void TreeLooper::finalize()
     TreeMap::iterator it, end = m_treeMap.end();
     for (it = m_treeMap.begin(); it != end; ++it) {
         m_outputFile->cd();
-        std::string path = (it->first[0] == '/' ? it->first.substr(1) : it->first);
-        if (!gDirectory->cd(path.c_str())) {
-            gDirectory->mkdir(path.c_str());
-            gDirectory->cd(path.c_str());
+        std::string fullPath = (it->first[0] == '/' ? it->first.substr(1) : it->first);
+        std::string dir = fullPath.substr(0,fullPath.rfind('/'));
+        if (!gDirectory->cd(dir.c_str())) {
+            gDirectory->mkdir(dir.c_str());
+            gDirectory->cd(dir.c_str());
         }
         it->second->writeTree();
         m_breakPoints[it->first] = it->second->getBreakPoints();
