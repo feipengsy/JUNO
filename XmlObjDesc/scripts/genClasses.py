@@ -320,7 +320,7 @@ class genClasses(genSrcUtils.genSrcUtils):
         s += '  }\n'
         s += '  return false; \n} \n\n'
       else:
-        s += '  if (!eventName) {\n'
+        s += '  if (!eventName.size()) {\n'
         s += '    return false;\n'
         s += '  }\n'
         for sr in srs:
