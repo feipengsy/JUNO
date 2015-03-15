@@ -242,7 +242,7 @@ void InputElementKeeper::OpenFile(int fileid)
     this->LoadUniqueID(fileid);
 }
 
-TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Int_t branchID)
+TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Long64_t& offset, Int_t branchID)
 {
     int treeid = m_table->GetTreeID(uid, pid);
     if (-1 == treeid) {
@@ -264,6 +264,7 @@ TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Int_t b
         }
     }
     TTree* tree = m_treeMgr->GetTree(treeid);
+    offset = m_table->GetOffset(uid, pid);
     if (!tree) {
         return 0;
     }

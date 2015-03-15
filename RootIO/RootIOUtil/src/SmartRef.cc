@@ -170,12 +170,13 @@ JM::EventObject* JM::SmartRef::GetObject()
 
   // Search the referenced object in SmartRefTable
   InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
-  TBranch* branch =  keeper->GetBranch(uid, m_pid, m_branchID);
+  Long64_t offset = 0;
+  TBranch* branch =  keeper->GetBranch(uid, m_pid, offset, m_branchID);
   if (!branch) return 0;
   // Load the referenced object
   void* addr = 0;
   branch->SetAddress(&addr);
-  branch->GetEntry(m_entry);
+  branch->GetEntry(m_entry + offset);
 
   obj = (JM::EventObject*)addr;
   // Add reference count

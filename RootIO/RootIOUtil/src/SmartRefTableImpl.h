@@ -30,6 +30,8 @@ class SmartRefTableImpl {
         Int_t GetTreeID(Int_t uid, const TProcessID* pid);
         // Given a SmartRef, get the id of the branch holding the referenced object
         Int_t GetBranchID(Int_t uid, const TProcessID* pid);
+        // Given a TProcessID, get the entry offset number(caused by merging)
+        Long64_t GetOffset(Int_t uid, const TProcessID* pid);
         // Get the file ID of this table
         Int_t GetFileID();
         // Read UniqueIDTable, register all referenced object it holds
@@ -38,12 +40,12 @@ class SmartRefTableImpl {
     private:
 
         // Add one guid of TProcessID
-        Int_t AddInternalIdxForPID(const std::string& guid);
+        Int_t AddInternalIdxForPID(const std::string& guid, bool create);
         // Expand table for a new TProcessID
         Int_t ExpandForIID(Int_t iid, Int_t newsize);
         void  ExpandPIDs(Int_t numpids);
         Int_t FindPIDGUID(const std::string& guid) const;
-        Int_t GetInternalIdxForPID(const std::string& guid) const;
+        Int_t GetInternalIdxForPID(const std::string& guid, bool create) const;
 
     private:
 

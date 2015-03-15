@@ -34,7 +34,7 @@ void SmartRefTableImpl::Add(const std::string& guid, Int_t uid, Int_t bid, Int_t
   // Called by SmartRefTable::ReadMetaData()
 
   // get or generate a iid for a TProcessID title 
-  Int_t iid = GetInternalIdxForPID( guid );
+  Int_t iid = GetInternalIdxForPID( guid, true );
 
   Int_t newsize = 0;
   uid = uid & 0xffffff;
@@ -53,13 +53,17 @@ void SmartRefTableImpl::Add(const std::string& guid, Int_t uid, Int_t bid, Int_t
   if (uid >= m_N[iid]) m_N[iid] = uid + 1;
 }
 
-Int_t SmartRefTableImpl::AddInternalIdxForPID(const std::string& guid)
+Int_t SmartRefTableImpl::AddInternalIdxForPID(const std::string& guid, bool create)
 {
   // Add the internal index for fProcessIDs, fAllocSize, etc given a guid.
 
   if (guid == m_PrePID) return m_PreIid; // use cached iid
   Int_t iid = FindPIDGUID(guid);
   if (iid == -1) {
+    // not found
+    if (!create) {
+      return -1;
+    }
     // new guid
     m_ProcessGUIDs.push_back(guid);
     iid = m_ProcessGUIDs.size() - 1;
@@ -179,7 +183,7 @@ Int_t SmartRefTableImpl::FindPIDGUID(const std::string& guid) const
 
 Int_t SmartRefTableImpl::GetBranchID(Int_t uid, const TProcessID* pid)
 {
-  Int_t iid = GetInternalIdxForPID(pid->GetTitle());
+  Int_t iid = GetInternalIdxForPID(pid->GetTitle(), false);
 
   uid = uid & 0xFFFFFF;
   if (uid < 0 || uid >= m_N[iid]) return -1;
@@ -188,11 +192,16 @@ Int_t SmartRefTableImpl::GetBranchID(Int_t uid, const TProcessID* pid)
 
 Int_t SmartRefTableImpl::GetTreeID(Int_t uid, const TProcessID* pid)
 {
-  Int_t iid = GetInternalIdxForPID(pid->GetTitle());
+  Int_t iid = GetInternalIdxForPID(pid->GetTitle(), false);
 
   uid = uid & 0xFFFFFF;
   if (uid < 0 || uid >= m_N[iid]) return -1;
   return ( m_TreeIDs[iid][uid] & 0xFFFFFF ) - 1;
+}
+
+Long64_t SmartRefTableImpl::GetOffset(Int_t uid, const TProcessID* pid)
+{
+  return 0;
 }
 
 Int_t SmartRefTableImpl::GetFileID()
@@ -200,11 +209,11 @@ Int_t SmartRefTableImpl::GetFileID()
   return m_FileID;
 }
 
-Int_t SmartRefTableImpl::GetInternalIdxForPID(const std::string& guid) const
+Int_t SmartRefTableImpl::GetInternalIdxForPID(const std::string& guid, bool create) const
 {
   // Get the index for m_ProcessIDs
 
-  return const_cast <SmartRefTableImpl*>(this)->AddInternalIdxForPID(guid);
+  return const_cast <SmartRefTableImpl*>(this)->AddInternalIdxForPID(guid, create);
 }
 
 void SmartRefTableImpl::ReadMetaData(JM::TablePerTree* table, Int_t treeid)

@@ -43,6 +43,8 @@ public:
     Int_t GetTreeID(Int_t uid, const TProcessID* pid);
     // Given a SmartRef, get the id of the branch holding the referenced object
     Int_t GetBranchID(Int_t uid, const TProcessID* pid);
+    // Given a TProcessID, get the entry offset number(caused by merging)
+    Long64_t GetOffset(Int_t uid, const TProcessID* pid);
     // Static method to get the current SmartRefTable
     static SmartRefTable* GetRefTable();
     // Read UniqueIDTable, register all referenced object it holds

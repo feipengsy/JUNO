@@ -78,7 +78,7 @@ class InputElementKeeper {
         // Check file status of a certain input file
         bool CheckFileStatus(int fileid) const;
         // Given a SmartRef, get the parent branch
-        TBranch* GetBranch(Int_t uid, const TProcessID* pid, Int_t branchID = -1);
+        TBranch* GetBranch(Int_t uid, const TProcessID* pid, Long64_t& offset, Int_t branchID = -1);
         // Given a path, get the input file list of it
         std::vector<int> GetFileList(const std::string& path);
 
