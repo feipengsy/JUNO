@@ -3,7 +3,6 @@
 #include "RootIOUtil/RootFileReader.h"
 #include "RootIOUtil/FileMetaData.h"
 #include "RootIOUtil/TreeMetaData.h"
-#include "TObject.h"
 #include "TTree.h"
 #include "TFile.h"
 
@@ -36,7 +35,7 @@ bool TreeMerger::next()
     return true;
 }
 
-void TreeMerger::newTree(TTree* tree, const std::vector<int>& iBreakPoints)
+void TreeMerger::newTree(TTree* tree, const std::vector<Long64_t>& iBreakPoints)
 {
     if (m_oTree->GetEntries()) {
         m_breakPoints.push_back(m_oTree->GetEntries());
@@ -49,7 +48,7 @@ void TreeMerger::newTree(TTree* tree, const std::vector<int>& iBreakPoints)
         }
     }
     else {
-        // Replace the break points directly
+        // First file, replace the break points directly
         m_breakPoints = iBreakPoints;
     }
     m_idx = 0;

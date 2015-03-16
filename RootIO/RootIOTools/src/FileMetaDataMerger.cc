@@ -3,7 +3,7 @@
 #include "RootIOUtil/FileMetaData.h"
 #include "TFile.h"
 
-FileMetaDataMerger::FileMetaDataMerger(std::map<std::string, std::vector<int> >* breakPoints)
+FileMetaDataMerger::FileMetaDataMerger(std::map<std::string, std::vector<Long64_t> >* breakPoints)
        : IMerger(), m_breakPoints(breakPoints)
 {
 }

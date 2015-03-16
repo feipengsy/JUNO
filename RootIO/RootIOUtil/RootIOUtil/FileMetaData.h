@@ -13,7 +13,7 @@ class FileMetaData : public TObject {
     public:
         typedef std::vector<JM::TreeMetaData*> TMDVector;
         typedef std::vector<std::string> StringVector;
-        typedef std::map<std::string, std::vector<int> > BreakPointsMap;
+        typedef std::map<std::string, std::vector<Long64_t> > BreakPointsMap;
 
         FileMetaData() : m_NavPriority(-1) {}
         FileMetaData(const FileMetaData& fmd);

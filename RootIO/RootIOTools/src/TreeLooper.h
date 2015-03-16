@@ -1,6 +1,7 @@
 #ifndef ROOTIOTOOLS_TREELOOPER_H
 #define ROOTIOTOOLS_TREELOOPER_H
 
+#include "TObject.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -17,7 +18,7 @@ class TreeMerger {
         bool next();
         void newTree(TTree* tree, const std::vector<int>& iBreakPoints);
         void writeTree();
-        const std::vector<int>& getBreakPoints() const { return m_breakPoints; }
+        const std::vector<Long64_t>& getBreakPoints() const { return m_breakPoints; }
 
     private:
         TTree* m_oTree;
@@ -25,7 +26,7 @@ class TreeMerger {
         void* m_addr;
         int m_idx;
         int m_entries;
-        std::vector<int> m_breakPoints;
+        std::vector<Long64_t> m_breakPoints;
 
 };
 
@@ -34,7 +35,7 @@ class TreeLooper {
     public:
         typedef std::map<std::string, TreeMerger*> TreeMap; // Key: data path; Value: TreeMerger
         typedef std::map<std::string, std::string> PathMap;
-        typedef std::map<std::string, std::vector<int> > BreakPointsMap;
+        typedef std::map<std::string, std::vector<Long64_t> > BreakPointsMap;
         TreeLooper(const PathMap& dataPathMap, TFile* file);
         ~TreeLooper();
         
