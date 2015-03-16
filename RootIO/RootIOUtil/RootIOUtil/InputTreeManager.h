@@ -20,12 +20,16 @@ class InputTreeHandle {
     void SetTree(TTree* tree);
     void Close() { m_active = false; }
     int GetFileID() { return m_fileID; }
+    void SetBreakPoints(const std::vector<Long64_t>& value) { m_breakPoints = value; }
+    const std::vector<Long64_t>& GetBreakPoints() { return m_breakPoints; }
+    Long64_t GetTreeOffset(int offsetid) { return m_breakPoints[offsetid]; }
 
   private:
     int m_fileID;
     int m_activeEntries;
     int m_entries;
     bool m_active;
+    std::vector<Long64_t> m_breakPoints;
     TTree* m_tree;
 
 };
@@ -37,10 +41,12 @@ class InputTreeManager {
     ~InputTreeManager();
     void AddRef(int treeid);
     void DelObj(int treeid, Long64_t entry);
-    int AddTree(int fileid);
+    int AddTree(int fileid, const std::vector<Long64_t>& breakPoints);
     TTree* GetTree(int treeid);
     void ResetTree(int treeid, TTree* tree);
     int GetFileID(int treeid);
+    Long64_t GetTreeOffset(int treeid, int offsetid);
+    const std::vector<Long64_t>& GetBreakPoints(int treeid);
 
   private:
     std::vector<InputTreeHandle*> m_trees;

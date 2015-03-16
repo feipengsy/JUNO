@@ -28,7 +28,7 @@ SmartRefTableImpl::~SmartRefTableImpl()
   delete [] m_TreeIDs;
 }
 
-void SmartRefTableImpl::Add(const std::string& guid, Int_t uid, Int_t bid, Int_t tid)
+void SmartRefTableImpl::Add(const std::string& guid, Int_t uid, Int_t bid, Int_t oid, Int_t tid)
 {
   // Add a referenced object to SmartRefTableImpl
   // Called by SmartRefTable::ReadMetaData()
@@ -49,7 +49,7 @@ void SmartRefTableImpl::Add(const std::string& guid, Int_t uid, Int_t bid, Int_t
     // fail to expand or fTreeIDs
     return;
   }
-  m_TreeIDs[iid][uid] = tid + 1 + ( bid + 1  << 24 );
+  m_TreeIDs[iid][uid] = tid + 1 + ( oid + 1 << 16 );
   if (uid >= m_N[iid]) m_N[iid] = uid + 1;
 }
 
@@ -183,11 +183,12 @@ Int_t SmartRefTableImpl::FindPIDGUID(const std::string& guid) const
 
 Int_t SmartRefTableImpl::GetBranchID(Int_t uid, const TProcessID* pid)
 {
-  Int_t iid = GetInternalIdxForPID(pid->GetTitle(), false);
+  //Int_t iid = GetInternalIdxForPID(pid->GetTitle(), false);
 
-  uid = uid & 0xFFFFFF;
-  if (uid < 0 || uid >= m_N[iid]) return -1;
-  return ( m_TreeIDs[iid][uid] >> 24 ) - 1;
+  //uid = uid & 0xFFFFFF;
+  //if (uid < 0 || uid >= m_N[iid]) return -1;
+  //return ( m_TreeIDs[iid][uid] >> 24 ) - 1;
+  return 0;
 }
 
 Int_t SmartRefTableImpl::GetTreeID(Int_t uid, const TProcessID* pid)
@@ -196,12 +197,16 @@ Int_t SmartRefTableImpl::GetTreeID(Int_t uid, const TProcessID* pid)
 
   uid = uid & 0xFFFFFF;
   if (uid < 0 || uid >= m_N[iid]) return -1;
-  return ( m_TreeIDs[iid][uid] & 0xFFFFFF ) - 1;
+  return ( m_TreeIDs[iid][uid] & 0xFFFF ) - 1;
 }
 
 Long64_t SmartRefTableImpl::GetOffset(Int_t uid, const TProcessID* pid)
 {
-  return 0;
+  Int_t iid = GetInternalIdxForPID(pid->GetTitle(), false);
+
+  uid = uid & 0xFFFFFF;
+  if (uid < 0 || uid >= m_N[iid]) return -1;
+  return ( m_TreeIDs[iid][uid] >> 16 ) - 1;
 }
 
 Int_t SmartRefTableImpl::GetFileID()
@@ -216,7 +221,7 @@ Int_t SmartRefTableImpl::GetInternalIdxForPID(const std::string& guid, bool crea
   return const_cast <SmartRefTableImpl*>(this)->AddInternalIdxForPID(guid, create);
 }
 
-void SmartRefTableImpl::ReadMetaData(JM::TablePerTree* table, Int_t treeid)
+void SmartRefTableImpl::ReadMetaData(JM::TablePerTree* table, Int_t treeid, const std::vector<Long64_t>& breakPoints)
 {
   // Read UniqueIDTable
 
@@ -230,19 +235,30 @@ void SmartRefTableImpl::ReadMetaData(JM::TablePerTree* table, Int_t treeid)
   JM::TablePerTree::UIDVector::const_iterator it_uids;
   std::vector<Int_t>::const_iterator it_uid;
   JM::TablePerTree::GUIDVector::const_iterator it_guids;
+  Long64_t count = 1;
   if (0 != bids.size()) {
     JM::TablePerTree::BIDVector::const_iterator it_bids;
     std::vector<Short_t>::const_iterator it_bid;
     for (it_uids = uids.begin(), it_bids = bids.begin(), it_guids = guids.begin(); it_guids != guids.end(); ++it_uids, ++it_bids, ++it_guids) {
       for (it_uid = it_uids->begin(), it_bid = it_bids->begin(); it_uid != it_uids->end(); ++it_uid, ++it_bid) {
-        Add(*it_guids, *it_uid, *it_bid, treeid);
+        for (int idx = breakPoints.size() - 1; idx >= 0; --idx) {
+          if (count > breakPoints[idx]) {
+              Add(*it_guids, *it_uid, *it_bid, idx, treeid);
+              ++count;
+          }
+        }
       }
     }
   }
   else {
     for (it_uids = uids.begin(), it_guids = guids.begin(); it_guids != guids.end(); ++it_uids, ++it_guids) {
       for (it_uid = it_uids->begin(); it_uid != it_uids->end(); ++it_uid) {
-        Add(*it_guids, *it_uid, 0, treeid);
+        for (int idx = breakPoints.size() - 1; idx >= 0; --idx) {
+          if (count > breakPoints[idx]) {
+            Add(*it_guids, *it_uid, 0, idx, treeid);
+            ++count;
+          }
+        }
       }
     }
   }

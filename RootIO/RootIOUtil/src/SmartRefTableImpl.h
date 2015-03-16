@@ -35,7 +35,7 @@ class SmartRefTableImpl {
         // Get the file ID of this table
         Int_t GetFileID();
         // Read UniqueIDTable, register all referenced object it holds
-        void ReadMetaData(JM::TablePerTree* table, Int_t treeid);
+        void ReadMetaData(JM::TablePerTree* table, Int_t treeid, const std::vector<Long64_t>& breakPoints);
 
     private:
 

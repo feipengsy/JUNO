@@ -48,7 +48,7 @@ public:
     // Static method to get the current SmartRefTable
     static SmartRefTable* GetRefTable();
     // Read UniqueIDTable, register all referenced object it holds
-    void ReadMetaData(JM::TablePerTree* table, Int_t treeid);
+    void ReadMetaData(JM::TablePerTree* table, Int_t treeid, const std::vector<Long64_t>& breakPoints);
     // Start a new table for a new input file
     void StartNewTable(Int_t fileid);
     // Delete the table for a given file

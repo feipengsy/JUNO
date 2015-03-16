@@ -61,9 +61,9 @@ void SmartRefTable::StartNewTable(Int_t fileid)
     m_tableList.push_back(new SmartRefTableImpl(fileid));
 }
 
-void SmartRefTable::ReadMetaData(JM::TablePerTree* table, Int_t treeid)
+void SmartRefTable::ReadMetaData(JM::TablePerTree* table, Int_t treeid, const std::vector<Long64_t>& breakPoints)
 {
-    m_tableList.back()->ReadMetaData(table, treeid);
+    m_tableList.back()->ReadMetaData(table, treeid, breakPoints);
 }
 
 void SmartRefTable::DeleteTable(Int_t fileid)

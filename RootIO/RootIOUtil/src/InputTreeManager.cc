@@ -28,9 +28,10 @@ InputTreeManager::~InputTreeManager()
     }
 }
 
-int InputTreeManager::AddTree(int fileid)
+int InputTreeManager::AddTree(int fileid, const std::vector<Long64_t>& breakPoints)
 {
   InputTreeHandle* tree = new InputTreeHandle(fileid);
+  tree->SetBreakPoints(breakPoints);
   m_trees.push_back(tree);
   return m_trees.size() - 1;
 }
@@ -74,4 +75,14 @@ void InputTreeManager::ResetTree(int treeid, TTree* tree)
 int InputTreeManager::GetFileID(int treeid)
 {
   return m_trees[treeid]->GetFileID();
+}
+
+Long64_t InputTreeManager::GetTreeOffset(int treeid, int offsetid)
+{
+  return m_trees[treeid]->GetTreeOffset(offsetid);
+}
+
+const std::vector<Long64_t>& InputTreeManager::GetBreakPoints(int treeid)
+{
+  return m_trees[treeid]->GetBreakPoints();
 }

@@ -70,7 +70,7 @@ class InputElementKeeper {
         // Open a certain file
         void OpenFile(int fileid);
         // Register a new input file into this keeper
-        int RegisterFile(const std::string& filename, const std::vector<JM::TreeMetaData*>& trees);
+        int RegisterFile(const std::string& filename, const JM::FileMetaData* metadata);
         // Reigster the map of data path and input file list
         void RegisterPathMap(const String2FileIDs& pathmap);
         // Register the map of TProcessID UUID and input file list

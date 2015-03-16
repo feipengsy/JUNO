@@ -54,7 +54,7 @@ void InputElementKeeper::DecRef()
     }
 }
 
-int InputElementKeeper::RegisterFile(const std::string& filename, const std::vector<JM::TreeMetaData*>& trees)
+int InputElementKeeper::RegisterFile(const std::string& filename, const JM::FileMetaData* metadata)
 {
     int fileid = m_fileMgr->FindFile(filename);
     // File already registered.
@@ -63,9 +63,11 @@ int InputElementKeeper::RegisterFile(const std::string& filename, const std::vec
     }
     fileid = m_fileMgr->AddFile(filename);
     std::map<int,std::string> treeinfo;
+    const std::vector<JM::TreeMetaData*>& trees = metadata->GetTreeMetaData();
     std::vector<JM::TreeMetaData*>::const_iterator it;
     for (it = trees.begin(); it != trees.end(); ++it) {
-        int treeid = m_treeMgr->AddTree(fileid);
+        std::map<std::string, std::vector<Long64_t> > allBreakPoints = metadata->GetBreakPoints();
+        int treeid = m_treeMgr->AddTree(fileid, allBreakPoints[(*it)->GetTreeName()]);
         // Register meta data later when start to read data
         //m_table->ReadMetaData(*it, treeid);
         treeinfo.insert(std::make_pair(treeid, (*it)->GetTreeName()));
@@ -213,7 +215,7 @@ void InputElementKeeper::LoadUniqueID(int fileid)
     for (it = treeInfo.begin(); it != end; ++it) {
         JM::UniqueIDTable::TableMap::iterator tpos = tables.find(it->second);
         if (tpos != tables.end()) {
-            m_table->ReadMetaData(tpos->second, it->first);
+            m_table->ReadMetaData(tpos->second, it->first, m_treeMgr->GetBreakPoints(it->first));
         }
     }
     delete uidTable;
@@ -264,7 +266,10 @@ TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Long64_
         }
     }
     TTree* tree = m_treeMgr->GetTree(treeid);
-    offset = m_table->GetOffset(uid, pid);
+    offsetID = m_table->GetOffset(uid, pid);
+    if (-1 != offsetID) {
+        offset = m_treeMgr->GetTreeOffset(treeid, offsetID);
+    }
     if (!tree) {
         return 0;
     }
