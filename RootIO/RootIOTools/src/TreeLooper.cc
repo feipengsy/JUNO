@@ -42,7 +42,7 @@ void TreeMerger::newTree(TTree* tree, const std::vector<Long64_t>& iBreakPoints)
     }
     if (m_breakPoints.size()) {
         // Link the break points
-        std::vector<int>::const_iterator it, end = iBreakPoints.end();
+        std::vector<Long64_t>::const_iterator it, end = iBreakPoints.end();
         for (it = iBreakPoints.begin(); it != end; ++it) {
             m_breakPoints.push_back(*it + m_oTree->GetEntries());
         }
