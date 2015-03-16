@@ -266,7 +266,7 @@ TBranch* InputElementKeeper::GetBranch(Int_t uid, const TProcessID* pid, Long64_
         }
     }
     TTree* tree = m_treeMgr->GetTree(treeid);
-    offsetID = m_table->GetOffset(uid, pid);
+    int offsetID = m_table->GetOffset(uid, pid);
     if (-1 != offsetID) {
         offset = m_treeMgr->GetTreeOffset(treeid, offsetID);
     }

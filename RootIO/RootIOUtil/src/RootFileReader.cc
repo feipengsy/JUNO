@@ -74,7 +74,7 @@ bool RootFileReader::ReadFiles(const vector<string>& fileList, NavTreeList* navs
 
     // Get tree metadatas in file metadata, and register this file in InputElementKeeper
     vector<JM::TreeMetaData*> tmetadatas = fmetadata->GetTreeMetaData();
-    int fileid = keeper->RegisterFile(*it, tmetadatas);    
+    int fileid = keeper->RegisterFile(*it, fmetadata);    
     fileMetaDatas.insert(make_pair(fileid, fmetadata));
 
     // Construct the path2filesList map

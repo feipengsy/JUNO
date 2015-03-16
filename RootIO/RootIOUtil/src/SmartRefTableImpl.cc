@@ -200,7 +200,7 @@ Int_t SmartRefTableImpl::GetTreeID(Int_t uid, const TProcessID* pid)
   return ( m_TreeIDs[iid][uid] & 0xFFFF ) - 1;
 }
 
-Long64_t SmartRefTableImpl::GetOffset(Int_t uid, const TProcessID* pid)
+Int_t SmartRefTableImpl::GetOffset(Int_t uid, const TProcessID* pid)
 {
   Int_t iid = GetInternalIdxForPID(pid->GetTitle(), false);
 

@@ -21,7 +21,7 @@ class SmartRefTableImpl {
         SmartRefTableImpl(Int_t fileid);
         ~SmartRefTableImpl();
         // Register a referenced object into this table
-        void Add(const std::string& guid, Int_t uid, Int_t bid, Int_t tid);
+        void Add(const std::string& guid, Int_t uid, Int_t bid, Int_t oid, Int_t tid);
         // Clear the table
         void Clear();
         // Clear the table and reclaim memory
@@ -31,7 +31,7 @@ class SmartRefTableImpl {
         // Given a SmartRef, get the id of the branch holding the referenced object
         Int_t GetBranchID(Int_t uid, const TProcessID* pid);
         // Given a TProcessID, get the entry offset number(caused by merging)
-        Long64_t GetOffset(Int_t uid, const TProcessID* pid);
+        Int_t GetOffset(Int_t uid, const TProcessID* pid);
         // Get the file ID of this table
         Int_t GetFileID();
         // Read UniqueIDTable, register all referenced object it holds

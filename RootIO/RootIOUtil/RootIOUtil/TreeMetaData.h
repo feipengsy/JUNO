@@ -18,7 +18,7 @@ class TreeMetaData : public TObject {
         const std::string& GetObjName() const { return m_ObjName; }
         const std::string& GetTreeName() const { return m_TreeName; }
         void SetTreeName(const std::string& value) { m_TreeName = value; }
-        void SetObjName(const std:string& value) { m_ObjName = value; }
+        void SetObjName(const std::string& value) { m_ObjName = value; }
 
     private:
         std::string m_TreeName;  // Tree name(path) of this tree
