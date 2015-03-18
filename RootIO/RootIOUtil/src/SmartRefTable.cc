@@ -41,10 +41,10 @@ Int_t SmartRefTable::GetTreeID(Int_t uid, const TProcessID* pid)
 
 Int_t SmartRefTable::GetOffset(Int_t uid, const TProcessID* pid)
 {
-    int offset = 0;
+    Int_t offset = -1;
     for (SRTIterator it = m_tableList.begin();it != m_tableList.end(); ++it) {
-        int = (*it)->GetOffset(uid, pid);
-        if (0 != offset) return offset;
+        offset = (*it)->GetOffset(uid, pid);
+        if (-1 != offset) return offset;
     }
     return offset;
 }

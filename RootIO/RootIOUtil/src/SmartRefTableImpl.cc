@@ -226,7 +226,7 @@ void SmartRefTableImpl::ReadMetaData(JM::TablePerTree* table, Int_t treeid, cons
   // Read UniqueIDTable
 
   //BIDVector: std::vector<std::vector<Short_t> >
-  JM::TablePerTree::BIDVector bids = table->GetBranchIDs();
+  //JM::TablePerTree::BIDVector bids = table->GetBranchIDs();
   //UIDVector: std::vector<std::vector<Int_t> > 
   JM::TablePerTree::UIDVector uids = table->GetUniqueIDs();
   //GUIDVector: std::vector<std::string> 
@@ -236,30 +236,17 @@ void SmartRefTableImpl::ReadMetaData(JM::TablePerTree* table, Int_t treeid, cons
   std::vector<Int_t>::const_iterator it_uid;
   JM::TablePerTree::GUIDVector::const_iterator it_guids;
   Long64_t count = 1;
-  if (0 != bids.size()) {
-    JM::TablePerTree::BIDVector::const_iterator it_bids;
-    std::vector<Short_t>::const_iterator it_bid;
-    for (it_uids = uids.begin(), it_bids = bids.begin(), it_guids = guids.begin(); it_guids != guids.end(); ++it_uids, ++it_bids, ++it_guids) {
-      for (it_uid = it_uids->begin(), it_bid = it_bids->begin(); it_uid != it_uids->end(); ++it_uid, ++it_bid) {
-        for (int idx = breakPoints.size() - 1; idx >= 0; --idx) {
-          if (count > breakPoints[idx]) {
-              Add(*it_guids, *it_uid, *it_bid, idx, treeid);
-              ++count;
-          }
+  for (it_uids = uids.begin(), it_guids = guids.begin(); it_guids != guids.end(); ++it_uids, ++it_guids) {
+    for (it_uid = it_uids->begin(); it_uid != it_uids->end(); ++it_uid) {
+      int oid = -1;
+      for (int idx = breakPoints.size() - 1; idx >= 0; --idx) {
+        if (count > breakPoints[idx]) {
+          oid = idx;
+          break;
         }
       }
-    }
-  }
-  else {
-    for (it_uids = uids.begin(), it_guids = guids.begin(); it_guids != guids.end(); ++it_uids, ++it_guids) {
-      for (it_uid = it_uids->begin(); it_uid != it_uids->end(); ++it_uid) {
-        for (int idx = breakPoints.size() - 1; idx >= 0; --idx) {
-          if (count > breakPoints[idx]) {
-            Add(*it_guids, *it_uid, 0, idx, treeid);
-            ++count;
-          }
-        }
-      }
+      Add(*it_guids, *it_uid, 0, oid, treeid);
+      ++count;
     }
   }
 }

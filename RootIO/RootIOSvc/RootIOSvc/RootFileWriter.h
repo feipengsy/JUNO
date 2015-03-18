@@ -32,6 +32,8 @@ class OutputTreeHandle {
         Long64_t entries() const { return m_entries; }
         const std::string& objectName() const { return m_objName; }
         const std::string& fullTreeName() const { return m_fullTreeName; }
+        JM::TreeMetaData* getTreeMetaData() { return m_metaData; }
+        void initialize();
         bool fill(int& nbytes);
         void write();
         void writeUID(RootOutputFileHandle* file);
@@ -39,17 +41,18 @@ class OutputTreeHandle {
     private:
         void fillUID(int bid = -1);
 
-        std::string  m_path;
-        std::string  m_objName;
-        std::string  m_fullTreeName;
-        TTree*       m_tree;
-        void*        m_addr;
-        Long64_t     m_entries;
+        std::string        m_path;
+        std::string        m_objName;
+        std::string        m_fullTreeName;
+        TTree*             m_tree;
+        void*              m_addr;
+        JM::TreeMetaData*  m_metaData;
+        Long64_t           m_entries;
 
         // For lazy-loading data
-        StringVector            m_guid;
-        BIDVector               m_bid;
-        UIDVector               m_uid;
+        StringVector       m_guid;
+        BIDVector          m_bid;
+        UIDVector          m_uid;
         
 };
 

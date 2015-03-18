@@ -16,6 +16,7 @@ OutputTreeHandle::OutputTreeHandle(const std::string& path, const std::string& o
     , m_objName(objName)
     , m_tree(0)
     , m_addr(0)
+    , m_metaData(0)
     , m_entries(0)
 {
     if (m_path[m_path.length() + 1] == '/') {
@@ -29,6 +30,19 @@ OutputTreeHandle::OutputTreeHandle(const std::string& path, const std::string& o
 OutputTreeHandle::~OutputTreeHandle()
 {
     // Yes, we don't delete TTree*
+    // And TreeMetaData will be handled by RootOutputFileManager
+}
+
+void OutputTreeHandle::initialize()
+{
+    std::string title = "Tree at " + m_path + " holding " + m_objName;
+    std::string treeName = m_objName.substr(m_objName.rfind("::")+2);
+    std::string branchName = treeName;
+    m_tree = new TTree(treeName.c_str(), title.c_str());
+    m_tree->Branch(branchName.c_str(), m_objName.c_str(), &m_addr,16000,1);
+    m_metaData = new JM::TreeMetaData();
+    m_metaData->SetTreeName(m_fullTreeName);
+    m_metaData->SetObjName(m_objName);
 }
 
 bool OutputTreeHandle::fill(int& nbytes)
@@ -37,12 +51,8 @@ bool OutputTreeHandle::fill(int& nbytes)
         return false;
     }
     if (!m_tree) {
-        // Create tree first
-        std::string title = "Tree at " + m_path + " holding " + m_objName;
-        std::string treeName = m_objName.substr(m_objName.rfind("::")+2);
-        std::string branchName = treeName;
-        m_tree = new TTree(treeName.c_str(), title.c_str());
-        m_tree->Branch(branchName.c_str(), m_objName.c_str(), &m_addr,16000,1);
+        // Initialize tree first
+        this->initialize();
     }
     nbytes = m_tree->Fill();
     ++m_entries;
@@ -148,6 +158,8 @@ bool RootFileWriter::write(JM::EvtNavigator* nav)
         return true;  
     }
 
+    m_file->getFile()->cd();
+
     bool ok = this->writeEvent();
     if (!ok) {
         LogError << "Fail to write event data for " << m_path
@@ -244,6 +256,10 @@ bool RootFileWriter::close()
     for (it = m_eventTrees.begin(); it != end; ++it) {
         it->second->write();
         it->second->writeUID(m_file);
+        JM::TreeMetaData* md = it->second->getTreeMetaData();
+        if (md) {
+            m_treeMetaDatas.push_back(md);
+        }
         delete it->second;
     }
 
@@ -314,10 +330,6 @@ void RootFileWriter::initialize()
     const std::vector<std::string>& eventNames = EDMManager::get()->getEventNameWithHeader(m_headerName);
     for (std::vector<std::string>::const_iterator it = eventNames.begin(); it != eventNames.end(); ++it) {
         m_eventTrees.insert(std::make_pair(*it, new OutputTreeHandle(m_path, *it)));
-        JM::TreeMetaData* etmd = new JM::TreeMetaData();
-        etmd->SetTreeName(tempPath + it->substr(it->rfind("::") + 2));
-        etmd->SetObjName(*it);
-        m_treeMetaDatas.push_back(etmd);
     }
 
     JM::TreeMetaData* htmd = new JM::TreeMetaData();

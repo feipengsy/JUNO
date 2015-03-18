@@ -10,6 +10,7 @@
 #include "TFile.h"
 
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 
@@ -177,12 +178,12 @@ bool RootFileReader::GetNavTreeList(map<int,JM::FileMetaData*>& fmetadatas, NavT
 
 TTree* RootFileReader::GetNavTree(TFile* file)
 {
-  return dynamic_cast<TTree*>(file->Get("/Meta/navigator"));
+  return static_cast<TTree*>(file->Get("/Meta/navigator"));
 }
 
 TTree* RootFileReader::GetDataTree(TFile* file, const std::string& treename) 
 {
-  return dynamic_cast<TTree*>(file->Get(treename.c_str()));
+  return static_cast<TTree*>(file->Get(treename.c_str()));
 }
 
 TObject* RootFileReader::GetUserData(const std::vector<int>& fileList, const std::string& name)
