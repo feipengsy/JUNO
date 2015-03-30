@@ -4,6 +4,11 @@
 
 ClassImp(JM::EvtNavigator);
 
+JM::EvtNavigator::EvtNavigator()
+{
+    this->Class()->IgnoreTObjectStreamer();
+}
+
 JM::EvtNavigator::~EvtNavigator()
 {
     std::vector<JM::SmartRef*>::iterator it, end = m_refs.end();
@@ -15,14 +20,14 @@ JM::EvtNavigator::~EvtNavigator()
 JM::EvtNavigator::EvtNavigator(const JM::EvtNavigator& nav)
     : TObject(nav)
 {
-    init(nav);
+    this->init(nav);
 }
 
 JM::EvtNavigator& JM::EvtNavigator::operator=(const JM::EvtNavigator& nav)
 {
     if (this != &nav) {
         TObject::operator=(nav);
-        init(nav);
+        this->init(nav);
     }
     return *this;
 }
@@ -47,10 +52,12 @@ void JM::EvtNavigator::init(const JM::EvtNavigator& nav)
 
 JM::HeaderObject* JM::EvtNavigator::getHeader(const std::string& path)
 {
-    std::vector<std::string>::iterator pos = find(m_paths.begin(), m_paths.end(), path);
-    if (m_paths.end() == pos) return 0;
-    m_refs[pos - m_paths.begin()]->SetBranchID(0);
-    return static_cast<JM::HeaderObject*>(m_refs[pos - m_paths.begin()]->GetObject());
+    JM::SmartRef* ref = this->getSmartRef(path);
+    if (!ref) {
+        return 0;
+    }
+    ref->SetBranchID(0);
+    return static_cast<JM::HeaderObject*>(ref->GetObject());
 }
 
 std::vector<std::string>& JM::EvtNavigator::getPath()
@@ -75,9 +82,11 @@ const std::vector<JM::SmartRef*>& JM::EvtNavigator::getRef() const
 
 void JM::EvtNavigator::setHeaderEntry(const std::string& path, int entry)
 {
-    std::vector<std::string>::iterator pos = find(m_paths.begin(), m_paths.end(), path);
-    if (m_paths.end() == pos) return;
-    m_refs[pos - m_paths.begin()]->setEntry(entry);
+    JM::SmartRef* ref = this->getSmartRef(path);
+    if (!ref) {
+        return;
+    }
+    ref->setEntry(entry);
 }
 
 void JM::EvtNavigator::addHeader(const std::string& path, JM::HeaderObject* header)
@@ -85,7 +94,7 @@ void JM::EvtNavigator::addHeader(const std::string& path, JM::HeaderObject* head
     m_paths.push_back(path);
     SmartRef* ref = new SmartRef();
     m_refs.push_back(ref);
-    m_refs.back() -> SetObject(header);
+    m_refs.back()->SetObject(header);
     m_writeFlag.push_back(true);
 }
 
@@ -98,6 +107,30 @@ void JM::EvtNavigator::addHeader(JM::HeaderObject* header)
     m_writeFlag.push_back(true);
 }
 
+void JM::EvtNavigator::adjustPath(const std::vector<std::string>& path)
+{
+    for (size_t i = 0; i < path.size(); ++i ) {
+        std::vector<std::string>::iterator pos = std::find(m_paths.begin(), m_paths.end(),path[i]);
+        if (pos == m_paths.end()) {
+            // One new path, insert it just for occupying position
+            m_paths.insert(m_paths.begin() + i, path[i]);
+            m_refs.insert(m_refs.begin() + i, new SmartRef);
+            m_writeFlag.insert(m_writeFlag.begin() + i, false);
+        }
+        else {
+            size_t ps = pos - m_paths.begin();
+            if (ps != i) {
+                // We find the path, but it's on the wrong position
+                std::swap(*pos, m_paths[i]);
+                std::swap(m_refs[pos - m_paths.begin()], m_refs[i]);
+                bool temp = m_writeFlag[pos - m_paths.begin()];
+                m_writeFlag[pos - m_paths.begin()] = m_writeFlag[i];
+                m_writeFlag[i] = temp;
+            }
+        }
+    }
+}
+
 void JM::EvtNavigator::setPath(const std::vector<std::string>& paths)
 {
     m_paths = paths;
@@ -106,7 +139,9 @@ void JM::EvtNavigator::setPath(const std::vector<std::string>& paths)
 bool JM::EvtNavigator::writePath(const std::string& path)
 {
     std::vector<std::string>::iterator pos = find(m_paths.begin(), m_paths.end(), path);
-    if (m_paths.end() == pos) return false;
+    if (m_paths.end() == pos) {
+        return false;
+    }
     return m_writeFlag[pos - m_paths.begin()];
 }
 
@@ -128,16 +163,28 @@ void JM::EvtNavigator::resetWriteFlag()
 
 const TTimeStamp& JM::EvtNavigator::TimeStamp() const
 {
-  return m_TimeStamp;
+    return m_TimeStamp;
 }
 
 TTimeStamp& JM::EvtNavigator::TimeStamp()
 {
-  return m_TimeStamp;
+    return m_TimeStamp;
 }
 
 void JM::EvtNavigator::setTimeStamp(const TTimeStamp& value)
 {
-  m_TimeStamp = value;
+    m_TimeStamp = value;
 }
 
+JM::SmartRef* JM::EvtNavigator::getSmartRef(const std::string& path)
+{
+    std::vector<std::string>::iterator pos = std::find(m_paths.begin(), m_paths.end(), path);
+    if (m_paths.end() == pos) {
+        return 0;
+    }
+    size_t ps = pos - m_paths.begin();
+    if (ps >= m_refs.size()) {
+        return 0;
+    } 
+    return m_refs[ps];
+}

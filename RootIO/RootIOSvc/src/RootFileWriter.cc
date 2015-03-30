@@ -228,13 +228,11 @@ bool RootFileWriter::writeEvent()
 
 bool RootFileWriter::writeNav()
 {
-    if (0 == m_fileEntries) {
-        // TODO do we need to reset this?
-        // Tell FileMetaData what paths EvtNavigator privides.
-        std::vector<std::string> eventNames, paths = m_navAddr->getPath();
-        std::vector<std::string>::iterator it, end = paths.end();
-        m_file->setNavPath(paths);
-    }
+    // Tell FileMetaData what paths EvtNavigator privides.
+    const std::vector<std::string>& adjustedPath = m_file->setNavPath(m_navAddr->getPath());
+    // Make sure all EvtNavigators in this stream hold same paths.
+    m_navAddr->adjustPath(adjustedPath);
+
     m_file->setNavAddr(m_navAddr);
     int nbytes = m_navTree->Fill();
     LogDebug <<  "Wrote " << nbytes

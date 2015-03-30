@@ -18,8 +18,8 @@ RootOutputFileHandle::RootOutputFileHandle(const std::string& filename,
     , m_fileMetaData(new JM::FileMetaData())
     , m_IDTable(new JM::UniqueIDTable())
     , m_jobInfo(0)
-    , m_refCount(0)
     , m_navAddr(0)
+    , m_refCount(0)
 {
     std::map<std::string, int>::const_iterator it, end = paths.end();
     int pri = 0;
@@ -103,6 +103,7 @@ void RootOutputFileHandle::close()
     }
     m_jobInfo->Write();
     m_jobInfo->decRef();
+    m_fileMetaData->SetNavPath(m_navPath);
 
     // Write out TTree holding EvtNavigator
     m_navTree->Write(NULL,TObject::kOverwrite);
@@ -137,9 +138,19 @@ void RootOutputFileHandle::occupyPath(const std::string& path)
     it->second = true;
 }
 
-void RootOutputFileHandle::setNavPath(const std::vector<std::string>& paths)
+const std::vector<std::string>& RootOutputFileHandle::setNavPath(const StringVector& paths)
 {
-    m_fileMetaData->SetNavPath(paths);
+    if (!m_navPath.size()) {
+        m_navPath = paths;
+        return m_navPath;
+    }
+    StringVector::const_iterator it, end = paths.end();
+    for (it = paths.begin(); it != end; ++it) {
+        if (std::find(m_navPath.begin(), m_navPath.end(), *it) == m_navPath.end()) {
+            m_navPath.push_back(*it);
+        }
+    }
+    return m_navPath;
 }
 
 void RootOutputFileHandle::addTreeMetaData(JM::TreeMetaData* treemetadata)

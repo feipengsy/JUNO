@@ -149,6 +149,7 @@ void JM::SmartRef::SetBranchID(Short_t value)
 JM::EventObject* JM::SmartRef::GetObject()
 {
   // Return a pointer to the referenced object.
+  if (!this->HasObject()) return 0;
 
   // Referenced object has been already set or loaded
   if (m_refObjTemp) return m_refObjTemp;

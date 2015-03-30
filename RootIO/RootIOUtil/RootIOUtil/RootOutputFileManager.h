@@ -27,42 +27,25 @@ public:
  
     RootOutputFileHandle(const std::string& filename, const std::map<std::string, int>& paths);
     ~RootOutputFileHandle();
-
     TFile* getFile();
-
     TTree* getNavTree();
-
     std::string getName();
-
-    void setNavPath(const StringVector& paths);
-
+    const StringVector& setNavPath(const StringVector& paths);
     void addTreeMetaData(JM::TreeMetaData* treemetadata);
-
     void addGeoManager(TGeoManager* geo);
-
     void setJobInfo(JobInfo* jobinfo);
-
     void addRef();
-
     void addUniqueIDTable(const std::string& treename,
                           const StringVector& guid,
                           const std::vector<std::vector<Int_t> >& uid,
                           const std::vector<std::vector<Short_t> >& bid);
-
     void addUUID(const StringVector& uuids);
-
-    int decRef();
-
+    int  decRef();
     bool isLastPath(const std::string& path);
-
     void setNavAddr(void* navAddr);
-
     void close();
-
     void occupyPath(const std::string& path);
-
     bool hasPath(const std::string& path);
-
     void revise(const std::string& path, int priority);
 
 private:
@@ -70,12 +53,13 @@ private:
     TTree*              m_navTree;
     JM::FileMetaData*   m_fileMetaData;
     JM::UniqueIDTable*  m_IDTable;
+    JobInfo*            m_jobInfo;
+    void*               m_navAddr;
     StringVector        m_UUIDList;
+    StringVector        m_navPath;
     PathMap             m_paths;
     GeoVector           m_geos;
-    JobInfo*            m_jobInfo;
     int                 m_refCount;
-    void*               m_navAddr;
 };
 
 class RootOutputFileManager {
