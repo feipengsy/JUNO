@@ -274,7 +274,7 @@ class genClasses(genSrcUtils.genSrcUtils):
       if not self.tools.isFundamentalT(att['type']) and not self.tools.isPointerT(att['type']): ret += '&'
       ret += ' '
       what = ''
-    s +=  '  ' + ret + scopeName + what + metName + '(' + param + ')' + constF
+    s +=  '' + ret + scopeName + what + metName + '(' + param + ')' + constF
     if ( not scopeName ) : # this is a declaration
       if not what and att['virtualaccessor'] == 'PURE' : s += ' = 0'
       s += ';\n\n'
@@ -289,11 +289,11 @@ class genClasses(genSrcUtils.genSrcUtils):
     if not scopeName:
       #declaration
       s += '  /// Set entry number of events\n'
-      s += '  void setEventEntry(const std::string& eventName, Long64_t& value);\n\n'
+      s += 'void setEventEntry(const std::string& eventName, Long64_t& value);\n\n'
       s += '  /// Get event\n'
-      s += '  JM::EventObject* event(const std::string& eventName);\n\n'
+      s += 'JM::EventObject* event(const std::string& eventName);\n\n'
       s += '  //Check if event exists\n'
-      s += '  bool hasEvent(const std::string& eventName="");\n\n'
+      s += 'bool hasEvent(const std::string& eventName="");\n\n'
     else:
       #definition
       s += 'inline void ' + scopeName + '::setEventEntry(const std::string& eventName, Long64_t& value)\n{\n'
