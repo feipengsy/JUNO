@@ -6,14 +6,13 @@
 void InputTreeHandle::SetTree(TTree* tree)
 {
     m_tree = tree;
-    m_entries = tree->GetEntries();
     m_active = true;
 }
 
-bool InputTreeHandle::LastObj(Long64_t entry)
+bool InputTreeHandle::LastObj(Int_t uid)
 {
     if (!m_active) return false;
-    if (m_entries == entry + 1) {
+    if (uid == m_lastUID) {
         return true;
     }
     return false;
@@ -46,9 +45,9 @@ void InputTreeManager::AddRef(int treeid)
   }
 }
 
-void InputTreeManager::DelObj(int treeid, Long64_t entry)
+void InputTreeManager::DelObj(int treeid, Int_t uid)
 {
-  bool fdel = m_trees[treeid]->LastObj(entry);
+  bool fdel = m_trees[treeid]->LastObj(uid);
   if (fdel) {
     m_trees[treeid]->Close();
     InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
@@ -70,6 +69,11 @@ TTree* InputTreeManager::GetTree(int treeid)
 void InputTreeManager::ResetTree(int treeid, TTree* tree)
 {
   m_trees[treeid]->SetTree(tree);
+}
+
+void InputTreeManager::SetLastUID(int treeid, Int_t uid)
+{
+  m_trees[treeid]->SetLastUID(uid);
 }
 
 int InputTreeManager::GetFileID(int treeid)

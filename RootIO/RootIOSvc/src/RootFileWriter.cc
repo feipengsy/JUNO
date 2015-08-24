@@ -5,6 +5,7 @@
 #include "Event/HeaderObject.h"
 #include "RootIOUtil/TreeMetaData.h"
 #include "RootIOUtil/RootOutputFileManager.h"
+#include <algorithm>
 
 #include "TTree.h"
 #include "TFile.h"
@@ -39,7 +40,7 @@ void OutputTreeHandle::initialize()
     std::string treeName = m_objName.substr(m_objName.rfind("::")+2);
     std::string branchName = treeName;
     m_tree = new TTree(treeName.c_str(), title.c_str());
-    m_tree->Branch(branchName.c_str(), m_objName.c_str(), &m_addr,16000,1);
+    m_tree->Branch(branchName.c_str(), m_objName.c_str(), &m_addr, 32000, 1);
     m_metaData = new JM::TreeMetaData();
     m_metaData->SetTreeName(m_fullTreeName);
     m_metaData->SetObjName(m_objName);

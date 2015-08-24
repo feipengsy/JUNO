@@ -60,7 +60,7 @@ class InputElementKeeper {
         // Minus active trees number of one file by 1, if goes to 0, close the file
         void DecTreeRef(int fileid);
         // Called by SmartRef::clear()
-        void DelObj(Int_t uid, TProcessID* pid, Long64_t entry);
+        void DelObj(Int_t uid, TProcessID* pid);
         // Get the TTree* owning EvtNavigators of a file
         bool GetNavTree(int fileid, TTree*& tree);
         // Get file name

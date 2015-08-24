@@ -2,6 +2,7 @@
 #include "SniperKernel/SniperLog.h"
 #include "SniperKernel/SvcFactory.h"
 #include "SniperKernel/SniperPtr.h"
+#include "EvtNavigator/EvtNavigator.h"
 #include "RootIOSvc/RootOutputStream.h"
 #include "EDMManager.h"
 #include "JobInfo.h"

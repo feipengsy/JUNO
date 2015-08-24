@@ -15,7 +15,7 @@ TreeMerger::TreeMerger(const std::string& path, const std::string& objName)
     std::string treeName = objName.substr(objName.rfind("::")+2);
     std::string branchName = treeName;
     m_oTree = new TTree(treeName.c_str(), title.c_str());
-    m_oTree->Branch(branchName.c_str(), objName.c_str(), &m_addr,16000,1);
+    m_oTree->Branch(branchName.c_str(), objName.c_str(), &m_addr);
 }
 
 TreeMerger::~TreeMerger()

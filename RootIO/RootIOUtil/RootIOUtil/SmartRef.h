@@ -8,6 +8,10 @@ class TProcessID;
 namespace JM 
 {
   class EventObject;
+  class SmartRef;
+
+  bool operator==(const SmartRef& r1, const SmartRef& r2);
+  bool operator!=(const SmartRef& r1, const SmartRef& r2);
 
   class SmartRef: public TObject
   {

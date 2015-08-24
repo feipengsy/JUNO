@@ -2,13 +2,17 @@
 #define ROOTIOSVC_ROOTOUTPUTSVC_H
 
 #include "RootIOSvc/BaseIOSvc.h"
-#include "EvtNavigator/EvtNavigator.h"
 
 #include <map>
 #include <string>
 #include <vector>
 
+class TObject;
 class RootOutputStream;
+
+namespace JM {
+    class EvtNavigator;
+}
 
 class RootOutputSvc: public BaseIOSvc {
 

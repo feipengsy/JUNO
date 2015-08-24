@@ -79,7 +79,7 @@ void JM::SmartRef::clear() {
     InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper(false);
     if (keeper && TProcessID::IsValid(m_pid)) {
         UInt_t uid = GetUniqueID();
-        keeper->DelObj(uid, m_pid, m_entry);
+        keeper->DelObj(uid, m_pid);
     }
   }
   m_pid = 0;
@@ -172,7 +172,9 @@ JM::EventObject* JM::SmartRef::GetObject()
   // Search the referenced object in SmartRefTable
   InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
   Long64_t offset = 0;
-  TBranch* branch =  keeper->GetBranch(uid, m_pid, offset, m_branchID);
+  int branchID = 0;
+  if (m_branchID != -1) branchID = m_branchID;
+  TBranch* branch =  keeper->GetBranch(uid, m_pid, offset, branchID);
   if (!branch) return 0;
   // Load the referenced object
   void* addr = 0;

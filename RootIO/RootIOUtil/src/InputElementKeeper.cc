@@ -144,14 +144,14 @@ void InputElementKeeper::ResetNavTreeRef(int fileid)
     m_fileMgr->ResetNavTreeRef(fileid);
 }
 
-void InputElementKeeper::DelObj(Int_t uid, TProcessID* pid, Long64_t entry)
+void InputElementKeeper::DelObj(Int_t uid, TProcessID* pid)
 {
     int treeid = m_table->GetTreeID(uid, pid);
     if (-1 == treeid) {
         return;
     }
     m_tempUUID = pid->GetTitle();
-    m_treeMgr->DelObj(treeid, entry);
+    m_treeMgr->DelObj(treeid, uid);
     m_tempUUID.clear();
 }
 
@@ -205,7 +205,7 @@ void InputElementKeeper::LoadUniqueID(int fileid)
     }
     else {
         TFile* file = RootFileReader::OpenFile(GetFileName(fileid));
-        uidTable = RootFileReader::GetUniqueIDTable(GetFile(fileid));
+        uidTable = RootFileReader::GetUniqueIDTable(file);
         // Do not leave the file opened
         file->Close();
     }
@@ -216,6 +216,7 @@ void InputElementKeeper::LoadUniqueID(int fileid)
         JM::UniqueIDTable::TableMap::iterator tpos = tables.find(it->second);
         if (tpos != tables.end()) {
             m_table->ReadMetaData(tpos->second, it->first, m_treeMgr->GetBreakPoints(it->first));
+            m_treeMgr->SetLastUID(it->first, tpos->second->GetUniqueIDs().back().back());
         }
     }
     delete uidTable;

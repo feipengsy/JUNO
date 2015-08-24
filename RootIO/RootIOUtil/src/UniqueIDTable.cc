@@ -1,4 +1,5 @@
 #include "RootIOUtil/UniqueIDTable.h"
+#include <algorithm>
 
 void JM::TablePerTree::MergeTable(const JM::TablePerTree& table) 
 {

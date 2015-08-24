@@ -11,24 +11,25 @@ class TTree;
 class InputTreeHandle {
 
   public:
-    InputTreeHandle(int fileid) : m_fileID(fileid), m_activeEntries(0), m_entries(0), m_active(false), m_tree(0) {}
+    InputTreeHandle(int fileid) : m_fileID(fileid), m_activeEntries(0), m_active(false), m_lastUID(-1), m_tree(0) {}
     // Destructor dosen't have to delete m_tree
     ~InputTreeHandle() {}
+    bool LastObj(Int_t uid);
     int AddRef() { return ++m_activeEntries; }
-    bool LastObj(Long64_t entry);
     TTree* GetTree() { return m_tree; }
     void SetTree(TTree* tree);
     void Close() { m_active = false; }
     int GetFileID() { return m_fileID; }
     void SetBreakPoints(const std::vector<Long64_t>& value) { m_breakPoints = value; }
+    void SetLastUID(Int_t value) { m_lastUID = value; }
     const std::vector<Long64_t>& GetBreakPoints() { return m_breakPoints; }
     Long64_t GetTreeOffset(int offsetid) { return m_breakPoints[offsetid]; }
 
   private:
     int m_fileID;
     int m_activeEntries;
-    int m_entries;
     bool m_active;
+    Int_t m_lastUID;
     std::vector<Long64_t> m_breakPoints;
     TTree* m_tree;
 
@@ -40,10 +41,11 @@ class InputTreeManager {
     InputTreeManager() {}
     ~InputTreeManager();
     void AddRef(int treeid);
-    void DelObj(int treeid, Long64_t entry);
+    void DelObj(int treeid, Int_t uid);
     int AddTree(int fileid, const std::vector<Long64_t>& breakPoints);
     TTree* GetTree(int treeid);
     void ResetTree(int treeid, TTree* tree);
+    void SetLastUID(int treeid, Int_t uid);
     int GetFileID(int treeid);
     Long64_t GetTreeOffset(int treeid, int offsetid);
     const std::vector<Long64_t>& GetBreakPoints(int treeid);
