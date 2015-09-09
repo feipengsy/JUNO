@@ -16,8 +16,8 @@
                     type="void"
                     desc="Set the entry number of the event object"
                     virtual="PURE">
-              <arg type="const std::string" />
-              <arg type="Long64_t" />
+              <arg type="const std::string" name="eventName"/>
+              <arg type="Long64_t" name="value"/>
             </method>
 
             <method name="event"

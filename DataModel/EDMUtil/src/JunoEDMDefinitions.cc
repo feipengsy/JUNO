@@ -1,10 +1,12 @@
-#include "DataRegistritionSvc/BookEDM.h"
+#include "BookEDM.h"
 
-JUNO_BOOK_EDM(JM::GenHeader, JM::GenEvent, 100, /Event/GenEvent);
-JUNO_BOOK_EDM(JM::SimHeader, JM::SimEvent, 200, /Event/SimEvent);
-JUNO_BOOK_EDM(JM::MuonSimHeader, JM::MuonSimEvent, 210, /Event/MuonSimEvent);
-JUNO_BOOK_EDM(JM::ElecHeader, JM::ElecEvent, 250, /Event/ElecEvent);
-JUNO_BOOK_EDM(JM::CalibHeader, JM::CalibEvent, 300, /Event/CalibEvent);
-JUNO_BOOK_EDM(JM::RecHeader, JM::RecEvent, 400, /Event/RecEvent);
-JUNO_BOOK_EDM(JM::RecTrackHeader, JM::RecTrackEvent, 410, /Event/RecTrackEvent);
-JUNO_BOOK_EDM(JM::PhyHeader, JM::PhyEvent, 500, /Event/PhyEvent);
+JUNO_BOOK_EDM(JM::GenHeader, JM::GenEvent, 100, /Event/Gen);
+JUNO_BOOK_EDM(JM::SimHeader, JM::SimEvent, 200, /Event/Sim);
+JUNO_BOOK_EDM(JM::MuonSimHeader, JM::MuonSimEvent, 210, /Event/MuonSim);
+JUNO_BOOK_EDM(JM::ElecHeader, JM::ElecEvent, 250, /Event/Elec);
+JUNO_BOOK_EDM(JM::CalibHeader, JM::CalibEvent, 300, /Event/Calib);
+JUNO_BOOK_EDM(JM::RecHeader, JM::RecEvent, 400, /Event/Rec);
+JUNO_BOOK_EDM(JM::RecTrackHeader, JM::RecTrackEvent, 410, /Event/RecTrack);
+JUNO_BOOK_EDM(JM::PhyHeader, JM::PhyEvent, 500, /Event/Phy);
+JUNO_BOOK_EDM(JM::TestHeaderA, JM::ATestEventA&JM::ATestEventB, 600, /Event/TestA);
+JUNO_BOOK_EDM(JM::TestHeaderB, JM::BTestEventA&JM::BTestEventB, 700, /Event/TestB);

@@ -1,5 +1,6 @@
-#include "DataRegistritionSvc/EDMManager.h"
+#include "EDMManager.h"
 #include "SniperKernel/SniperLog.h"
+#include <algorithm>
 
 EDMManager* EDMManager::s_manager = 0;
 

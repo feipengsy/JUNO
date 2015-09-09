@@ -1,5 +1,5 @@
-#include "DataRegistritionSvc/BookEDM.h"
-#include "DataRegistritionSvc/EDMManager.h"
+#include "BookEDM.h"
+#include "EDMManager.h"
 
 BookEDM::BookEDM(const std::string& headerName, const std::string& eventName, int priority, const std::string& defaultPath)
 {
