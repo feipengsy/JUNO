@@ -1,7 +1,8 @@
-#ifndef ROOTINPUTSTREAM_H
-#define ROOTINPUTSTREAM_H
+#ifndef ROOT_INPUT_STREAM_H
+#define ROOT_INPUT_STREAM_H 1
 
-#include "RootIOSvc/BaseIOStream.h"
+#include "RootIOSvc/IInputStream.h"
+#include "RootIOSvc/RootIOStream.h"
 #include <vector>
 #include <string>
 
@@ -11,62 +12,42 @@ namespace JM {
     class EvtNavigator;
 }
 
-class RootInputStream : public BaseIOStream {
+class RootInputStream : public IInputStream, public RootIOStream {
 
-public:
+    public:
 
-    RootInputStream();
-    ~RootInputStream();
+        // RootInputStream is created by RootInputSvc
+        RootInputStream(NavTreeList* ntl, const std::vector<std::string>& navPath);
+        ~RootInputStream();
 
-    bool init();
+        // Get current index of NavTreeList
+        int treeIndex();
+        // Get current entry number
+        int getEntry() { return m_entry; }
+        // Get the EvtNavigator just read
+        JM::EvtNavigator* get();
+        // Set the absolute entry to read.  If read is true read the resulting entry.
+        bool setEntry(int entry, bool read=true);
+        // Set entry to entry + steps.  If read is true read the resulting entry. 
+        bool next(int steps=1, bool read=true);
+        // Set entry to entry - steps.  If read is true read the resulting entry.
+        bool prev(int nsteps=1, bool read=true);
+        // Go to the very first entry
+        bool first(bool read=true);
+        // Go to the very last entry
+        bool last(bool read=true);
+        // Return total number of entries
+        int entries();
 
-    /// Get current index of NavTreeList
-    int treeIndex();
+    private:
+        // Read in Current entry
+        bool read();
 
-    /// Get current entry number
-    int getEntry() { return m_entry; }
-
-    /// Get NavTreeList
-    NavTreeList* getTrees() { return m_trees; }
-
-    void registerTreeList(NavTreeList* ntl);
-
-    void registerNavPaths(const std::vector<std::string>& paths);
-
-    /// Read in current entry
-    bool read();
-
-    /// Get the EvtNavigator just read
-    JM::EvtNavigator* get();
-
-    /// Set the absolute entry to read.  If read is true read() the
-    /// entry.
-    bool setEntry(int entry, bool read=true);
-
-    /// Set entry to entry + steps.  If read is true read the
-    /// resulting entry. 
-    bool next(int steps=1, bool read=true);
-
-    /// Set entry to entry - steps.  If read is true read the
-    /// resulting entry.
-    bool prev(int nsteps=1, bool read=true);
-
-    /// Go to the very first entry
-    bool first(bool read=true);
-
-    /// Go to the very last entry
-    bool last(bool read=true);
-
-    /// Return total number of entries
-    int entries();
-
-private:
-    NavTreeList* m_trees; // tree list of navigator
-    std::vector<std::string> m_paths;
-    int m_entry;         // global entry count
-    int m_entries;       // total entries;
-    void* m_addr;
-    bool m_initialized;
+        NavTreeList* m_trees;               // Tree list of EvtNavigator
+        std::vector<std::string> m_paths;   // Path vector saved in EvtNavigator
+        int m_entry;                        // Global entry count
+        int m_entries;                      // Total entries;
+        bool m_initialized;
 };
 
 #endif

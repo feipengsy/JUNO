@@ -3,12 +3,11 @@
 #include "SniperKernel/SniperLog.h"
 #include "EvtNavigator/EvtNavigator.h"
     
-RootInputStream::RootInputStream()
-    : BaseIOStream("RootInputStream")
-    , m_trees(0)
+RootInputStream::RootInputStream(NavTreeList* ntl, const std::vector<std::string>& navPath)
+    : m_trees(ntl)
+    , m_paths(navPath)
     , m_entry(-1)
     , m_entries(-1)
-    , m_addr(0)
     , m_initialized(false)
 {
 }
@@ -19,24 +18,9 @@ RootInputStream::~RootInputStream()
     delete m_trees;
 }           
 
-bool RootInputStream::init()
-{
-    return true;
-}
-
 int RootInputStream::treeIndex()
 { 
     return m_trees->index();
-}
-
-void RootInputStream::registerTreeList(NavTreeList* ntl)
-{
-  m_trees = ntl;
-}
-
-void RootInputStream::registerNavPaths(const std::vector<std::string>& paths)
-{
-  m_paths = paths;
 }
 
 JM::EvtNavigator* RootInputStream::get() 

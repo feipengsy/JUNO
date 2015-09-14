@@ -10,7 +10,7 @@
 DECLARE_SERVICE(RootInputSvc);
 
 RootInputSvc::RootInputSvc(const std::string& name) 
-  : BaseIOSvc(name),
+  : SvcBase(name),
     m_inputStream(0), 
     m_keeper(0)
 {
