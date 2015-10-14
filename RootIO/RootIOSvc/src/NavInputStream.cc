@@ -1,29 +1,26 @@
-#include "RootIOSvc/RootInputStream.h"
+#include "RootIOSvc/NavInputStream.h"
 #include "RootIOUtil/NavTreeList.h"
 #include "SniperKernel/SniperLog.h"
-#include "EvtNavigator/EvtNavigator.h"
-    
-RootInputStream::RootInputStream(NavTreeList* ntl, const std::vector<std::string>& navPath)
-    : m_trees(ntl)
-    , m_paths(navPath)
+
+NavInputStream::NavInputStream(const StringVector& file)
+    : RootIOStream("NavInputStream")
+    , m_trees(0)
     , m_entry(-1)
-    , m_entries(-1)
-    , m_initialized(false)
+    , m_files(file)
 {
 }
 
-
-RootInputStream::~RootInputStream()
-{   
+NavInputStream::~NavInputStream()
+{
     delete m_trees;
-}           
-
-int RootInputStream::treeIndex()
-{ 
-    return m_trees->index();
 }
 
-JM::EvtNavigator* RootInputStream::get() 
+bool NavInputStream::initialize()
+{
+    // Initialize NavInputStream
+}
+
+JM::EvtNavigator* NavInputStream::get()
 {
     if (!m_addr) {
         LogError << "No EvtNavigator is loaded"
@@ -31,17 +28,17 @@ JM::EvtNavigator* RootInputStream::get()
         return 0;
     }
     JM::EvtNavigator* nav = static_cast<JM::EvtNavigator*>(m_addr);
-    nav->setPath(m_paths);
+    nav->setPath(m_navPath);
     nav->resetWriteFlag();
     return nav;
 }
 
-bool RootInputStream::read()
+bool NavInputStream::read()
 {
     void* addr = 0;
     NavTreeHandle* handle = m_trees->current();
     if (!handle) {
-        LogError << "No current nav tree" 
+        LogError << "No current nav tree"
                  << std::endl;
         return false;
     }
@@ -54,7 +51,7 @@ bool RootInputStream::read()
     return ok;
 }
 
-bool RootInputStream::setEntry(int entry, bool read)
+bool NavInputStream::setEntry(int entry, bool read)
 {
     int steps = entry - m_entry;
     LogDebug << "Set entry to " << entry
@@ -64,12 +61,12 @@ bool RootInputStream::setEntry(int entry, bool read)
     return true;                // no change
 }
 
-bool RootInputStream::next(int nsteps, bool read)
+bool NavInputStream::next(int nsteps, bool read)
 {
     NavTreeHandle* handle = m_trees->current();
 
     if (!handle) {
-        LogError << "No current nav tree, can't go forward" 
+        LogError << "No current nav tree, can't go forward"
                  << std::endl;
         return false;
     }
@@ -108,11 +105,11 @@ bool RootInputStream::next(int nsteps, bool read)
     return true;
 }
 
-bool RootInputStream::prev(int nsteps, bool read)
+bool NavInputStream::prev(int nsteps, bool read)
 {
     NavTreeHandle* handle = m_trees->current();
     if (!handle) {
-        LogError << "No current nav tree, can't go backward" 
+        LogError << "No current nav tree, can't go backward"
                  << std::endl;
         return false;
     }
@@ -154,7 +151,7 @@ bool RootInputStream::prev(int nsteps, bool read)
     return true;
 }
 
-bool RootInputStream::first(bool read)
+bool NavInputStream::first(bool read)
 {
     bool okay = m_trees->first();
     if (!okay) {
@@ -177,7 +174,7 @@ bool RootInputStream::first(bool read)
     return true;
 }
 
-bool RootInputStream::last(bool read)
+bool NavInputStream::last(bool read)
 {
     bool okay = m_trees->last();
     if (!okay) {
@@ -198,19 +195,5 @@ bool RootInputStream::last(bool read)
 
     if (read) return this->read();
     return true;
-}
-
-int RootInputStream::entries()
-{
-  if( m_entries>=0 ) {
-    return m_entries;
-  } else {
-    m_entries=0;
-    NavTreeList::iterator it,itend = m_trees->end();
-    for( it=m_trees->begin(); it!=itend; ++it ) {
-      m_entries+= (*it)->entries();
-    }
-    return m_entries;
-  }
 }
 

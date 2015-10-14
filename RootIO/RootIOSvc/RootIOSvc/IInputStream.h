@@ -9,7 +9,9 @@ class IInputStream {
         IInputStream() {}
         virtual ~IInputStream() {}
 
-        // Interfaces to locate the stream
+        // Interface to initialize this stream
+        virtual bool initialize();
+        // Interfaces to handle the stream
         // Read the event if read is set to true
         virtual bool next(int step = 1, bool read = true);
         virtual bool previous(int step = 1, bool read = true);
@@ -19,6 +21,11 @@ class IInputStream {
         virtual TObject* get() = 0;
 
 };
+
+inline bool IInputStream::initialize()
+{
+    return true;
+}
 
 // Default implementations of stream-control methods
 // Should never be called
