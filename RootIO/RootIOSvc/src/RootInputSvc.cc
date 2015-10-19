@@ -1,20 +1,16 @@
 #include "RootIOSvc/RootInputSvc.h"
-#include "RootIOSvc/RootInputStream.h"
-#include "RootIOUtil/InputElementKeeper.h"
-#include "RootIOUtil/RootFileReader.h"
-#include "RootIOUtil/NavTreeList.h"
 #include "SniperKernel/SvcFactory.h"
 #include "SniperKernel/SniperLog.h"
 #include "SniperKernel/SniperPtr.h"
+#include <boost/foreach.hpp>
 
 DECLARE_SERVICE(RootInputSvc);
 
 RootInputSvc::RootInputSvc(const std::string& name) 
-  : SvcBase(name),
-    m_inputStream(0), 
-    m_keeper(0)
+  : SvcBase(name)
 {
-    declProp("InputFile", m_inputFile);
+    declProp("InputFile",  m_navInputFile);
+    declProp("InputFileMap", m_inputFileMap);
 }
 
 RootInputSvc::~RootInputSvc()
@@ -23,93 +19,123 @@ RootInputSvc::~RootInputSvc()
 
 bool RootInputSvc::initialize() 
 {
-    LogDebug << "Initialize RootInputSvc..." << std::endl;
+    LogInfo << "Initialize RootInputSvc..." << std::endl;
 
-    // Get element keeper and add its ref count by one
-    m_keeper = InputElementKeeper::GetInputElementKeeper();
-    m_keeper->AddRef();
-
-    // Print out input file list and erase reduplicated input files
+    // initialize input stream(s)
+    bool okay;
     if (!m_inputFile.size()) {
-        LogError << "No input file set"
+        okay = this->initPlainStream();
+    }
+    else {
+        okay = this->initNavStream();
+    }
+
+    if (!okay) {
+        LogError << "Failed to initialize RootInputSvc." 
                  << std::endl;
         return false;
     }
-    std::vector<std::string>::iterator it, ret, beg = m_inputFile.begin();
 
-    LogDebug << "InputFile list: total " << m_inputFile.size()
-             << std::endl;
-
-    LogDebug << "Input File: " << *beg << std::endl;
-    for (it = beg + 1; it != m_inputFile.end(); ) {
-        ret = std::find(beg, it, *it);
-        if (ret != it) {
-            LogWarn << "Found reduplicated input file: " << *it
-                    << ". Skipped" << std::endl;
-            it = m_inputFile.erase(it);
-        }
-        else {
-            LogDebug << "Input File: " << *it << std::endl;
-            ++it;
-        }
-    }
-  
-    // Construct input stream
-    m_inputStream = new RootInputStream();
-
-    // Register input files to InputElementKeeper
-    // and initialize input stream
-    LogDebug << "Start registering input files to InputElementKeeper and initializing InputStream"
-             << std::endl;
-    NavTreeList* ntl = new NavTreeList();
-    std::vector<std::string> paths;
-    if (!RootFileReader::ReadFiles(m_inputFile, ntl, paths)) {
-        LogError << "Failed to register input file"
-                 << std::endl;
-        return false;
-    }
-    m_inputStream->registerTreeList(ntl);
-    m_inputStream->registerNavPaths(paths);
-
-    LogDebug << "Sucessfully registered all input files, input stream initialized. " 
-             << "RootInputSvc sucessfully initialized"
-             << std::endl;
+    LogInfo << "RootInputSvc successfully initialized." 
+            << std::endl;
     return true;
 }
 
 bool RootInputSvc::finalize()
 {
-  LogDebug << "Finalizing RootInputSvc..."
-           << std::endl;
+  LogInfo << "Finalizing RootInputSvc..."
+          << std::endl;
+ 
+  bool okay = true;
+  BOOST_FOREACH(InputStreamMap::value_type& item, m_inputStream) {
+      okay = okay && item.second->finalize();
+      delete item.second;
+  }
 
-  delete m_inputStream;
-  m_keeper->DecRef();
+  if (!okay) {
+      LogError << "One or more input streams is failed to finalzie, please check!"
+               << std::endl;
+      return false;
+  }
 
-  LogDebug << "RootInputSvc sucessfully finalized"
-           << std::endl;
+  LogInfo << "RootInputSvc sucessfully finalized"
+          << std::endl;
   return true; 
 }
 
-RootInputStream* RootInputSvc::getInputStream()
+IInputStream* RootInputSvc::getInputStream(const std::string& path)
 {
-    return m_inputStream;
+    InputStreamMap::iterator pos = m_inputStream.find(path);
+    if (pos == m_inputStream.end()) {
+        return 0;
+    }
+    return pos->second;
 }
 
 bool RootInputSvc::getObj(TObject*& obj, const std::string& name, const std::string& path)
 {
-  TObject* readObj = 0;
-  std::vector<int> fileList = m_keeper->GetFileList(path);
-  if (0 == fileList.size()) {
-      LogError << "Unknown path: " << path
-               << ". Can't read object" << std::endl;
-      return false;
-  }
-  readObj = RootFileReader::GetUserData(fileList, name);
-  if (0 == readObj) {
-      LogError << "Failed to read object: " << name 
-               << std::endl;
-      return false;
-  }
-  obj = readObj;
-  return true;
+    InputStreamMap::iterator streamPos = m_inputStream.find("EvtNavigator");
+    if (streamPos == m_inputStream.end()) {
+        // NavInputStream is not managed
+        if (path == "none") {
+            LogError << "Path not provided, can not read object: " << name
+                     << std::endl;
+            return false;
+        }   
+        pos = m_inputStream.find(path);
+        if (pos == m_inputStream.end()) {
+            LogError << "Failed to find path: " << path
+                     << ". Can not read object: " << name
+                     << std::endl;
+            return false;
+        }
+    }
+
+    // Stream found, start to get object
+    bool okay = pos->second->getObj(obj, name);
+    if (!okay) {
+        LogError << "Failed to read object: " << name
+                 << std::endl;
+    } 
+    return okay;
+}
+
+bool RootInputSvc::initPlainStream()
+{
+    BOOST_FOREACH(const InputFileMap::value_type& item, m_inputFileMap) {
+        LogDebug << "Creating RootInputStream of: " << item.first
+                 << std::endl;
+        IInputStream* stream = new RootInputStream(item.second);
+        bool okay = stream->initialize();
+        if (!okay) {
+            LogError << "Failed to initialize RootInputStream of: " << item.first
+                     << std::endl;
+            return false;
+        }
+        m_inputStream.push_back(std::make_pair(item.first, stream));
+    }
+    return true;
+}
+
+
+bool RootInputSvc::initNavStream()
+{
+    LogDebug << "Creating NavInputStream..." << std::endl;
+
+    // Construct input file list
+    std::vector<std::string> files = m_navInputFile;
+    BOOST_FOREACH(const InputFileMap::value_type& item, m_inputFileMap) {
+        // Should add all other input files user configured(for event navigating)
+        files.insert(files.end(), item.second.first(), item.second.end());
+    }
+    IInputStream* stream = new NavInputStream(files);
+    bool okay = stream->initialize();
+    if (!okay) {
+        LogError << "Failed to initialize NavInputStream"
+                 << std::endl;
+        return false;
+    }
+
+    m_inputStream.push_back(std::make_pair("EvtNavigator", stream));
+    return true;
 }

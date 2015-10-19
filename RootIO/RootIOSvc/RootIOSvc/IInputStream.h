@@ -9,8 +9,9 @@ class IInputStream {
         IInputStream() {}
         virtual ~IInputStream() {}
 
-        // Interface to initialize this stream
+        // Interface to initialize and finalize this stream
         virtual bool initialize();
+        virtual bool finalize();
         // Interfaces to handle the stream
         // Read the event if read is set to true
         virtual bool next(int step = 1, bool read = true);
@@ -23,6 +24,11 @@ class IInputStream {
 };
 
 inline bool IInputStream::initialize()
+{
+    return true;
+}
+
+inline bool IInputStream::finalize()
 {
     return true;
 }

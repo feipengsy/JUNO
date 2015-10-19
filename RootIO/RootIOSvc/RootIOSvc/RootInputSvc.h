@@ -1,42 +1,39 @@
 /*  class RootInputSvc
  *  
  *  RootInputSvc is designed to configure input files and intialize
- *  RootInputStream and InputElementKeeper.
+ *  RootInputStream.
  *
  */
-#ifndef ROOTINPUTSVC_H
-#define ROOTINPUTSVC_H
+#ifndef ROOT_INPUT_SVC_H
+#define ROOT_INPUT_SVC_H 0
 
-#include <vector>
-#include <string>
-#include "RootIOSvc/BaseIOSvc.h"
+#include "SniperKernel/SvcBase.h"
+#include "RootIOSvc/IInputSvc.h"
 
-class RootInputStream;
-class InputElementKeeper;
 class TObject;
 
-class RootInputSvc: public BaseIOSvc {
+class RootInputSvc: public SvcBase, public IInputSvc {
 
-public:
-    RootInputSvc(const std::string& name);
+    public:
+        RootInputSvc(const std::string& name);
+        ~RootInputSvc();
 
-    ~RootInputSvc();
+        // Service interface
+        bool initialize();
+        bool finalize();
+        // Get the nav input stream
+        IInputStream* getInputStream(const std::string& path);
+        // Get the additional TObject of one file
+        bool getObj(TObject*& obj, const std::string& filename, const std::string& path="none");
 
-    // Service interface
-    bool initialize();
-    bool finalize();
+    private:
+        bool initPlainStream();
+        bool initNavStream();
 
-    // Get the nav input stream
-    RootInputStream* getInputStream();
-
-    // Get the additional TObject of the stream
-    bool getObj(TObject*& obj, const std::string& name, const std::string& path="none");
-
-private:
-
-    std::vector<std::string> m_inputFile;
-    RootInputStream* m_inputStream;
-    InputElementKeeper* m_keeper;
+    private:
+        InputFileList   m_navInputFile;    // List of input files holding EvtNavigators.(If set, NavInputStream will be created)
+        InputFileMap    m_inputFileMap;    // Map of path to input files
+        InputStreamMap  m_inputStream;     // Map of path to input stream
 };
 
 #endif

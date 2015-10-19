@@ -20,6 +20,11 @@ bool NavInputStream::initialize()
     // Initialize NavInputStream
 }
 
+bool NavInputStream::finailize()
+{
+    // Finalize NavInputStream
+}
+
 JM::EvtNavigator* NavInputStream::get()
 {
     if (!m_addr) {

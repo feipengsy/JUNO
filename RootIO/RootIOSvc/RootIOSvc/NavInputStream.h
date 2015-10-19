@@ -14,19 +14,21 @@ class NavInputStream : public IInputStream {
     public:
         NavInputStream(const StringVector& file);
         ~NavInputStream();
-        /// iniaizlie NavInputStream.
+        // Iniaizlie NavInputStream.
         bool initialize();
-        /// Get the EvtNavigator just read.
+        // Finalize NavInputStream.
+        bool finalize();
+        // Get the EvtNavigator just read.
         JM::EvtNavigator* get();
-        /// Set the absolute entry to read.  If read is true read entry
+        // Set the absolute entry to read.  If read is true read entry
         bool setEntry(int entry, bool read=true);
-        /// Set entry to entry + steps.  If read is true read the resulting entry
+        // Set entry to entry + steps.  If read is true read the resulting entry
         bool next(int steps=1, bool read=true);
-        /// Set entry to entry - steps.  If read is true read the resluting entry
+        // Set entry to entry - steps.  If read is true read the resluting entry
         bool prev(int nsteps=1, bool read=true);
-        /// Go to the very first entry.
+        // Go to the very first entry.
         bool first(bool read=true);
-        /// Go to the very last entry.
+        // Go to the very last entry.
         bool last(bool read=true);
 
     private:
