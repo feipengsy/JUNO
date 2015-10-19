@@ -7,6 +7,9 @@
 #include <stirng>
 #include <vector>
 
+class RootFileReader;
+class NavTreeList;
+
 class NavInputStream : public IInputStream {
 
     typedef std::vector<std::string> StringVector;
@@ -36,10 +39,11 @@ class NavInputStream : public IInputStream {
         bool read();
 
     private:
-        NavTreeList*    m_trees;   // Implementation of TTrees list holding EvtNavigators
-        long            m_entry;   // Current entry number
-        StringVector    m_files;   // File list
-        StringVector    m_navPath; // Event path list of EvtNavigators
+        NavTreeList*    m_trees;      // Implementation of TTrees list holding EvtNavigators
+        long            m_entry;      // Current entry number
+        StringVector    m_files;      // File list
+        StringVector    m_navPath;    // Event path list of EvtNavigators
+        RootFileReader* m_reader;     // Tool for file-level analyzing(validation, metadata-extraction)
 };
 
 
