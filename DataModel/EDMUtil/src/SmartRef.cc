@@ -9,7 +9,6 @@ ClassImp(JM::SmartRef);
 
 JM::SmartRef::SmartRef() 
     : m_entry(-1)
-    , m_branchID(-1)
     , m_refObjTemp(0)
     , m_pid(0) 
 {
@@ -34,7 +33,6 @@ JM::SmartRef& JM::SmartRef::operator=(const JM::SmartRef& ref)
   if (this != &ref) {
     SetUniqueID(ref.GetUniqueID());
     m_entry = ref.m_entry;
-    m_branchID = ref.m_branchID;
     m_refObjTemp = ref.m_refObjTemp;
     m_pid = ref.m_pid;
     SetBit(kHasUUID, ref.TestBit(kHasUUID));
@@ -72,18 +70,17 @@ void JM::SmartRef::clear() {
   } 
 
   // Substract the reference count 
-  int rc = m_refObjTemp->DesRef();
+  int rc = m_refObjTemp->DecRef();
   if (0 == rc) {
     delete m_refObjTemp;
     InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper(false);
     if (keeper && TProcessID::IsValid(m_pid)) {
         UInt_t uid = GetUniqueID();
-        keeper->Notify(uid, m_pid);
+        keeper->Notify(InputElementKeeper::Delete, uid, m_pid);
     }
   }
   m_pid = 0;
   m_entry = -1;
-  m_branchID = -1;
   m_refObjTemp = 0;
 }
 
@@ -132,11 +129,6 @@ void JM::SmartRef::SetObject(JM::EventObject* obj)
 
   obj->AddRef();
   m_refObjTemp = obj;
-}
-
-void JM::SmartRef::SetBranchID(Short_t value)
-{
-  m_branchID = value;
 }
 
 JM::EventObject* JM::SmartRef::GetObject()
@@ -193,8 +185,8 @@ void JM::SmartRef::Streamer(TBuffer &R__b)
     pidf += R__b.GetPidOffset();
     m_pid = R__b.ReadProcessID(pidf);
     InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper(false);
-    Int_t uid = GetUniqueID();
-    if (keeper) keeper->Notify(uid, m_pid);
+    UInt_t uid = GetUniqueID();
+    if (keeper) keeper->Notify(InputElementKeeper::New, uid, m_pid);
   } 
   else {
     // Writing
