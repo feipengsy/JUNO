@@ -16,7 +16,7 @@
                     type="unsigned int"
                     desc="Add the reference count by one"/>
 
-            <method name="DesRef"
+            <method name="DecRef"
                     type="unsigned int"
                     desc="Minus the reference count by one"/>
             
