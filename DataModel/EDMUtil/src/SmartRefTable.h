@@ -2,19 +2,18 @@
  *
  *  SmartRefTable holds the tree id and branch id of all 
  *  object referenced by SmartRef. During intializing
- *  of RootInputStream, information of referenced object
+ *  of NavInputStream, information of referenced object
  *  will be added into this table.
  *
  *  When a SmartRef tries to load the object it refers
  *  to, it will query SmartRefTable to get the tree id
- *  and file id allocated by InputTreeManager and 
- *  InputFileManager.
+ *  and file id allocated by InputElementKeeper
  *  
  *  This class is inspired by TRefTable in ROOT. 
  */
 
-#ifndef ROOTIOUTIL_SMARTREFTABLE_H
-#define ROOTIOUTIL_SMARTREFTABLE_H
+#ifndef SMARTREF_TABLE_H
+#define SMARTREF_TABLE_H 0
 
 #include "TObject.h"
 

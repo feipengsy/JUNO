@@ -1,5 +1,5 @@
-#ifndef ROOTIOUTIL_UNIQUEIDTABLE_H
-#define ROOTIOUTIL_UNIQUEIDTABLE_H
+#ifndef UNIQUE_ID_TABLE_H
+#define UNIQUE_ID_TABLE_H 0
 
 #include "TObject.h"
 

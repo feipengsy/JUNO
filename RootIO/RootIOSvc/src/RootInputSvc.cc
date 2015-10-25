@@ -74,6 +74,7 @@ IInputStream* RootInputSvc::getInputStream(const std::string& path)
 
 bool RootInputSvc::getObj(TObject*& obj, const std::string& name, const std::string& path)
 {
+    std::string objName;
     InputStreamMap::iterator streamPos = m_inputStream.find("EvtNavigator");
     if (streamPos == m_inputStream.end()) {
         // NavInputStream is not managed
@@ -89,10 +90,15 @@ bool RootInputSvc::getObj(TObject*& obj, const std::string& name, const std::str
                      << std::endl;
             return false;
         }
+        objName = name;
+    }
+    else {
+        // For NavInputStream, all paths are managed together, so path need to be provided.
+        objName = path + name;
     }
 
     // Stream found, start to get object
-    bool okay = pos->second->getObj(obj, name);
+    bool okay = pos->second->getObj(obj, objName);
     if (!okay) {
         LogError << "Failed to read object: " << name
                  << std::endl;

@@ -1,4 +1,4 @@
-#include "RootIOUtil/FileMetaData.h"
+#include "FileMetaData.h"
 
 ClassImp(JM::FileMetaData);
 

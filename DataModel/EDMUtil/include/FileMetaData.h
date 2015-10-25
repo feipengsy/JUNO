@@ -1,5 +1,5 @@
-#ifndef ROOTIOUTIL_FILEMETADATA_H
-#define ROOTIOUTIL_FILEMETADATA_H
+#ifndef FILE_META_DATA_H
+#define FILE_META_DATA_H 0
 
 #include "TObject.h"
 #include "TreeMetaData.h"

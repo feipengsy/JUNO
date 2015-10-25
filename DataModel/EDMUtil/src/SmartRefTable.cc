@@ -1,4 +1,4 @@
-#include "RootIOUtil/SmartRefTable.h"
+#include "SmartRefTable.h"
 #include "SmartRefTableImpl.h"
 
 SmartRefTable* SmartRefTable::fgSmartRefTable = 0;

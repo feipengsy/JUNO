@@ -1,57 +1,31 @@
-/*  Class RootFileReader
- *
- *  RootFileReader is designed to open root files and
- *  to read the meta datas in it.
- *
- */
-#ifndef ROOTIOUTIL_ROOTFILEREADER_H
-#define ROOTIOUTIL_ROOTFILEREADER_H
+#ifndef ROOT_FILE_READER_H
+#define ROOT_FILE_READER_H 0
 
 #include <string>
 #include <map>
 #include <vector>
 
-class TObject;
-class TTree;
-class TFile;
-class TDirectory;
 class NavTreeList;
 
-namespace JM {
+class RootFileReader {
 
-    class FileMetaData;
-    class UniqueIDTable;
+    typedef std::vector<std::string> StringVector;
 
-}
+    public:
+        RootFileReader(const StringVector& filelist, bool withNav);
+        ~RootFileReader();
 
-class RootFileReader { 
+        // Analyze input files, construct NavTreeList and InputElementKeeper
+        bool checkAndExecute();
+        // For SniperLog
+        const std::string& objName() { return m_objName; }
 
-public:
-
-    ~RootFileReader() {}
-    // Open a registered input file again, called by InputElementKeeper
-    static bool ReOpen(const std::string& filename, TFile*& file, const std::map<int,std::string>& treeinfo, std::vector<TTree*>& trees);
-    // Open a input file and register it to InputElementKeeper
-    static bool ReadFiles(const std::vector<std::string>& fileList, NavTreeList* navs, std::vector<std::string>& path);
-    // Static function to open a file
-    static TFile* OpenFile(const std::string& filename);
-    // Static function to get the tree holding EvtNavigator
-    static TTree* GetNavTree(TFile* file);
-    // Static function to get the tree holding event data
-    static TTree* GetDataTree(TFile* file, const std::string& treename);
-    // Given FileMetaDatas and file ids, initialize NavTreeList
-    static bool GetNavTreeList(std::map<int,JM::FileMetaData*>& fmetadatas, NavTreeList* navs, std::vector<std::string>& path);
-    // Get the FileMetaData of a TFile
-    static JM::FileMetaData* GetFileMetaData(TFile* file);
-    // Get the UniqueIDTable of a TFile
-    static JM::UniqueIDTable* GetUniqueIDTable(TFile* file);
-    // Get addtional TObject of input file(s)
-    static TObject* GetUserData(const std::vector<int>& fileList, const std::string& name);
-
-private:
-    RootFileReader() {}
-    static TObject* ReadObject(TDirectory* dir, const std::string& name);
-
+    private:
+        StringVector m_fileList;
+        bool m_withNav;
+        NavTreeList* m_navTree;
+        StringVector m_navPath;
+        std::string  m_objName;
 };
 
 #endif

@@ -1,5 +1,5 @@
-#include "RootIOUtil/InputFileManager.h"
-#include "RootIOUtil/InputElementKeeper.h"
+#include "InputFileManager.h"
+#include "InputElementKeeper.h"
 
 #include "TTree.h"
 #include "TFile.h"
@@ -7,10 +7,10 @@
 InputFileHandle::InputFileHandle(const std::string& filename, int fileid) 
         : m_name(filename)
         , m_status(false)
-        , m_navTreeRefFlag(false)
         , m_activeTrees(0)
-        , m_file(0)
+        , m_activeEntries(0)
         , m_fileID(fileid)
+        , m_file(0)
 {
 }
 
@@ -44,29 +44,33 @@ void InputFileHandle::AddTreeRef()
 void InputFileHandle::DecTreeRef()
 {
   --m_activeTrees;
-  if (m_activeTrees <= 0 && !m_navTreeRefFlag) {
+  this->CloseCheck();
+}
+
+void InputFileHandle::AddObjRef()
+{
+  ++m_activeEntries;
+}
+
+void InputFileHandle::DecObjRef()
+{
+  --m_activeEntries;
+  this->CloseCheck();
+}
+
+void InputFileHandle::AddTreeInfo(int treeid, const std::string& treename) 
+{
+    m_treeInfo.insert(std::make_pair(treeid, treename));
+}
+
+void InputFileHandle::CloseCheck()
+{
+  if (m_activeTrees == 0 && m_activeEntries ==0) {
     this->Close();
     InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
-    keeper->ClearTable();
+    keeper->ClearTable(m_fileID);
   }
-}
 
-void InputFileHandle::SetNavTreeRef()
-{
-  m_navTreeRefFlag = true;
-}
-
-void InputFileHandle::ResetNavTreeRef()
-{
-  m_navTreeRefFlag = false;
-  if (m_activeTrees <= 0) {
-    this->Close();
-  }
-}
-
-void InputFileHandle::SetTreeInfo(const std::map<int,std::string>& treeinfo) 
-{
-    m_treeInfo = treeinfo;
 }
 
 InputFileManager::~InputFileManager()
@@ -95,9 +99,9 @@ int InputFileManager::FindFile(const std::string& filename)
   return -1;
 }
 
-void InputFileManager::SetTreeInfo(int fileid, const std::map<int,std::string>& treeinfo)
+void InputFileManager::AddTreeInfo(int fileid, int treeid, const std::string& treename)
 {
-  m_files[fileid]->SetTreeInfo(treeinfo);
+  m_files[fileid]->SetTreeInfo(treeid, treename);
 }
 
 void InputFileManager::AddTreeRef(int fileid)
@@ -115,14 +119,14 @@ void InputFileManager::DecTreeRef(int fileid)
   m_files[fileid]->DecTreeRef();
 }
 
-void InputFileManager::SetNavTreeRef(int fileid)
+void InputFileManager::AddObjRef(int fileid)
 {
-  m_files[fileid]->SetNavTreeRef();
+  m_files[fileid]->AddObjRef();
 }
 
-void InputFileManager::ResetNavTreeRef(int fileid)
+void InputFileManager::DecObjRef(int fileid)
 {
-  m_files[fileid]->ResetNavTreeRef();
+  m_files[fileid]->DecObjRef();
 }
 
 bool InputFileManager::CheckFileStatus(int fileid) const

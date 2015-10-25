@@ -1,15 +1,5 @@
-/*  Class InputElementKeeper
- *  
- *  InputElementKeeper is a singleton class shared by
- *  all input streams of EvtNavigator
- *
- *  InputElementKeeper holds SmartRefTable, InputFlieManager
- *  and InputTreeManager and provides interfaces of them.
- *  
- */
-
-#ifndef ROOTIOUTIL_INPUTELEMENTKEEPER_H
-#define ROOTIOUTIL_INPUTELEMENTKEEPER_H
+#ifndef INPUT_ELEMENT_KEEPER_H
+#define INPUT_ELEMENT_KEEPER_H 0
 
 #include "TObject.h"
 
@@ -18,7 +8,7 @@
 #include <vector>
 
 class SmartRefTable;
-class InputTreeManager;
+class PassiveStream;
 class InputFileManager;
 class TBranch;
 class TTree;
@@ -26,19 +16,33 @@ class TFile;
 class TProcessID;
 
 namespace JM {
-  
+
   class FileMetaData;
   class TreeMetaData;
-  
+
 }
 
 
 class InputElementKeeper {
 
-    public:
-
+    private:
+        struct TreeInfo {
+            // TreeInfo records the information of one registered TTree
+            PassiveStream*  stream;       // The PassiveStream holds this tree
+            int             streamIndex;  // Index of this tree in a PassiveStream
+            int             fileID;       // The file holds this tree
+        };
         typedef std::map<std::string, std::vector<int> > String2FileIDs;
+        typedef std::vector<TreeInfo*> TreeInfoList;
+        typedef std::map<std::string, PassiveStream*> PSMap;
 
+    public:
+        // Notify() options
+        enum {
+            Read;
+            Delete;
+            New;
+        };
         // Destructor
         ~InputElementKeeper();
         // Static function to get the class
@@ -47,56 +51,47 @@ class InputElementKeeper {
         void AddRef();
         // Minus reference count of this object by 1
         void DecRef();
-        // Set nav tree reference of one file
-        void SetNavTreeRef(int fileid);
-        // Reset nav tree refernence of one file
-        void ResetNavTreeRef(int fileid);
-        // Given a SmartRef, add active entries of the parent tree by 1
-        void AddObjRef(Int_t uid, const TProcessID* pid);
         // Add active trees number of one file by 1
         void AddTreeRef(int fileid);
         // Clear the SmartRefTable, reclaim memory
         void ClearTable();
         // Minus active trees number of one file by 1, if goes to 0, close the file
         void DecTreeRef(int fileid);
-        // Called by SmartRef::clear()
-        void DelObj(Int_t uid, TProcessID* pid);
         // Get the TTree* owning EvtNavigators of a file
         bool GetNavTree(int fileid, TTree*& tree);
         // Get file name
         std::string& GetFileName(int fileid);
         // Get the pointer of the TFile
         TFile* GetFile(int fileid);
-        // Open a certain file
-        void OpenFile(int fileid);
         // Register a new input file into this keeper
         int RegisterFile(const std::string& filename, const JM::FileMetaData* metadata);
-        // Reigster the map of data path and input file list
-        void RegisterPathMap(const String2FileIDs& pathmap);
-        // Register the map of TProcessID UUID and input file list
-        void RegisterUUIDMap(const String2FileIDs& uuidmap);
         // Check file status of a certain input file
         bool CheckFileStatus(int fileid) const;
-        // Given a SmartRef, get the parent branch
-        TBranch* GetBranch(Int_t uid, const TProcessID* pid, Long64_t& offset, Int_t branchID = -1);
+        void Notify(Int_t uid, const TProcessID* pid, Long64_t entry);
         // Given a path, get the input file list of it
         std::vector<int> GetFileList(const std::string& path);
 
-    private:    
-        // Singleton class, private constructor
+    private:
+        // Suppress default
         InputElementKeeper();
-        void RegisterFileMap(const String2FileIDs& value, const std::string& type);
         // Load meta data of one file into SmartRefTable
         void LoadUniqueID(int fileid);
+        // Given a SmartRef, add active entries of the parent file by 1
+        void AddObjRef(Int_t uid, const TProcessID* pid);
+        // Given a SmartRef, minus active entries of the parent file by 1
+        void DecObjRef(Int_t uid, const TProcessID* pid);
+        // Open a certain file
+        void OpenFile(int fileid);
 
     private:
         SmartRefTable*              m_table;
-        InputTreeManager*           m_treeMgr;
         InputFileManager*           m_fileMgr;
+        PSMap                       m_psMap;
+        TreeInfoList                m_treeInfoList;
         String2FileIDs              m_path2FileList;
         String2FileIDs              m_uuid2FileList;
         std::string                 m_tempUUID;
-        // Singleton class
+        // Singleton
         int                         m_refCount;   // Reference count
         static InputElementKeeper*  m_keeper;     // Current InputElementKeeper
 };

@@ -1,5 +1,5 @@
-#ifndef ROOTIOUTIL_SMARTREF_H
-#define ROOTIOUTIL_SMARTREF_H
+#ifndef SMART_REF_H
+#define SMART_REF_H 0
 
 #include "TObject.h"
 

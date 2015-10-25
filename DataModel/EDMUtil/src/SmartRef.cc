@@ -1,10 +1,9 @@
-#include "RootIOUtil/SmartRef.h"
-#include "RootIOUtil/InputElementKeeper.h"
+#include "SmartRef.h"
+#include "InputElementKeeper.h"
 #include "Event/EventObject.h"
 #include "TClass.h"
 #include "TROOT.h"
 #include "TProcessID.h"
-#include "TBranch.h"
 
 ClassImp(JM::SmartRef);
 
@@ -79,7 +78,7 @@ void JM::SmartRef::clear() {
     InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper(false);
     if (keeper && TProcessID::IsValid(m_pid)) {
         UInt_t uid = GetUniqueID();
-        keeper->DelObj(uid, m_pid);
+        keeper->Notify(uid, m_pid);
     }
   }
   m_pid = 0;
@@ -91,31 +90,25 @@ void JM::SmartRef::clear() {
 void JM::SmartRef::operator=(JM::EventObject* obj)
 {
   // Set the reference object
-
   SetObject(obj);
 }
 
 JM::EventObject* JM::SmartRef::operator->() {
   // Get the referenced object
-
   return GetObject();
 }
 
 JM::EventObject& JM::SmartRef::operator*() {
   // Get the referenced object
-  
   return *GetObject();
 }
 
 void JM::SmartRef::SetObject(JM::EventObject* obj)
 {
   // Set the reference object
-
   if (!obj) return; 
-
   // if the object is the same as orig, do nothing
   if (m_refObjTemp == obj) return;
-  
   // SmartRef may be already referring to a object
   if (m_refObjTemp) {
     // Clear first
@@ -162,6 +155,12 @@ JM::EventObject* JM::SmartRef::GetObject()
 
   // Search the referenced object in the memory
   JM::EventObject *obj = (JM::EventObject*)m_pid->GetObjectWithID(uid);
+  if (!obj) {
+      // Notify the InputElementKeeper to load the refereced object
+      InputElementKeeper::GetInputElementKeeper()->Notify(uid, m_pid, m_entry);
+      obj = (JM::EventObject*)m_pid->GetObjectWithID(uid);
+  }
+  // Add reference count
   if (obj) {
     // The referenced object was not loaded by this SmartRef, add reference count
     obj->AddRef();
@@ -169,23 +168,8 @@ JM::EventObject* JM::SmartRef::GetObject()
     return obj;
   }
 
-  // Search the referenced object in SmartRefTable
-  InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper();
-  Long64_t offset = 0;
-  int branchID = 0;
-  if (m_branchID != -1) branchID = m_branchID;
-  TBranch* branch =  keeper->GetBranch(uid, m_pid, offset, branchID);
-  if (!branch) return 0;
-  // Load the referenced object
-  void* addr = 0;
-  branch->SetAddress(&addr);
-  branch->GetEntry(m_entry + offset);
-
-  obj = (JM::EventObject*)addr;
-  // Add reference count
-  obj->AddRef();
-  m_refObjTemp = obj;
-  return obj;
+  // Failed to get object
+  return 0;
 }
 
 bool JM::SmartRef::HasObject()
@@ -210,7 +194,7 @@ void JM::SmartRef::Streamer(TBuffer &R__b)
     m_pid = R__b.ReadProcessID(pidf);
     InputElementKeeper* keeper = InputElementKeeper::GetInputElementKeeper(false);
     Int_t uid = GetUniqueID();
-    if (keeper) keeper->AddObjRef(uid, m_pid);
+    if (keeper) keeper->Notify(uid, m_pid);
   } 
   else {
     // Writing

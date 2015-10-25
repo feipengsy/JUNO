@@ -1,4 +1,4 @@
-#include "RootIOUtil/TreeMetaData.h"
+#include "TreeMetaData.h"
 
 ClassImp(JM::TreeMetaData)
 
