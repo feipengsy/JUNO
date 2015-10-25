@@ -217,3 +217,8 @@ bool NavInputStream::last(bool read)
     return true;
 }
 
+bool getObj(TObject*& obj, const std::string& objName) 
+{
+    return InputElementKeeper::Get()->getObj(obj, objName);
+}
+

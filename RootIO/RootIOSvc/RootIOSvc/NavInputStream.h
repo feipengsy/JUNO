@@ -33,6 +33,8 @@ class NavInputStream : public IInputStream {
         bool first(bool read=true);
         // Go to the very last entry.
         bool last(bool read=true);
+        // Get user object
+        bool getObj(TObject*& obj, const std::string& objName);
 
     private:
         /// Read in current entry.
