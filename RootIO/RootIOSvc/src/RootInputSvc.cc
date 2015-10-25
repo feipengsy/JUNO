@@ -78,7 +78,7 @@ bool RootInputSvc::getObj(TObject*& obj, const std::string& name, const std::str
     InputStreamMap::iterator streamPos = m_inputStream.find("EvtNavigator");
     if (streamPos == m_inputStream.end()) {
         // NavInputStream is not managed
-        if (path == "none") {
+        if (path.size() == 0) {
             LogError << "Path not provided, can not read object: " << name
                      << std::endl;
             return false;
@@ -94,7 +94,7 @@ bool RootInputSvc::getObj(TObject*& obj, const std::string& name, const std::str
     }
     else {
         // For NavInputStream, all paths are managed together, so path need to be provided.
-        objName = path + name;
+        objName = path + "::" + name;
     }
 
     // Stream found, start to get object

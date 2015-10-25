@@ -278,20 +278,30 @@ void InputElementKeeper::Notify(int option, Int_t uid, const TProcessID* pid, Lo
     }
 }
 
-std::vector<int> InputElementKeeper::GetFileList(const std::string& path)
+bool InputElementKeeper::GetObj(TObject*& obj, const std::string& fullName)
 {
-    if (path == "none") {
-        // Return all the files
-        std::vector<int> allList;
-        String2FileIDs::iterator it, end = m_path2FileList.end();
-        for (it = m_path2FileList.begin(); it != end; ++it) {
-            allList.insert(allList.begin(), it->second.begin(), it->second.end());
-        }
-        return allList;
+    std::string path = fullName.substr(0, fullName.find("::"));
+    std::string name = fullName.substr(fullName.find("::"));
+    int fileid;
+    if (path.size() == 0) {
+        fileid = m_path2FileList.begin()->second;
     }
-    String2FileIDs::iterator pos = m_path2FileList.find(path);
-    if (pos == m_path2FileList.end()) {
-        return std::vector<int>();
+    else if (m_path2FileList.find(path) == m_path2FileList.end()) {
+        return false;
     }
-    return pos->second;
+    else {
+        fileid = m_path2FileList.find(path)->second;
+    }
+
+    if (CheckFileStatus(fileid)) {
+        TFile* file = GetFile(fileid);
+        obj = RootFileInter::ReadObject(file, name);
+    }
+    else {
+        TFile* file = RootFileInter::OpenFile(GetFileName(fileid));
+        if (!file) return false;
+        obj = RootFileInter::ReadObject(file, name);
+    }
+
+    return obj != 0;
 }

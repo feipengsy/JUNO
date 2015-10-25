@@ -67,9 +67,9 @@ class InputElementKeeper {
         int RegisterFile(const std::string& filename, const JM::FileMetaData* metadata);
         // Check file status of a certain input file
         bool CheckFileStatus(int fileid) const;
+        // Get additional object of input file list
+        bool GetObj(TObject*&, const std::string& objName);
         void Notify(Int_t uid, const TProcessID* pid, Long64_t entry);
-        // Given a path, get the input file list of it
-        std::vector<int> GetFileList(const std::string& path);
 
     private:
         // Suppress default

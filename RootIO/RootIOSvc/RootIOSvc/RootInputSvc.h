@@ -24,7 +24,7 @@ class RootInputSvc: public SvcBase, public IInputSvc {
         // Get the nav input stream
         IInputStream* getInputStream(const std::string& path);
         // Get the additional TObject of one file
-        bool getObj(TObject*& obj, const std::string& filename, const std::string& path="none");
+        bool getObj(TObject*& obj, const std::string& filename, const std::string& path="");
 
     private:
         bool initPlainStream();
