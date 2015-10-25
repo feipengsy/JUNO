@@ -1,6 +1,8 @@
 #ifndef I_INPUT_STREAM_H
 #define I_INPUT_STREAM_H 1
 
+#include <string>
+
 class TObject;
 
 class IInputStream {
@@ -20,6 +22,7 @@ class IInputStream {
         virtual bool last(bool read = true);
         virtual bool setEntry(int entry, bool read = true);
         virtual TObject* get() = 0;
+        virtual getObj(TObject*& obj, const std::string& objName);
 
 };
 
@@ -62,6 +65,11 @@ inline bool IInputStream::first(bool read)
 }
 
 inline bool IInputStream::setEntry(int entry, bool read)
+{
+    return false;
+}
+
+inline bool IInputStream::getObj(TObject*& obj, const std::string& objName)
 {
     return false;
 }
