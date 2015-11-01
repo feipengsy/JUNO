@@ -247,7 +247,7 @@ class genSrcUtils(importUtils.importUtils):
           s += '  %s %s // %s\n' % (relType.ljust(maxLenTypNam[0]),
                                         ('m_%s;'%relAtt['name']).ljust(maxLenTypNam[1]), relAtt['desc'])
     if godClass.has_key('SmartRelation'):
-      self.addInclude('RootIOUtil/SmartRef')
+      self.addInclude('EDMUtil/SmartRef')
       #if godClass['attrs'].has_key('priority') and godClass['attrs'].has_key('path'):
       #  self.addInclude('DataRegistritionSvc/BookEDM.h')
       for rel in godClass['SmartRelation'] :
