@@ -4,8 +4,8 @@
 #include "TFile.h"
 #include "TGeoManager.h"
 #include "JobInfo.h"
-#include "RootIOUtil/FileMetaData.h"
-#include "RootIOUtil/UniqueIDTable.h"
+#include "FileMetaData.h"
+#include "UniqueIDTable.h"
 
 #include <iostream>
 #include <fstream>

@@ -17,6 +17,8 @@ class RootFileReader {
 
         // Analyze input files, construct NavTreeList and InputElementKeeper
         bool checkAndExecute();
+        const StringVector& getNavPath() { return m_navPath; }
+        NavTreeList* getNavTree() { return m_navTree; }
         // For SniperLog
         const std::string& objName() { return m_objName; }
 

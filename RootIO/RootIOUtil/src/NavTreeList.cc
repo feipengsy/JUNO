@@ -1,5 +1,5 @@
 #include "RootIOUtil/NavTreeList.h"
-#include "RootIOUtil/InputElementKeeper.h"
+#include "InputElementKeeper.h"
 #include "SniperKernel/SniperLog.h"
 
 #include "TTree.h"
@@ -28,13 +28,13 @@ bool NavTreeHandle::open()
     bool ok = keeper->GetNavTree(m_fileID, m_tree);
     keeper->AddTreeRef(m_fileID);
     if (!ok) {
-        LogError << "Fail to open file for nav tree"
+        LogError << "Failed to open file for nav tree"
                  << std::endl;
         return false;
     }
     m_opened = true;
     if (!m_tree) {
-        LogError << "Fail to get nav tree"
+        LogError << "Failed to get nav tree"
                  << std::endl;
         return false;
     }

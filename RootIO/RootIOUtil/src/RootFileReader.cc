@@ -1,6 +1,11 @@
 #include "RootIOUtil/RootFileReader.h"
+#include "RootIOUtil/NavTreeList.h"
 #include "FileMetaData.h"
 #include "RootFileInter.h"
+#include "InputElementKeeper.h"
+#include "SniperKernel/SniperLog.h"
+#include <boost/foreach.hpp>
+#include "TFile.h"
 
 RootFileReader::RootFileReader(const StringVector& fileList, bool withNav)
     : m_fileList(fileList)
@@ -60,9 +65,9 @@ bool RootFileReader::checkAndExecute()
         }
 
         // Collect FileMetaDatas with the highest priority of the file list
-        int priority = fmd->GetPriority();
+        int priority = fmd->GetNavPriority();
         if (m_withNav && priority >= highestPriority) {
-            int priority = fmd->GetPriority();
+            int priority = fmd->GetNavPriority();
             if (priority > highestPriority) {
                 // We've got new list, purge old one
                 fid2fname.clear();
