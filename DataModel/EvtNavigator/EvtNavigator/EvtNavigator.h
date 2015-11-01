@@ -4,7 +4,7 @@
 #include "TObject.h"
 #include "TClass.h"
 #include "TTimeStamp.h"
-#include "RootIOUtil/SmartRef.h"
+#include "EDMUtil/SmartRef.h"
 #include "Event/HeaderObject.h"
 #include <vector>
 #include <string>

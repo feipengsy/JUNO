@@ -56,7 +56,6 @@ JM::HeaderObject* JM::EvtNavigator::getHeader(const std::string& path)
     if (!ref) {
         return 0;
     }
-    ref->SetBranchID(0);
     return static_cast<JM::HeaderObject*>(ref->GetObject());
 }
 
