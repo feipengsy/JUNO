@@ -1,16 +1,15 @@
 #include "RootIOSvc/RootFileWriter.h"
 #include "SniperKernel/SniperLog.h"
 #include "EvtNavigator/EvtNavigator.h"
+#include "RootIOUtil/RootOutputFileManager.h"
 #include "EDMManager.h"
 #include "Event/HeaderObject.h"
-#include "RootIOUtil/TreeMetaData.h"
-#include "RootIOUtil/RootOutputFileManager.h"
+#include "FileMetaData.h"
 #include <algorithm>
 
 #include "TTree.h"
 #include "TFile.h"
 #include "TProcessID.h"
-#include "TDirectory.h"
 
 OutputTreeHandle::OutputTreeHandle(const std::string& path, const std::string& objName)
     : m_path(path)

@@ -1,7 +1,7 @@
 #ifndef ROOTIOSVC_ROOTOUTPUTSVC_H
 #define ROOTIOSVC_ROOTOUTPUTSVC_H
 
-#include "RootIOSvc/BaseIOSvc.h"
+#include "SniperKernel/SvcBase.h"
 
 #include <map>
 #include <string>
@@ -14,7 +14,7 @@ namespace JM {
     class EvtNavigator;
 }
 
-class RootOutputSvc: public BaseIOSvc {
+class RootOutputSvc: public SvcBase {
 
     public:
         typedef std::map<std::string,std::string>     String2String;

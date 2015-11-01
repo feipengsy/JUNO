@@ -4,13 +4,16 @@
 #include "SniperKernel/SniperPtr.h"
 #include <boost/foreach.hpp>
 
+#include "RootIOSvc/NavInputStream.h"
+#include "RootIOSvc/RootInputStream.h"
+
 DECLARE_SERVICE(RootInputSvc);
 
 RootInputSvc::RootInputSvc(const std::string& name) 
   : SvcBase(name)
 {
     declProp("InputFile",  m_navInputFile);
-    declProp("InputFileMap", m_inputFileMap);
+    //declProp("InputFileMap", m_inputFileMap);
 }
 
 RootInputSvc::~RootInputSvc()
@@ -23,7 +26,7 @@ bool RootInputSvc::initialize()
 
     // initialize input stream(s)
     bool okay;
-    if (!m_inputFile.size()) {
+    if (!m_navInputFile.size()) {
         okay = this->initPlainStream();
     }
     else {
@@ -72,36 +75,36 @@ IInputStream* RootInputSvc::getInputStream(const std::string& path)
     return pos->second;
 }
 
-bool RootInputSvc::getObj(TObject*& obj, const std::string& name, const std::string& path)
+bool RootInputSvc::getObj(TObject*& obj, const std::string& objName, const std::string& path)
 {
-    std::string objName;
+    std::string pName;
     InputStreamMap::iterator streamPos = m_inputStream.find("EvtNavigator");
     if (streamPos == m_inputStream.end()) {
         // NavInputStream is not managed
         if (path.size() == 0) {
-            LogError << "Path not provided, can not read object: " << name
-                     << std::endl;
-            return false;
-        }   
-        pos = m_inputStream.find(path);
-        if (pos == m_inputStream.end()) {
-            LogError << "Failed to find path: " << path
-                     << ". Can not read object: " << name
-                     << std::endl;
+            //LogError << "Path not provided, can not read object: "
+            //         << std::endl;
             return false;
         }
-        objName = name;
+        streamPos = m_inputStream.find(path);
+        if (streamPos == m_inputStream.end()) {
+            //LogError << "Failed to find path: " << path
+            //         << ". Can not read object: " << objName
+            //         << std::endl;
+            return false;
+        }
+        pName = objName;
     }
     else {
         // For NavInputStream, all paths are managed together, so path need to be provided.
-        objName = path + "::" + name;
+        pName = path + "::" + objName;
     }
 
     // Stream found, start to get object
-    bool okay = pos->second->getObj(obj, objName);
+    bool okay = streamPos->second->getObj(obj, pName);
     if (!okay) {
-        LogError << "Failed to read object: " << name
-                 << std::endl;
+        //LogError << "Failed to read object: " << objName
+        //         << std::endl;
     } 
     return okay;
 }
@@ -118,7 +121,7 @@ bool RootInputSvc::initPlainStream()
                      << std::endl;
             return false;
         }
-        m_inputStream.push_back(std::make_pair(item.first, stream));
+        m_inputStream.insert(std::make_pair(item.first, stream));
     }
     return true;
 }
@@ -132,7 +135,7 @@ bool RootInputSvc::initNavStream()
     std::vector<std::string> files = m_navInputFile;
     BOOST_FOREACH(const InputFileMap::value_type& item, m_inputFileMap) {
         // Should add all other input files user configured(for event navigating)
-        files.insert(files.end(), item.second.first(), item.second.end());
+        files.insert(files.end(), item.second.begin(), item.second.end());
     }
     IInputStream* stream = new NavInputStream(files);
     bool okay = stream->initialize();
@@ -142,6 +145,6 @@ bool RootInputSvc::initNavStream()
         return false;
     }
 
-    m_inputStream.push_back(std::make_pair("EvtNavigator", stream));
+    m_inputStream.insert(std::make_pair("EvtNavigator", stream));
     return true;
 }

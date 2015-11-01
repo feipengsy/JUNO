@@ -14,7 +14,7 @@
 DECLARE_SERVICE(RootOutputSvc);
 
 RootOutputSvc::RootOutputSvc(const std::string& name)
-    : BaseIOSvc(name), m_streamInitialized(false)
+    : SvcBase(name), m_streamInitialized(false)
 {
     declProp("OutputStreams", m_outputFileMap);
 }

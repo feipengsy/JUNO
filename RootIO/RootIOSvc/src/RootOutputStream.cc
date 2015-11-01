@@ -7,8 +7,7 @@
 
 RootOutputStream::RootOutputStream(const std::string& headername,
                                    const std::string& treepath)
-    : BaseIOStream("RootOutputStream") 
-    , m_headerName(headername)
+    : m_headerName(headername)
     , m_path(treepath)
     , m_writer(new RootFileWriter(treepath, headername))
 {

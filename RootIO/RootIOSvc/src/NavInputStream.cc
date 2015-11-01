@@ -1,6 +1,7 @@
 #include "RootIOSvc/NavInputStream.h"
 #include "RootIOUtil/NavTreeList.h"
 #include "RootIOUtil/RootFileReader.h"
+#include "InputElementKeeper.h"
 #include "SniperKernel/SniperLog.h"
 
 NavInputStream::NavInputStream(const StringVector& file)
@@ -21,7 +22,7 @@ NavInputStream::~NavInputStream()
 bool NavInputStream::initialize()
 {
     // Initialize NavInputStream
-    m_reader = new RootFileReader(file, true);
+    m_reader = new RootFileReader(m_files, true);
     bool okay = m_reader->checkAndExecute();
     if (!okay) {
         LogError << "Reasonableness check of input file failed, please check input file list"
@@ -31,12 +32,6 @@ bool NavInputStream::initialize()
 
     m_trees = m_reader->getNavTree();
     m_navPath = m_reader->getNavPath();
-    return true;
-}
-
-bool NavInputStream::finailize()
-{
-    // Finalize NavInputStream
     return true;
 }
 
@@ -217,8 +212,8 @@ bool NavInputStream::last(bool read)
     return true;
 }
 
-bool getObj(TObject*& obj, const std::string& objName) 
+bool NavInputStream::getObj(TObject*& obj, const std::string& objName) 
 {
-    return InputElementKeeper::Get()->getObj(obj, objName);
+    return InputElementKeeper::GetInputElementKeeper()->GetObj(obj, objName);
 }
 

@@ -1,6 +1,8 @@
 #ifndef I_INPUT_STREAM_H
 #define I_INPUT_STREAM_H 1
 
+#define UNUSED __attribute__((unused))
+
 #include <string>
 
 class TObject;
@@ -22,7 +24,7 @@ class IInputStream {
         virtual bool last(bool read = true);
         virtual bool setEntry(int entry, bool read = true);
         virtual TObject* get() = 0;
-        virtual getObj(TObject*& obj, const std::string& objName);
+        virtual bool getObj(TObject*& obj, const std::string& objName);
 
 };
 
@@ -38,38 +40,34 @@ inline bool IInputStream::finalize()
 
 // Default implementations of stream-control methods
 // Should never be called
+// Use UNUSED macro to eliminate warnings
 
-inline bool IInputStream::next(int step, bool read)
+inline bool IInputStream::next(int step UNUSED, bool read UNUSED)
 {
     return false;
 }
 
-inline bool IInputStream::previous(int step, bool read)
+inline bool IInputStream::previous(int step UNUSED, bool read UNUSED)
 {
     return false;
 }
 
-inline bool IInputStream::first(bool read)
+inline bool IInputStream::first(bool read UNUSED)
 {
     return false;
 }
 
-inline bool IInputStream::last(bool read)
+inline bool IInputStream::last(bool read UNUSED)
 {
     return false;
 }
 
-inline bool IInputStream::first(bool read)
+inline bool IInputStream::setEntry(int entry UNUSED, bool read UNUSED)
 {
     return false;
 }
 
-inline bool IInputStream::setEntry(int entry, bool read)
-{
-    return false;
-}
-
-inline bool IInputStream::getObj(TObject*& obj, const std::string& objName)
+inline bool IInputStream::getObj(TObject*& obj UNUSED, const std::string& objName UNUSED)
 {
     return false;
 }

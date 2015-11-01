@@ -2,15 +2,16 @@
 #define NAV_INPUT_STREAM 0
 
 #include "IInputStream.h"
+#include "RootIOStream.h"
 #include "EvtNavigator/EvtNavigator.h"
 
-#include <stirng>
+#include <string>
 #include <vector>
 
 class RootFileReader;
 class NavTreeList;
 
-class NavInputStream : public IInputStream {
+class NavInputStream : public IInputStream, public RootIOStream {
 
     typedef std::vector<std::string> StringVector;
 
@@ -19,8 +20,6 @@ class NavInputStream : public IInputStream {
         ~NavInputStream();
         // Iniaizlie NavInputStream.
         bool initialize();
-        // Finalize NavInputStream.
-        bool finalize();
         // Get the EvtNavigator just read.
         JM::EvtNavigator* get();
         // Set the absolute entry to read.  If read is true read entry

@@ -1,8 +1,6 @@
 #ifndef ROOTIOSVC_ROOTOUTPUTSTREAM_H
 #define ROOTIOSVC_ROOTOUTPUTSTREAM_H
 
-#include "RootIOSvc/BaseIOStream.h"
-
 #include <map>
 #include <string>
 
@@ -13,7 +11,7 @@ namespace JM {
 class RootFileWriter;
 class TObject;
 
-class RootOutputStream : public BaseIOStream {
+class RootOutputStream {
 
 public:
 
