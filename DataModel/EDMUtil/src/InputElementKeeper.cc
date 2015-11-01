@@ -1,16 +1,23 @@
-#include "RootIOUtil/InputElementKeeper.h"
-#include "RootIOUtil/InputTreeManager.h"
-#include "RootIOUtil/InputFileManager.h"
-#include "RootIOUtil/SmartRefTable.h"
-#include "RootIOUtil/RootFileReader.h"
-#include "RootIOUtil/FileMetaData.h"
-#include "RootIOUtil/UniqueIDTable.h"
+#include "InputElementKeeper.h"
+#include "InputFileManager.h"
+#include "SmartRefTable.h"
+#include "RootFileInter.h"
+#include "FileMetaData.h"
+#include "UniqueIDTable.h"
+#include "PassiveStream.h"
 
 #include "TTree.h"
 #include "TFile.h"
 #include "TProcessID.h"
+#include <boost/foreach.hpp>
+#include <iostream>
 
 InputElementKeeper* InputElementKeeper::m_keeper = 0;
+
+InputElementKeeper::TreeInfo::TreeInfo(PassiveStream* ps, int index, int fileid, const std::vector<Long64_t>& bp)
+  : stream(ps), streamIndex(index), fileID(fileid), breakPoints(bp)
+{
+}
 
 InputElementKeeper::InputElementKeeper()
             : m_table(new SmartRefTable)
@@ -34,15 +41,9 @@ void InputElementKeeper::AddRef()
     ++m_refCount;
 }
 
-void InputElementKeeper::ClearTable()
+void InputElementKeeper::ClearTable(int fileid)
 {
-    String2FileIDs::iterator list = m_uuid2FileList.find(m_tempUUID);
-    if (list != m_uuid2FileList.end()) {
-        std::vector<int>::iterator it, end = list->second.end();
-        for (it = list->second.begin(); it != end; ++it) {
-            m_table->DeleteTable(*it);
-        }
-    }
+    m_table->DeleteTable(fileid);
 }
 
 void InputElementKeeper::DecRef()
@@ -78,29 +79,30 @@ int InputElementKeeper::RegisterFile(const std::string& filename, const JM::File
             ps = pos->second;
         }
         // Add this tree to the certain passive stream
-        int treeid = TreeInfoList.size();
-        int treeIndex = ps->AddTree(fileid, fmd->GetBreakPoints()[treeName]);
+        int treeid = m_treeInfoList.size();
+        int treeIndex = ps->AddTree(fileid);
         // Create a treeInfo
-        TreeInfoList.push_back(new TreeInfo(ps, treeIndex, fileid));
+        const std::vector<Long64_t>& bp = metadata->GetBreakPoints().find(treeName)->second;
+        m_treeInfoList.push_back(new TreeInfo(ps, treeIndex, fileid, bp));
         // Tell fileMgr about the info of this tree.
         // So that when a file need to be re-opened, we can update passive streams with new tree pointer
-        m_fileMgr->AddTreeInfo(treeid, treeName);
+        m_fileMgr->AddTreeInfo(fileid, treeid, treeName);
         // Add this file to the path2fileid map
         // Only need dir path, burn tree name
-        std::string path = treeName.subdir(0, treeName.rfind('/'));
+        std::string path = treeName.substr(0, treeName.rfind('/'));
         if (m_path2FileList.find(path) == m_path2FileList.end()) {
             m_path2FileList.insert(std::make_pair(path, std::vector<int>()));
         }
         // TODO redupiclated fileid?
-        m_path2FileList(path).push_back(fileid);
+        m_path2FileList[path].push_back(fileid);
     }
     // Add this file to the uuid2fileid map
-    const JM::FileMetaData::StringVector& uuidList = fmd->GetUUIDList();
+    const JM::FileMetaData::StringVector& uuidList = metadata->GetUUIDList();
     BOOST_FOREACH(const std::string& uuid, uuidList) {
         if (m_uuid2FileList.find(uuid) == m_uuid2FileList.end()) {
             m_uuid2FileList.insert(std::make_pair(uuid, std::vector<int>()));
         }
-        m_uuid2FileList(uuid).push_back(fileid);
+        m_uuid2FileList[uuid].push_back(fileid);
     }
     return fileid;
 }
@@ -157,11 +159,11 @@ bool InputElementKeeper::GetNavTree(int fileid, TTree*& tree)
         OpenFile(fileid); // TODO rubust check: fail to open file
     }
     TFile* file = m_fileMgr->GetFile(fileid);
-    tree = RootFileReader::GetNavTree(file);
+    tree = RootFileInter::GetTree(file, "Meta/navigator");
     return true;
 }
 
-std::string& InputElementKeeper::GetFileName(int fileid)
+const std::string& InputElementKeeper::GetFileName(int fileid)
 {
     return m_fileMgr->GetFileName(fileid);
 }
@@ -183,11 +185,11 @@ void InputElementKeeper::LoadUniqueID(int fileid)
     bool preStatus = CheckFileStatus(fileid);
     // TODO robust check: fail to get uidTable
     if (preStatus) {
-        uidTable = RootFileInterface::GetUniqueIDTable(GetFile(fileid));
+        uidTable = RootFileInter::GetUniqueIDTable(GetFile(fileid));
     }
     else {
-        TFile* file = RootFileReader::OpenFile(GetFileName(fileid));
-        uidTable = RootFileReader::GetUniqueIDTable(file);
+        TFile* file = RootFileInter::OpenFile(GetFileName(fileid));
+        uidTable = RootFileInter::GetUniqueIDTable(file);
         // Only open file when start to read object
         file->Close();
     }
@@ -211,14 +213,14 @@ void InputElementKeeper::OpenFile(int fileid)
     const std::string& filename = m_fileMgr->GetFileName(fileid);
     const std::map<int,std::string>& treeInfo = m_fileMgr->GetTreeInfo(fileid);
 
-    TFile* file = RootFileInterface::OpenFile(filename);
+    TFile* file = RootFileInter::OpenFile(filename);
     std::map<int,std::string>::const_iterator treeInfoIt;
-    for (treeInfoIt = treeInfo.first(); treeInfoIt != treeInfo.end(); ++treeInfoIt) {
+    for (treeInfoIt = treeInfo.begin(); treeInfoIt != treeInfo.end(); ++treeInfoIt) {
         // Update PassiveStream
-        TTree* tree = RootFileInterface::GetTree(treeInfo->second);
+        TTree* tree = RootFileInter::GetTree(file, treeInfoIt->second);
         int index =  m_treeInfoList[treeInfoIt->first]->streamIndex;
         PassiveStream* stream = m_treeInfoList[treeInfoIt->first]->stream;
-        stream->updateTree(index, tree);
+        stream->UpdateTree(index, tree);
     }
     // Update InputFileHandle
     m_fileMgr->UpdateFile(fileid, file);
@@ -244,12 +246,13 @@ void InputElementKeeper::ReadObject(Int_t uid, const TProcessID* pid, Long64_t e
         }
         // Sorry, the object is not in the input file list
         if (-1 == treeid) {
-            return 0;
+            return;
         }
     }
     // Tree id is found, now try to load object
     // Check status of the file holding the tree
-    int fileID = TreeInfoList[treeID]->fileID;
+    int fileID = m_treeInfoList[treeid]->fileID;
+    int streamIndex = m_treeInfoList[treeid]->streamIndex;
     bool status = this->CheckFileStatus(fileID);
     if (!status) {
         // File is closed, need to open
@@ -258,21 +261,21 @@ void InputElementKeeper::ReadObject(Int_t uid, const TProcessID* pid, Long64_t e
     Long64_t offset = 0;
     int offsetIndex = m_table->GetOffset(uid, pid);
     if (-1 != offsetIndex) {
-        offset = m_treeInfoList[treeid]->GetTreeOffset(offsetIndex);
+        offset = m_treeInfoList[treeid]->breakPoints[offsetIndex];
     }
-    TreeInfoList[treeID]->stream->ReadObject(entry + offset);
+    m_treeInfoList[treeid]->stream->ReadObject(streamIndex, entry + offset);
 }
 
 void InputElementKeeper::Notify(int option, Int_t uid, const TProcessID* pid, Long64_t entry)
 {
     switch (option) {
-        case : Read
+        case Read:
             ReadObject(uid, pid, entry);
             break;
-        case : New
+        case New:
             AddObjRef(uid, pid);
             break;
-        case : Delete
+        case Delete:
             DecObjRef(uid, pid);
             break;
     }
@@ -284,13 +287,13 @@ bool InputElementKeeper::GetObj(TObject*& obj, const std::string& fullName)
     std::string name = fullName.substr(fullName.find("::"));
     int fileid;
     if (path.size() == 0) {
-        fileid = m_path2FileList.begin()->second;
+        fileid = m_path2FileList.begin()->second[0];
     }
     else if (m_path2FileList.find(path) == m_path2FileList.end()) {
         return false;
     }
     else {
-        fileid = m_path2FileList.find(path)->second;
+        fileid = m_path2FileList.find(path)->second[0];
     }
 
     if (CheckFileStatus(fileid)) {

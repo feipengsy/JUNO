@@ -1,5 +1,6 @@
 #include "FileMetaData.h"
 
+ClassImp(JM::TreeMetaData);
 ClassImp(JM::FileMetaData);
 
 JM::FileMetaData::FileMetaData(const JM::FileMetaData& fmd)

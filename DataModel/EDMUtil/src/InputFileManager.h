@@ -14,8 +14,6 @@ public:
 
     InputFileHandle(const std::string& filename, int fileid);
     ~InputFileHandle();
-    // Close the file
-    void Close();
     // Update the pointer to TFile when file is re-opened
     void UpdateFile(TFile* file);
     // Get the pointer to TFile
@@ -68,8 +66,6 @@ public:
     void AddTreeInfo(int fileid, int treeid, const std::string& treename);
     // Add number of active trees by one
     void AddTreeRef(int fileid);
-    // Close the file
-    void CloseFile(int fileid);
     // Minus number of active trees by one
     void DecTreeRef(int fileid);
     void AddObjRef(int fileid);

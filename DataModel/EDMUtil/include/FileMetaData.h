@@ -2,11 +2,32 @@
 #define FILE_META_DATA_H 0
 
 #include "TObject.h"
-#include "TreeMetaData.h"
 #include <vector>
 #include <map>
 
 namespace JM {
+
+class TreeMetaData : public TObject {
+
+    public:
+        TreeMetaData() {}
+        ~TreeMetaData() {}
+
+        bool IsSameAs(const TreeMetaData* other) { return m_TreeName == other->m_TreeName && m_ObjName == other->m_ObjName; }
+        std::string& GetTreeName() { return m_TreeName; }
+        std::string& GetObjName() { return m_ObjName; }
+        const std::string& GetObjName() const { return m_ObjName; }
+        const std::string& GetTreeName() const { return m_TreeName; }
+        void SetTreeName(const std::string& value) { m_TreeName = value; }
+        void SetObjName(const std::string& value) { m_ObjName = value; }
+
+    private:
+        std::string m_TreeName;  // Tree name(path) of this tree
+        std::string m_ObjName;   // Name of object holded by this tree
+
+    ClassDef(TreeMetaData,1)
+
+};
 
 class FileMetaData : public TObject {
 

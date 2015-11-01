@@ -1,4 +1,4 @@
-#include "SmartRef.h"
+#include "EDMUtil/SmartRef.h"
 #include "InputElementKeeper.h"
 #include "Event/EventObject.h"
 #include "TClass.h"
@@ -149,7 +149,7 @@ JM::EventObject* JM::SmartRef::GetObject()
   JM::EventObject *obj = (JM::EventObject*)m_pid->GetObjectWithID(uid);
   if (!obj) {
       // Notify the InputElementKeeper to load the refereced object
-      InputElementKeeper::GetInputElementKeeper()->Notify(uid, m_pid, m_entry);
+      InputElementKeeper::GetInputElementKeeper()->Notify(InputElementKeeper::Read, uid, m_pid, m_entry);
       obj = (JM::EventObject*)m_pid->GetObjectWithID(uid);
   }
   // Add reference count

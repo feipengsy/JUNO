@@ -44,7 +44,7 @@ void InputFileHandle::AddTreeRef()
 void InputFileHandle::DecTreeRef()
 {
   --m_activeTrees;
-  this->CloseCheck();
+  this->CheckClose();
 }
 
 void InputFileHandle::AddObjRef()
@@ -55,7 +55,7 @@ void InputFileHandle::AddObjRef()
 void InputFileHandle::DecObjRef()
 {
   --m_activeEntries;
-  this->CloseCheck();
+  this->CheckClose();
 }
 
 void InputFileHandle::AddTreeInfo(int treeid, const std::string& treename) 
@@ -63,7 +63,7 @@ void InputFileHandle::AddTreeInfo(int treeid, const std::string& treename)
     m_treeInfo.insert(std::make_pair(treeid, treename));
 }
 
-void InputFileHandle::CloseCheck()
+void InputFileHandle::CheckClose()
 {
   if (m_activeTrees == 0 && m_activeEntries ==0) {
     this->Close();
@@ -101,17 +101,12 @@ int InputFileManager::FindFile(const std::string& filename)
 
 void InputFileManager::AddTreeInfo(int fileid, int treeid, const std::string& treename)
 {
-  m_files[fileid]->SetTreeInfo(treeid, treename);
+  m_files[fileid]->AddTreeInfo(treeid, treename);
 }
 
 void InputFileManager::AddTreeRef(int fileid)
 {
   m_files[fileid]->AddTreeRef();
-}
-
-void InputFileManager::CloseFile(int fileid)
-{
-  m_files[fileid]->Close();
 }
 
 void InputFileManager::DecTreeRef(int fileid)
@@ -139,7 +134,7 @@ void InputFileManager::UpdateFile(int fileid, TFile* file)
   m_files[fileid]->UpdateFile(file);
 }
 
-std::string& InputFileManager::GetFileName(int fileid)
+const std::string& InputFileManager::GetFileName(int fileid)
 {
   return m_files[fileid]->GetFileName();
 }
@@ -149,7 +144,7 @@ TFile* InputFileManager::GetFile(int fileid)
   return m_files[fileid]->GetFile();
 }
 
-std::map<int,std::string>& InputFileManager::GetTreeInfo(int fileid)
+const std::map<int,std::string>& InputFileManager::GetTreeInfo(int fileid)
 {
   return m_files[fileid]->GetTreeInfo();
 }

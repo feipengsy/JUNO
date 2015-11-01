@@ -15,8 +15,8 @@ PassiveStream::~PassiveStream()
 }
 
 PassiveStream::TreeHandle::TreeHandle(int fileid)
-  : tree(0)
-  , fileID(fileid)
+  : fileID(fileid)
+  , tree(0)
 {
 }
 
@@ -28,7 +28,7 @@ int PassiveStream::AddTree(int fileid)
 
 void PassiveStream::UpdateTree(int treeIndex, TTree* tree)
 {
-    m_trees[treeIndex].tree = tree;
+    m_trees[treeIndex]->tree = tree;
 }
 
 bool PassiveStream::ReadObject(int treeIndex, Long64_t entry)
@@ -40,5 +40,9 @@ bool PassiveStream::ReadObject(int treeIndex, Long64_t entry)
         m_lastReadTreeIndex = treeIndex;
         InputElementKeeper::GetInputElementKeeper()->AddTreeRef(m_trees[treeIndex]->fileID);
     }
-    m_trees[treeIndex]->tree->GetEntry(entry);
+    TBranch* branch = (TBranch*)m_trees[treeIndex]->tree->GetListOfBranches()->At(0);
+    if (!branch) return false;
+    void* addr = 0;
+    branch->SetAddress(&addr);
+    return branch->GetEntry(entry);
 }

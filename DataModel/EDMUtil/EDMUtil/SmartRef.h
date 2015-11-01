@@ -52,9 +52,6 @@ namespace JM
   
   // Set the referenced object
   void SetObject(EventObject* value);
-
-  // Set the branch ID, called by header object or EvtNavigator
-  void SetBranchID(Short_t value);
   
   // Get the refernced object
   EventObject* GetObject();
